@@ -98,11 +98,11 @@ def create_server() -> Any:
 
     @mcp.tool()
     def lookup_word(
-        query: str | list[str], direction: str | None = None, limit: int | None = None
+        words: str | list[str], direction: str | None = None, limit: int | None = None
     ) -> dict[str, Any]:
         """
         Look up one or more words. Pass a single string, or a list of up to 15
-        strings to look up many in one call. Output is keyed by input query;
+        words to look up many in one call. Output is keyed by input word;
         each result is a compact concept object with language keys such as en,
         et, and vro. Direction accepts the standard values en-vro, et-vro,
         vro-en, and vro-et; directed results include a direction field and only
@@ -112,21 +112,21 @@ def create_server() -> Any:
         Exact normalized matches are preferred; if none exist, lookup also
         searches inside stored comma-separated terms such as "church, temple".
         """
-        return tools.lookup_word(query, direction=direction, limit=limit)
+        return tools.lookup_word(words, direction=direction, limit=limit)
 
     @mcp.tool()
     def find_usage_examples(
-        query: str | list[str], source_type: str | None = None, limit: int | None = None
+        words: str | list[str], source_type: str | None = None, limit: int = 3
     ) -> dict[str, Any]:
         """
         Find real usage snippets from the local Võro corpus. Pass a single
-        string, or a list of up to 15 strings to search many terms at once.
-        Output is keyed by input query and contains short text snippets only.
+        word/phrase, or a list of up to 15 words/phrases to search many terms at once.
+        Output is keyed by input word/phrase and contains short text snippets only.
         Optional source_type filters: wiki_article for encyclopedia text,
         parallel_corpus_vro_side for translated/aligned text, and
         tei_literature for fiction/literature.
         """
-        return tools.find_usage_examples(query, source_type=source_type, limit=limit)
+        return tools.find_usage_examples(words, source_type=source_type, limit=limit)
 
     @mcp.tool()
     def word_exists_in_bag(words: str | list[str]) -> dict[str, Any]:

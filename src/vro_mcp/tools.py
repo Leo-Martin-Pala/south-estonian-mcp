@@ -179,12 +179,12 @@ class VroTools:
 
     def lookup_word(
         self,
-        query: str | list[str],
+        words: str | list[str],
         direction: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        queries, dropped = _prepare_batch(query, LOOKUP_CAP)
-        per = _per_item_limit(limit, batched=len(queries) > 1)
+        word_list, dropped = _prepare_batch(words, LOOKUP_CAP)
+        per = _per_item_limit(limit, batched=len(word_list) > 1)
         canonical_direction = normalize_public_direction(direction)
         if direction is not None and direction.strip() and canonical_direction is None:
             return {
@@ -195,8 +195,8 @@ class VroTools:
             }
         try:
             results = {
-                q: self.dictionary.lookup_word(q, direction=canonical_direction, limit=per)
-                for q in queries
+                w: self.dictionary.lookup_word(w, direction=canonical_direction, limit=per)
+                for w in word_list
             }
         except sqlite3.Error as exc:
             return self._db_unavailable("dictionary", self.settings.dictionary_db, exc)
@@ -207,16 +207,16 @@ class VroTools:
 
     def find_usage_examples(
         self,
-        query: str | list[str],
+        words: str | list[str],
         source_type: str | None = None,
-        limit: int | None = None,
+        limit: int = 3,
     ) -> dict[str, Any]:
-        queries, dropped = _prepare_batch(query, USAGE_CAP)
-        per = _per_item_limit(limit, batched=len(queries) > 1)
+        word_list, dropped = _prepare_batch(words, USAGE_CAP)
+        per = _per_item_limit(limit, batched=len(word_list) > 1)
         try:
             results = {
-                q: self.corpus.find_usage_examples(q, source_type=source_type, limit=per)
-                for q in queries
+                w: self.corpus.find_usage_examples(w, source_type=source_type, limit=per)
+                for w in word_list
             }
         except sqlite3.Error as exc:
             return self._db_unavailable("corpus", self.settings.corpus_db, exc)
