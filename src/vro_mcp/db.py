@@ -26,6 +26,7 @@ _DIRECTION_PAIRS = {
     "vro-en": ("vro", "en"),
     "vro-et": ("vro", "et"),
 }
+PUBLIC_DIRECTIONS = tuple(_DIRECTION_PAIRS)
 
 COMMON_TERM_MATCH_THRESHOLD = 5000
 _APOSTROPHE_VARIANTS = str.maketrans({
@@ -51,16 +52,25 @@ def _limit(value: int | None, default: int = 10, maximum: int = 50) -> int:
     return max(1, min(int(value), maximum))
 
 
+def normalize_public_direction(value: str | None) -> str | None:
+    if value is None:
+        return None
+    direction = value.strip().lower().replace(" ", "")
+    if not direction:
+        return None
+    return _DIRECTION_ALIASES.get(direction)
+
+
 def _parse_direction(value: str | None) -> tuple[str | None, str | None, str | None]:
+    canonical = normalize_public_direction(value)
+    if canonical:
+        source_lang, target_lang = _DIRECTION_PAIRS[canonical]
+        return canonical, source_lang, target_lang
     if value is None:
         return None, None, None
     direction = value.strip().lower().replace(" ", "")
     if not direction:
         return None, None, None
-    canonical = _DIRECTION_ALIASES.get(direction)
-    if canonical:
-        source_lang, target_lang = _DIRECTION_PAIRS[canonical]
-        return canonical, source_lang, target_lang
     if direction in {"en", "et", "vro"}:
         return None, direction, None
     return None, None, None

@@ -169,7 +169,8 @@ tick "I understand and wish to continue" → Create.
 Quick checks that the endpoint is live and the secret path is doing its job:
 
 ```sh
-# Should return JSON / an event stream (NOT 404) at the secret path:
+# Should reach the MCP route at the secret path. A 406 response asking for
+# text/event-stream is still a healthy reachability signal for a plain curl:
 curl -i https://<workspace>--vro-mcp-serve.modal.run/<secret>/mcp
 
 # Any other path should 404 (that's the point):

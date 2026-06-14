@@ -163,11 +163,11 @@ tool outputs are intentionally compact so MCP clients spend less context on
 internal IDs, debug metadata, and provenance fields.
 
 The open dictionary currently contains IDS concepts with English, Estonian, and
-Võro terms where available. `lookup_word` accepts standard direction values
-`en-vro`, `et-vro`, `vro-en`, and `vro-et`; directed results include the
-requested `direction`. Exact normalized matches are preferred; when no exact
-entry exists, lookup can also match inside stored terms such as comma-separated
-English glosses.
+Võro terms where available. Leave `lookup_word.direction` unset for a full
+concept lookup, or use `en-vro`, `et-vro`, `vro-en`, or `vro-et` for directed
+results. Exact normalized matches are preferred; when no exact entry exists,
+lookup can also match inside stored terms such as comma-separated English
+glosses.
 
 ## Resources
 
@@ -188,11 +188,11 @@ data` + `make giella`) downloads everything, so you normally configure nothing.
 The fetch scripts honour `VRO_DATA_REPO`, `VRO_DATA_TAG`, and `VRO_GIELLA_TAG`
 to point at a different release.
 
-All path defaults are repo-local; override any with environment variables or a
-local `.env` where the deploy script supports it.
+All path defaults are repo-local; override them with environment variables when
+needed. For Modal deploy defaults, copy `.env.example` to `.env`.
 
 <details>
-<summary><strong>Environment variables</strong></summary>
+<summary><strong>Advanced configuration</strong></summary>
 
 <br />
 
@@ -202,20 +202,9 @@ local `.env` where the deploy script supports it.
 | `VRO_CORPUS_DB` | `./data/vro_corpus.sqlite` | Corpus SQLite path used by `find_usage_examples`. |
 | `VRO_WORD_BAG_DB` | `./data/vro_word_bag.sqlite` | Word-bag SQLite path used by seen/unknown word checks. |
 | `VRO_NEUROTOLGE_BASE_URL` | `https://api.tartunlp.ai/translation/v2` | Neurotõlge/TartuNLP translation API base URL. |
-| `VRO_ANALYZER_CMD` | `./tools/giella/bin/analyze-vro` | Command used for GiellaLT morphological analysis. |
-| `VRO_GENERATOR_CMD` | `./tools/giella/bin/generate-vro` | Command used for one-analysis GiellaLT form generation. |
-| `VRO_SPELLER_CMD` | `./tools/giella/bin/spellcheck-vro` | Command used for token spellchecking. |
-| `VRO_GRAMMAR_CMD` | `./tools/giella/bin/grammar-check-vro` | Command used for sentence grammar checking. |
-| `VRO_ANALYZER_MODEL` | `./data/giella-share/giella/vro/analyser-gt-desc.hfstol` | Model path used by `tools/giella/bin/analyze-vro`. |
-| `VRO_GENERATOR_MODEL` | `./data/giella-share/giella/vro/generator-gt-norm.hfstol` | Model path used by `tools/giella/bin/generate-vro`. |
-| `VRO_SPELLER_MODEL` | `./data/giella-share/voikko/3/vro.zhfst` | Speller archive path used by `tools/giella/bin/spellcheck-vro`. |
-| `VRO_GRAMMAR_MODEL` | `./data/giella-share/voikko/4/vro.zcheck` | Grammar checker archive path used by `tools/giella/bin/grammar-check-vro`. |
-| `VRO_SPELLER_MAX_SUGGESTIONS` | `10` | Maximum spelling suggestions returned per unknown token. |
 | `VRO_DATA_REPO` | `Leo-Martin-Pala/voro-mcp` | GitHub repository used for dataset and Giella release downloads. |
 | `VRO_DATA_TAG` | `data-v1` | GitHub release tag fetched for `vro-data.tar.xz` by `scripts/fetch_data.sh` and Modal release hydration. |
 | `VRO_GIELLA_TAG` | `giella-v1` | GitHub release tag fetched for `giella-share.tar.xz` by `scripts/fetch_giella.sh` and Modal release hydration. |
-| `VRO_GIELLA_BUILD_DIR` | `./.cache/giella-build` | Temporary build directory for `make giella-build`. |
-| `VRO_GIELLA_ARTIFACT_DIR` | `./data/giella-share` | Output directory for locally built Giella artifacts. |
 | `MCP_PATH` | `/mcp` locally; generated in `.env` for Modal deploys | Secret hosted HTTP path segment for Modal; local stdio clients do not need it. |
 | `DATA_SOURCE` | `release` | Modal deploy data source: `release`, `local`, or `none`. |
 | `FORCE_DATA` | `0` | Set to `1` to overwrite existing Modal Volume data. |

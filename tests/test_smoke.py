@@ -11,7 +11,7 @@ from vro_mcp.config import load_settings
 from vro_mcp.db import CorpusStore, DictionaryStore, normalize_db_text
 from vro_mcp.giella import GiellaAdapter
 from vro_mcp.server import _mcp_path_from_env, _read_resource
-from vro_mcp.tools import VroTools, _parse_spellcheck_lines
+from vro_mcp.tools import VroTools, _parse_grammar_lines, _parse_spellcheck_lines
 
 
 DATA_HINT = "run `make data` (or `make setup`) to download the datasets"
@@ -314,6 +314,36 @@ class SmokeTests(unittest.TestCase):
         self.assertEqual(result["forms"], ["kerikun"])
         self.assertEqual(tools.giella.call, ("kerik", "N+Sg+Ine"))
 
+    def test_grammar_parser_structures_json_lines(self) -> None:
+        parsed = _parse_grammar_lines(
+            [
+                '{"errs":[["tekstt",12,18,"typo","typo",["testt"],"typo"]],"text":"Miä olõ hüä tekstt."}'
+            ]
+        )
+        self.assertEqual(
+            parsed,
+            {
+                "errors": [
+                    {
+                        "word": "tekstt",
+                        "span": [12, 18],
+                        "type": "typo",
+                        "code": "typo",
+                        "suggestions": ["testt"],
+                        "message": "typo",
+                    }
+                ],
+                "text": "Miä olõ hüä tekstt.",
+            },
+        )
+
+    def test_grammar_check_returns_structured_errors(self) -> None:
+        self._require_giella("grammar")
+        result = self.tools.grammar_check_vro("Miä olõ hüä tekstt.")
+        self.assertIn("errors", result)
+        self.assertNotIn("lines", result)
+        self.assertTrue(any(error["word"] == "tekstt" for error in result["errors"]))
+
     def test_lookup_word_accepts_standard_direction(self) -> None:
         self._require_db("dictionary")
         out = self.tools.lookup_word("vesi", direction="vro-en", limit=1)
@@ -337,6 +367,12 @@ class SmokeTests(unittest.TestCase):
                 self.assertEqual(result["direction"], direction)
                 self.assertTrue(result[source_lang])
                 self.assertTrue(result[target_lang])
+
+    def test_lookup_word_rejects_invalid_direction(self) -> None:
+        out = self.tools.lookup_word("vesi", direction="ev")
+        self.assertEqual(out["error"], "invalid_direction")
+        self.assertEqual(out["valid_directions"], ["en-vro", "et-vro", "vro-en", "vro-et"])
+        self.assertIn("unset", out["detail"])
 
     def test_grammar_resources_are_readable(self) -> None:
         self.assertIn("Võro noun declension", _read_resource("resources/noun-cases.md"))

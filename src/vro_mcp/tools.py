@@ -1,12 +1,20 @@
 from __future__ import annotations
 
+import json
 import sqlite3
 import re
 from typing import Any
 
 from .config import Settings
 from .correction import CorrectionSuggester
-from .db import CorpusStore, DictionaryStore, WordBagStore, normalize_db_text
+from .db import (
+    PUBLIC_DIRECTIONS,
+    CorpusStore,
+    DictionaryStore,
+    WordBagStore,
+    normalize_db_text,
+    normalize_public_direction,
+)
 from .estonian_leakage import EstonianLeakageLinter
 from .giella import GiellaAdapter
 from .neurotolge import NeurotolgeClient
@@ -92,6 +100,38 @@ def _parse_spellcheck_lines(lines: list[str]) -> list[dict[str, Any]]:
     return unknown
 
 
+def _parse_grammar_lines(lines: list[str]) -> dict[str, Any]:
+    errors: list[dict[str, Any]] = []
+    text: str | None = None
+    for line in lines:
+        try:
+            payload = json.loads(line)
+        except json.JSONDecodeError:
+            return {"lines": lines}
+        if not isinstance(payload, dict):
+            return {"lines": lines}
+        if isinstance(payload.get("text"), str):
+            text = payload["text"]
+        for item in payload.get("errs", []):
+            if not isinstance(item, list) or len(item) < 7:
+                continue
+            suggestions = item[5] if isinstance(item[5], list) else []
+            errors.append(
+                {
+                    "word": item[0],
+                    "span": [item[1], item[2]],
+                    "type": item[3],
+                    "code": item[4],
+                    "suggestions": suggestions,
+                    "message": item[6],
+                }
+            )
+    out: dict[str, Any] = {"errors": errors}
+    if text is not None:
+        out["text"] = text
+    return out
+
+
 class VroTools:
     def __init__(self, settings: Settings):
         self.settings = settings
@@ -116,9 +156,17 @@ class VroTools:
     ) -> dict[str, Any]:
         queries, dropped = _prepare_batch(query, LOOKUP_CAP)
         per = _per_item_limit(limit, batched=len(queries) > 1)
+        canonical_direction = normalize_public_direction(direction)
+        if direction is not None and direction.strip() and canonical_direction is None:
+            return {
+                "error": "invalid_direction",
+                "direction": direction,
+                "valid_directions": list(PUBLIC_DIRECTIONS),
+                "detail": "Leave direction unset for full concept lookup.",
+            }
         try:
             results = {
-                q: self.dictionary.lookup_word(q, direction=direction, limit=per)
+                q: self.dictionary.lookup_word(q, direction=canonical_direction, limit=per)
                 for q in queries
             }
         except sqlite3.Error as exc:
@@ -290,7 +338,7 @@ class VroTools:
         result = self.giella.grammar_check_vro(text)
         if not result.get("available"):
             return result
-        return {"lines": result.get("lines", [])}
+        return _parse_grammar_lines(result.get("lines", []))
 
     def translate_vro(
         self,
