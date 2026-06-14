@@ -36,21 +36,11 @@ class CorrectionSuggester:
     def suggest_correction(self, form: str) -> dict[str, Any]:
         original = form.strip()
         if not original:
-            return {"form": original, "status": "empty", "best": None, "candidates": []}
+            return {"form": original, "valid": False, "alternatives": []}
 
         original_analysis = self.giella.analyze_words([original])
         if self._is_weight_zero(original_analysis, original):
-            return {
-                "form": original,
-                "status": "already_valid",
-                "best": {
-                    "form": original,
-                    "source": "analyzer",
-                    "confidence": "confirmed",
-                    "analyses": original_analysis["results"][original]["lines"],
-                },
-                "candidates": [],
-            }
+            return {"form": original, "valid": True, "alternatives": []}
 
         candidates: dict[str, Candidate] = {}
 
@@ -93,12 +83,10 @@ class CorrectionSuggester:
         confirmed = [candidate for candidate in analyzed.values() if candidate.analyses]
         confirmed.sort(key=self._ranking_key)
 
-        best = self._candidate_payload(confirmed[0]) if confirmed else None
         return {
             "form": original,
-            "status": "suggested" if best else "no_confirmed_candidate",
-            "best": best,
-            "candidates": [self._candidate_payload(candidate) for candidate in confirmed[:10]],
+            "valid": False,
+            "alternatives": [candidate.form for candidate in confirmed[:3]],
         }
 
     def _generate_inflection_candidates(
@@ -225,23 +213,6 @@ class CorrectionSuggester:
             candidate = Candidate(cleaned, source, source_rank, score, [])
             candidates[cleaned] = candidate
         candidate.add(source, source_rank, score, detail)
-
-    @staticmethod
-    def _candidate_payload(candidate: Candidate) -> dict[str, Any]:
-        sources = {detail.get("source") for detail in candidate.details}
-        source = (
-            "combined"
-            if len(sources) > 1
-            else candidate.details[0]["source"]
-            if candidate.details
-            else candidate.source
-        )
-        return {
-            "form": candidate.form,
-            "source": source,
-            "confidence": "confirmed",
-            "analyses": candidate.analyses,
-        }
 
     @staticmethod
     def _ranking_key(candidate: Candidate) -> tuple[int, int, float, int, str]:

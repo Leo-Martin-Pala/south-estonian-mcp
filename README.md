@@ -146,17 +146,18 @@ From least to most system-wide. Do the steps that apply, from the repo root.
 | `lookup_word` | Compact dictionary concept lookup (`en`/`et`/`vro` language lists), with exact lookup before term substring fallback. |
 | `find_usage_examples` | Full-text corpus search returning short text snippets. |
 | `word_exists_in_bag` | Fast word-bag count check; `0` means absent. |
+| `count_text` | Lean text length counter returning `characters`, `words`, and `estimated_sentences` for drafting constraints. |
 | `find_unknown_words` | List word forms in a text absent from the word bag. |
 | `find_unrecognized_words` | List text word forms that the GiellaLT analyzer returns as `+?`, with optional word-bag prefiltering. |
 | `analyze_word` | GiellaLT morphological analysis. |
 | `generate_forms` | GiellaLT generation for one exact lemma + tag analysis. |
-| `spellcheck_vro` | Token-level spellcheck returning `{"unknown": [...]}` with deduped words and up to three ranked suggestions per word. |
-| `grammar_check_vro` | Sentence-level grammar check returning `{"errors": [...]}` with spans, compact codes, and up to three suggestions per issue. |
+| `spellcheck_vro` | Token-level spellcheck returning `{"unknown": [...]}` with deduped words and up to three ranked suggestions per word. Defaults to 10 unknown words; `limit` can raise this up to 50. |
+| `grammar_check_vro` | Sentence-level grammar check returning `{"errors": [...]}` with spans, compact codes, and up to three suggestions per issue. Defaults to 10 errors; `limit` can raise this up to 50. |
 | `find_estonian_leakage` | Scan a larger text and return a slim, deduped list of word forms with Estonian-looking endings. |
 | `lint_estonian_leakage` | In-depth check of specific words/phrases: severities, messages, and hints. |
-| `suggest_correction` | Analyzer-verified fixes for a bad/unknown form. |
+| `suggest_correction` | Analyzer-verified correction alternatives for a bad/unknown form, capped to three ranked forms. |
 | `translate_vro` | Neurotõlge/TartuNLP translation. |
-| `check_setup` | Report database and external Giella tool availability. |
+| `check_setup` | Compact setup health: healthy components are `true`; failures include diagnostics. |
 
 Most lookup tools accept a single word or a list for batched queries. Successful
 tool outputs are intentionally compact so MCP clients spend less context on

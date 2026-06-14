@@ -76,14 +76,6 @@ def _parse_direction(value: str | None) -> tuple[str | None, str | None, str | N
     return None, None, None
 
 
-def _available_directions(languages: set[str]) -> list[str]:
-    return [
-        direction
-        for direction, (source_lang, target_lang) in _DIRECTION_PAIRS.items()
-        if source_lang in languages and target_lang in languages
-    ]
-
-
 def normalize_db_text(value: str) -> str:
     """Normalize text the same way the SQLite lookup keys are stored."""
     text = unicodedata.normalize("NFD", value.strip().translate(_APOSTROPHE_VARIANTS))
@@ -220,9 +212,6 @@ class DictionaryStore:
             if allowed_languages is not None and row["language"] not in allowed_languages:
                 continue
             concept.setdefault(row["language"], []).append(self._format_term(row))
-        if not direction:
-            languages = {key for key in concept if key in {"en", "et", "vro"}}
-            concept["available_directions"] = _available_directions(languages)
         return concept
 
 

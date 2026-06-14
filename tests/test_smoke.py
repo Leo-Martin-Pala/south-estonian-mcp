@@ -11,7 +11,7 @@ from vro_mcp.config import load_settings
 from vro_mcp.db import CorpusStore, DictionaryStore, normalize_db_text
 from vro_mcp.giella import GiellaAdapter
 from vro_mcp.server import _mcp_path_from_env, _read_resource
-from vro_mcp.tools import VroTools, _parse_grammar_lines, _parse_spellcheck_lines
+from vro_mcp.tools import VroTools, _count_text, _parse_grammar_lines, _parse_spellcheck_lines
 
 
 DATA_HINT = "run `make data` (or `make setup`) to download the datasets"
@@ -24,10 +24,12 @@ class SmokeTests(unittest.TestCase):
         cls.tools = VroTools(load_settings())
         status = cls.tools.check_setup()
         cls.db_available = {
-            name: bool(info.get("available")) for name, info in status["databases"].items()
+            name: bool(info if isinstance(info, bool) else info.get("available"))
+            for name, info in status["databases"].items()
         }
         cls.giella_available = {
-            key: bool(info.get("available")) for key, info in status["giella"].items()
+            key: bool(info if isinstance(info, bool) else info.get("available"))
+            for key, info in status["giella"].items()
         }
 
     def _require_db(self, *names: str) -> None:
@@ -47,6 +49,7 @@ class SmokeTests(unittest.TestCase):
         self.assertTrue(results)
         self.assertEqual(results[0]["en"], ["world"])
         self.assertIn("maailm", results[0]["vro"])
+        self.assertNotIn("available_directions", results[0])
 
     def test_lookup_word_batched_is_keyed(self) -> None:
         self._require_db("dictionary")
@@ -128,6 +131,23 @@ class SmokeTests(unittest.TestCase):
         out = self.tools.word_exists_in_bag(["Miä", "xyzzyvrotest"])
         self.assertGreater(out["Miä"], 0)
         self.assertEqual(out["xyzzyvrotest"], 0)
+
+    def test_count_text_counts_voro_prose_shape(self) -> None:
+        text = "Miä olõ-i hüä. Tuust huul'maldaq 110,000 rubla!"
+        self.assertEqual(
+            self.tools.count_text(text),
+            {
+                "characters": len(text),
+                "words": 7,
+                "estimated_sentences": 2,
+            },
+        )
+
+    def test_count_text_empty_text(self) -> None:
+        self.assertEqual(
+            _count_text(""),
+            {"characters": 0, "words": 0, "estimated_sentences": 0},
+        )
 
     def test_find_unknown_words_runs(self) -> None:
         self._require_db("word_bag")
@@ -242,16 +262,20 @@ class SmokeTests(unittest.TestCase):
     def test_suggest_correction_returns_valid_form_as_already_valid(self) -> None:
         self._require_giella("analyzer")
         result = self.tools.suggest_correction("köüdet")
-        self.assertEqual(result["status"], "already_valid")
-        self.assertEqual(result["best"]["form"], "köüdet")
+        self.assertTrue(result["valid"])
+        self.assertEqual(result["alternatives"], [])
+        self.assertNotIn("status", result)
+        self.assertNotIn("analyses", result)
 
     def test_suggest_correction_combines_dictionary_generation_and_analyzer(self) -> None:
         result = self.tools.suggest_correction("seotud")
-        if result.get("best", {}).get("form") != "köüdet":
+        if not result.get("alternatives") or result["alternatives"][0] != "köüdet":
             self.skipTest("public dictionary does not contain the expected köütmä correction path")
-        self.assertEqual(result["status"], "suggested")
-        self.assertEqual(result["best"]["form"], "köüdet")
-        self.assertTrue(any(line.endswith("\t0") for line in result["best"]["analyses"]))
+        self.assertFalse(result["valid"])
+        self.assertEqual(result["alternatives"][0], "köüdet")
+        self.assertLessEqual(len(result["alternatives"]), 3)
+        self.assertNotIn("best", result)
+        self.assertNotIn("candidates", result)
 
     def test_spellcheck_tokenizes_sentence_input(self) -> None:
         self._require_giella("speller")
@@ -278,6 +302,19 @@ class SmokeTests(unittest.TestCase):
             parsed,
             {"unknown": [{"word": "tarton", "suggestions": ["tarto", "tarõn", "taro"]}]},
         )
+
+    def test_spellcheck_parser_caps_unknown_words(self) -> None:
+        parsed = _parse_spellcheck_lines(
+            [
+                '"üks" is NOT in the lexicon:',
+                "üts    1.000000",
+                '"kats" is NOT in the lexicon:',
+                "katś    1.000000",
+            ],
+            limit=1,
+        )
+        self.assertEqual(parsed["unknown"], [{"word": "üks", "suggestions": ["üts"]}])
+        self.assertTrue(parsed["truncated"])
 
     def test_generate_forms_runs_with_giella_tags(self) -> None:
         self._require_giella("generator")
@@ -328,6 +365,19 @@ class SmokeTests(unittest.TestCase):
                 ],
             },
         )
+
+    def test_grammar_parser_caps_errors(self) -> None:
+        parsed = _parse_grammar_lines(
+            [
+                '{"errs":[["üks",0,3,"typo","typo",["üts"],"typo"],["kats",4,8,"typo","typo",["katś"],"typo"]],"text":"üks kats"}'
+            ],
+            limit=1,
+        )
+        self.assertEqual(
+            parsed["errors"],
+            [{"word": "üks", "span": [0, 3], "code": "typo", "suggestions": ["üts"]}],
+        )
+        self.assertTrue(parsed["truncated"])
 
     def test_grammar_check_returns_structured_errors(self) -> None:
         self._require_giella("grammar")
@@ -424,7 +474,7 @@ class SmokeTests(unittest.TestCase):
         self._require_db("dictionary")
         result = self.tools.check_setup()
         self.assertIn("databases", result)
-        self.assertTrue(result["databases"]["dictionary"]["available"])
+        self.assertTrue(result["databases"]["dictionary"])
 
 
 if __name__ == "__main__":

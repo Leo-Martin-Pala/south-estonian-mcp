@@ -106,7 +106,9 @@ def create_server() -> Any:
         each result is a compact concept object with language keys such as en,
         et, and vro. Direction accepts the standard values en-vro, et-vro,
         vro-en, and vro-et; directed results include a direction field and only
-        that source/target language pair. Leave direction unset when unsure.
+        that source/target language pair. Leave direction unset by default for
+        broader coverage; use direction only when that pair is specifically
+        needed.
         Exact normalized matches are preferred; if none exist, lookup also
         searches inside stored comma-separated terms such as "church, temple".
         """
@@ -135,6 +137,18 @@ def create_server() -> Any:
         Existence does not prove the form is standard or correct in context.
         """
         return tools.word_exists_in_bag(words)
+
+    @mcp.tool()
+    def count_text(text: str) -> dict[str, int]:
+        """
+        Count output length for drafting constraints. Returns only
+        {"characters": int, "words": int, "estimated_sentences": int}.
+        Characters include spaces and punctuation. Words include normal prose
+        words and numbers, preserving Võro apostrophe and hyphenated forms as
+        one word where possible. Sentence count is an estimate from terminal
+        punctuation.
+        """
+        return tools.count_text(text)
 
     @mcp.tool()
     def find_unknown_words(text: str, limit: int = 50) -> dict[str, Any]:
@@ -169,6 +183,11 @@ def create_server() -> Any:
         list of up to 100 words analyzed in one pass; the response is keyed by
         input form. Each value is a compact list of analysis strings; an empty
         list means no recognized analysis. Treat output as guidance.
+
+        Note: spellcheck_vro, grammar_check_vro, analyze_word, and suggest_correction
+        use related but not identical Giella/Divvun checks. A word may be morphologically
+        analyzable while still being flagged by the speller or grammar checker. Treat
+        spell/grammar results as warnings, not final proof.
         """
         return tools.analyze_word(words)
 
@@ -201,10 +220,15 @@ def create_server() -> Any:
     @mcp.tool()
     def suggest_correction(form: str) -> dict[str, Any]:
         """
-        Suggest the best Võro correction for one bad or unknown form by combining
-        speller suggestions, compact dictionary concepts, generated forms, and
-        analyzer confirmation. The best result is only promoted when the
-        candidate analyzes at weight 0.
+        Suggest compact Võro corrections for one bad or unknown form. Returns
+        {"form": ..., "valid": bool, "alternatives": [...]} with up to three
+        analyzer-confirmed alternatives ranked best to worst. If valid is true,
+        the form already analyzes cleanly and alternatives is empty.
+
+        Note: spellcheck_vro, grammar_check_vro, analyze_word, and suggest_correction
+        use related but not identical Giella/Divvun checks. A word may be morphologically
+        analyzable while still being flagged by the speller or grammar checker. Treat
+        spell/grammar results as warnings, not final proof.
         """
         return tools.suggest_correction(form)
 
@@ -222,26 +246,38 @@ def create_server() -> Any:
         return tools.generate_forms(lemma, tags=tags)
 
     @mcp.tool()
-    def spellcheck_vro(text: str) -> dict[str, Any]:
+    def spellcheck_vro(text: str, limit: int | None = None) -> dict[str, Any]:
         """
         Token-level Võro spellcheck with GiellaLT/Divvun. Checks each word form
         against the speller lexicon and returns {"unknown": [...]} with
         deduplicated unknown words and up to three ranked correction suggestions
-        per word. It does not judge sentence grammar; suggestions may be
-        incomplete or wrong.
+        per word. Returns at most 10 unknown words by default; raise limit up to
+        50 when checking longer text. It does not judge sentence grammar;
+        suggestions may be incomplete or wrong.
+
+        Note: spellcheck_vro, grammar_check_vro, analyze_word, and suggest_correction
+        use related but not identical Giella/Divvun checks. A word may be morphologically
+        analyzable while still being flagged by the speller or grammar checker. Treat
+        spell/grammar results as warnings, not final proof.
         """
-        return tools.spellcheck_vro(text)
+        return tools.spellcheck_vro(text, limit=limit)
 
     @mcp.tool()
-    def grammar_check_vro(text: str) -> dict[str, Any]:
+    def grammar_check_vro(text: str, limit: int | None = None) -> dict[str, Any]:
         """
         Sentence-level Võro grammar check with GiellaLT/Divvun. Returns
         {"errors": [...]} with structured error spans when the grammar checker
         detects issues, including some typos. Each error includes the word, span,
-        compact code, and up to three suggestions. Use as a weak warning signal,
-        not a final authority.
+        compact code, and up to three suggestions. Returns at most 10 errors by
+        default; raise limit up to 50 when checking longer text. Use as a weak
+        warning signal, not a final authority.
+
+        Note: spellcheck_vro, grammar_check_vro, analyze_word, and suggest_correction
+        use related but not identical Giella/Divvun checks. A word may be morphologically
+        analyzable while still being flagged by the speller or grammar checker. Treat
+        spell/grammar results as warnings, not final proof.
         """
-        return tools.grammar_check_vro(text)
+        return tools.grammar_check_vro(text, limit=limit)
 
     @mcp.tool()
     def translate_vro(text: str, source_lang: str | None = None, target_lang: str | None = None) -> dict[str, Any]:
@@ -257,7 +293,10 @@ def create_server() -> Any:
 
     @mcp.tool()
     def check_setup() -> dict[str, Any]:
-        """Report configured external-tool availability."""
+        """
+        Report compact database and Giella availability. Healthy components are
+        true; unavailable components include diagnostic details and setup hints.
+        """
         return tools.check_setup()
 
     return mcp

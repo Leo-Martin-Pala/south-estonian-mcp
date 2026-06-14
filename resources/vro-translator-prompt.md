@@ -57,6 +57,12 @@ the file wins, if that file is available; tools can lag the standard. When the
 file is unavailable, treat tool outputs as evidence and warnings, not absolute
 truth.
 
+Note: spellcheck_vro, grammar_check_vro, analyze_word, and suggest_correction use
+related but not identical Giella/Divvun checks. A word may be morphologically
+analyzable while still being flagged by the speller or grammar checker. Treat
+spell/grammar results as warnings, not final proof.
+
+
 ## Default workflow
 
 1. **Understand the source text before translating.** Identify the genre (news,
@@ -118,6 +124,8 @@ truth.
    * `generate_forms` when the lemma is known but the required inflected form is
      uncertain.
    * `word_exists_in_bag` to check whether a surface form has attested usage.
+   * `count_text` when the user asks for a target word count, character limit,
+     or sentence-length constraint.
    * `suggest_correction` for a single bad-looking or unknown form.
    * `lint_estonian_leakage` for the in-depth check of specific words or phrases
      you want rule IDs, severities, messages, and hints for.

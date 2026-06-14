@@ -30,7 +30,14 @@ ANALYZE_CAP = 100
 LEAKAGE_CAP = 100
 UNRECOGNIZED_LIMIT = 500
 _SPELL_SUGGESTION_RE = re.compile(r"^(?P<form>.+?)\s+(?P<score>-?\d+(?:\.\d+)?)$")
+_COUNT_WORD_RE = re.compile(
+    r"[^\W_]+(?:(?:['ʼ´’‘-][^\W_]+)|(?:[.,][0-9]+))*",
+    re.UNICODE,
+)
+_SENTENCE_END_RE = re.compile(r"[.!?…]+(?:[\"')\]\}»”’]+)?(?=\s|$)")
 SUGGESTION_LIMIT = 3
+FINDING_LIMIT_DEFAULT = 10
+FINDING_LIMIT_MAX = 50
 
 
 def _prepare_batch(value: str | list[str] | None, cap: int) -> tuple[list[str], int]:
@@ -71,10 +78,18 @@ def _output_limit(limit: int | None, default: int = 50, maximum: int = UNRECOGNI
     return max(1, min(int(limit), maximum))
 
 
-def _parse_spellcheck_lines(lines: list[str]) -> dict[str, Any]:
+def _finding_limit(limit: int | None) -> int:
+    if limit is None:
+        return FINDING_LIMIT_DEFAULT
+    return max(1, min(int(limit), FINDING_LIMIT_MAX))
+
+
+def _parse_spellcheck_lines(lines: list[str], limit: int | None = None) -> dict[str, Any]:
+    max_findings = _finding_limit(limit)
     unknown: list[dict[str, Any]] = []
     current: dict[str, Any] | None = None
     seen_words: set[str] = set()
+    truncated = False
     for line in lines:
         stripped = line.strip()
         if not stripped:
@@ -85,6 +100,10 @@ def _parse_spellcheck_lines(lines: list[str]) -> dict[str, Any]:
                 current = None
                 continue
             seen_words.add(word)
+            if len(unknown) >= max_findings:
+                current = None
+                truncated = True
+                continue
             current = {"word": word, "suggestions": []}
             unknown.append(current)
             continue
@@ -93,11 +112,16 @@ def _parse_spellcheck_lines(lines: list[str]) -> dict[str, Any]:
         match = _SPELL_SUGGESTION_RE.match(stripped)
         if match and len(current["suggestions"]) < SUGGESTION_LIMIT:
             current["suggestions"].append(match.group("form"))
-    return {"unknown": unknown}
+    out: dict[str, Any] = {"unknown": unknown}
+    if truncated:
+        out["truncated"] = True
+    return out
 
 
-def _parse_grammar_lines(lines: list[str]) -> dict[str, Any]:
+def _parse_grammar_lines(lines: list[str], limit: int | None = None) -> dict[str, Any]:
+    max_findings = _finding_limit(limit)
     errors: list[dict[str, Any]] = []
+    truncated = False
     for line in lines:
         try:
             payload = json.loads(line)
@@ -108,6 +132,9 @@ def _parse_grammar_lines(lines: list[str]) -> dict[str, Any]:
         for item in payload.get("errs", []):
             if not isinstance(item, list) or len(item) < 7:
                 continue
+            if len(errors) >= max_findings:
+                truncated = True
+                continue
             suggestions = item[5] if isinstance(item[5], list) else []
             errors.append(
                 {
@@ -117,7 +144,21 @@ def _parse_grammar_lines(lines: list[str]) -> dict[str, Any]:
                     "suggestions": suggestions[:SUGGESTION_LIMIT],
                 }
             )
-    return {"errors": errors}
+    out: dict[str, Any] = {"errors": errors}
+    if truncated:
+        out["truncated"] = True
+    return out
+
+
+def _count_text(text: str) -> dict[str, int]:
+    words = len(_COUNT_WORD_RE.findall(text))
+    sentence_marks = len(_SENTENCE_END_RE.findall(text))
+    estimated_sentences = max(1, sentence_marks) if words else 0
+    return {
+        "characters": len(text),
+        "words": words,
+        "estimated_sentences": estimated_sentences,
+    }
 
 
 class VroTools:
@@ -200,6 +241,9 @@ class VroTools:
         if dropped:
             out["_dropped"] = dropped
         return out
+
+    def count_text(self, text: str) -> dict[str, int]:
+        return _count_text(text)
 
     def find_unknown_words(self, text: str, limit: int = 50) -> dict[str, Any]:
         try:
@@ -316,17 +360,17 @@ class VroTools:
                 forms.append(parts[1].strip())
         return {"forms": forms}
 
-    def spellcheck_vro(self, text: str) -> dict[str, Any]:
+    def spellcheck_vro(self, text: str, limit: int | None = None) -> dict[str, Any]:
         result = self.giella.spellcheck_vro(text)
         if not result.get("available"):
             return result
-        return _parse_spellcheck_lines(result.get("lines", []))
+        return _parse_spellcheck_lines(result.get("lines", []), limit=limit)
 
-    def grammar_check_vro(self, text: str) -> dict[str, Any]:
+    def grammar_check_vro(self, text: str, limit: int | None = None) -> dict[str, Any]:
         result = self.giella.grammar_check_vro(text)
         if not result.get("available"):
             return result
-        return _parse_grammar_lines(result.get("lines", []))
+        return _parse_grammar_lines(result.get("lines", []), limit=limit)
 
     def translate_vro(
         self,
@@ -337,7 +381,7 @@ class VroTools:
         return self.neurotolge.translate(text, source_lang=source_lang, target_lang=target_lang)
 
     def check_setup(self) -> dict[str, Any]:
-        return {
+        detailed = {
             "databases": {
                 "dictionary": self._db_availability(
                     "dictionary",
@@ -368,6 +412,7 @@ class VroTools:
             },
             "giella": self.giella.availability(),
         }
+        return self._compact_setup(detailed)
 
     @staticmethod
     def _db_unavailable(name: str, path: Any, exc: Exception) -> dict[str, Any]:
@@ -413,3 +458,12 @@ class VroTools:
         except sqlite3.Error as exc:
             return cls._db_unavailable(name, path, exc)
         return {"available": True, "path": str(path)}
+
+    @staticmethod
+    def _compact_setup(detailed: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+        compact: dict[str, dict[str, Any]] = {}
+        for group, items in detailed.items():
+            compact[group] = {}
+            for name, info in items.items():
+                compact[group][name] = True if info.get("available") else info
+        return compact
