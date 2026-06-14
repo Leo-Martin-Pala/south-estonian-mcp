@@ -300,7 +300,11 @@ class SmokeTests(unittest.TestCase):
         )
         self.assertEqual(
             parsed,
-            {"unknown": [{"word": "tarton", "suggestions": ["tarto", "tarõn", "taro"]}]},
+            {
+                "unknown": [{"word": "tarton", "suggestions": ["tarto", "tarõn", "taro"]}],
+                "returned": 1,
+                "total_unknown": 1,
+            },
         )
 
     def test_spellcheck_parser_caps_unknown_words(self) -> None:
@@ -314,7 +318,8 @@ class SmokeTests(unittest.TestCase):
             limit=1,
         )
         self.assertEqual(parsed["unknown"], [{"word": "üks", "suggestions": ["üts"]}])
-        self.assertTrue(parsed["truncated"])
+        self.assertEqual(parsed["returned"], 1)
+        self.assertEqual(parsed["total_unknown"], 2)
 
     def test_generate_forms_runs_with_giella_tags(self) -> None:
         self._require_giella("generator")
@@ -363,6 +368,8 @@ class SmokeTests(unittest.TestCase):
                         "suggestions": ["testt", "teksti", "tekstõ"],
                     }
                 ],
+                "returned": 1,
+                "total_errors": 1,
             },
         )
 
@@ -377,7 +384,8 @@ class SmokeTests(unittest.TestCase):
             parsed["errors"],
             [{"word": "üks", "span": [0, 3], "code": "typo", "suggestions": ["üts"]}],
         )
-        self.assertTrue(parsed["truncated"])
+        self.assertEqual(parsed["returned"], 1)
+        self.assertEqual(parsed["total_errors"], 2)
 
     def test_grammar_check_returns_structured_errors(self) -> None:
         self._require_giella("grammar")

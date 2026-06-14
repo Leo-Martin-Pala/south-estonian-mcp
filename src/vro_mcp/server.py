@@ -98,7 +98,10 @@ def create_server() -> Any:
 
     @mcp.tool()
     def lookup_word(
-        words: str | list[str], direction: str | None = None, limit: int | None = None
+        words: str | list[str] | None = None,
+        word: str | list[str] | None = None,
+        direction: str | None = None,
+        limit: int | None = None,
     ) -> dict[str, Any]:
         """
         Look up one or more words. Pass a single string, or a list of up to 15
@@ -111,12 +114,19 @@ def create_server() -> Any:
         needed.
         Exact normalized matches are preferred; if none exist, lookup also
         searches inside stored comma-separated terms such as "church, temple".
+        Accepts either `words` or `word` (alias).
         """
-        return tools.lookup_word(words, direction=direction, limit=limit)
+        value = words if words is not None else word
+        if value is None:
+            return {"error": "missing_parameter", "detail": "Provide `words` or `word`."}
+        return tools.lookup_word(value, direction=direction, limit=limit)
 
     @mcp.tool()
     def find_usage_examples(
-        words: str | list[str], source_type: str | None = None, limit: int = 3
+        words: str | list[str] | None = None,
+        word: str | list[str] | None = None,
+        source_type: str | None = None,
+        limit: int = 3,
     ) -> dict[str, Any]:
         """
         Find real usage snippets from the local Võro corpus. Pass a single
@@ -125,18 +135,29 @@ def create_server() -> Any:
         Optional source_type filters: wiki_article for encyclopedia text,
         parallel_corpus_vro_side for translated/aligned text, and
         tei_literature for fiction/literature.
+        Accepts either `words` or `word` (alias).
         """
-        return tools.find_usage_examples(words, source_type=source_type, limit=limit)
+        value = words if words is not None else word
+        if value is None:
+            return {"error": "missing_parameter", "detail": "Provide `words` or `word`."}
+        return tools.find_usage_examples(value, source_type=source_type, limit=limit)
 
     @mcp.tool()
-    def word_exists_in_bag(words: str | list[str]) -> dict[str, Any]:
+    def word_exists_in_bag(
+        words: str | list[str] | None = None,
+        word: str | list[str] | None = None,
+    ) -> dict[str, Any]:
         """
         Check whether word surface forms exist in the Võro word bag. Pass a
         single string, or a list of up to 100 words. Output is keyed by input
         word; the integer value is the stored count, with 0 meaning absent.
         Existence does not prove the form is standard or correct in context.
+        Accepts either `words` or `word` (alias).
         """
-        return tools.word_exists_in_bag(words)
+        value = words if words is not None else word
+        if value is None:
+            return {"error": "missing_parameter", "detail": "Provide `words` or `word`."}
+        return tools.word_exists_in_bag(value)
 
     @mcp.tool()
     def count_text(text: str) -> dict[str, int]:
@@ -177,22 +198,32 @@ def create_server() -> Any:
         return tools.find_unrecognized_words(text, prefilter=prefilter, limit=limit)
 
     @mcp.tool()
-    def analyze_word(words: str | list[str]) -> dict[str, Any]:
+    def analyze_word(
+        words: str | list[str] | None = None,
+        word: str | list[str] | None = None,
+    ) -> dict[str, Any]:
         """
         Analyze one or more Võro words with GiellaLT. Pass a single string, or a
         list of up to 100 words analyzed in one pass; the response is keyed by
         input form. Each value is a compact list of analysis strings; an empty
         list means no recognized analysis. Treat output as guidance.
+        Accepts either `words` or `word` (alias).
 
         Note: spellcheck_vro, grammar_check_vro, analyze_word, and suggest_correction
         use related but not identical Giella/Divvun checks. A word may be morphologically
         analyzable while still being flagged by the speller or grammar checker. Treat
         spell/grammar results as warnings, not final proof.
         """
-        return tools.analyze_word(words)
+        value = words if words is not None else word
+        if value is None:
+            return {"error": "missing_parameter", "detail": "Provide `words` or `word`."}
+        return tools.analyze_word(value)
 
     @mcp.tool()
-    def lint_estonian_leakage(words: str | list[str]) -> dict[str, list[dict[str, Any]]]:
+    def lint_estonian_leakage(
+        words: str | list[str] | None = None,
+        word: str | list[str] | None = None,
+    ) -> dict[str, list[dict[str, Any]]]:
         """
         In-depth Standard Estonian leakage linter for discrete Võro words. Pass a
         single word/short phrase, or a list of up to 100 inputs; each input is
@@ -202,8 +233,12 @@ def create_server() -> Any:
         inflectional endings such as -nud, -tud/-dud, -b, -vad, -sse, and -sid,
         returning severities, messages, and hints. Findings mean "this ending
         looks Estonian-looking", not proof that the whole word is Estonian.
+        Accepts either `words` or `word` (alias).
         """
-        return tools.lint_estonian_leakage(words)
+        value = words if words is not None else word
+        if value is None:
+            return {"error": "missing_parameter", "detail": "Provide `words` or `word`."}
+        return tools.lint_estonian_leakage(value)
 
     @mcp.tool()
     def find_estonian_leakage(text: str, limit: int = 200) -> dict[str, Any]:
@@ -246,38 +281,58 @@ def create_server() -> Any:
         return tools.generate_forms(lemma, tags=tags)
 
     @mcp.tool()
-    def spellcheck_vro(text: str, limit: int | None = None) -> dict[str, Any]:
+    def spellcheck_vro(
+        text: str | None = None,
+        words: str | None = None,
+        word: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
         """
         Token-level Võro spellcheck with GiellaLT/Divvun. Checks each word form
-        against the speller lexicon and returns {"unknown": [...]} with
-        deduplicated unknown words and up to three ranked correction suggestions
-        per word. Returns at most 10 unknown words by default; raise limit up to
-        50 when checking longer text. It does not judge sentence grammar;
-        suggestions may be incomplete or wrong.
+        against the speller lexicon and returns {"unknown": [...], "returned": int,
+        "total_unknown": int} with deduplicated unknown words and up to three
+        ranked correction suggestions per word. Returns at most 10 unknown words
+        by default; raise limit up to 50 when checking longer text. Compare
+        returned vs total_unknown to see if more unknown words exist beyond the
+        limit. It does not judge sentence grammar; suggestions may be incomplete
+        or wrong. Accepts `text`, `words`, or `word` (aliases).
 
         Note: spellcheck_vro, grammar_check_vro, analyze_word, and suggest_correction
         use related but not identical Giella/Divvun checks. A word may be morphologically
         analyzable while still being flagged by the speller or grammar checker. Treat
         spell/grammar results as warnings, not final proof.
         """
-        return tools.spellcheck_vro(text, limit=limit)
+        value = text if text is not None else (words if words is not None else word)
+        if value is None:
+            return {"error": "missing_parameter", "detail": "Provide `text`, `words`, or `word`."}
+        return tools.spellcheck_vro(value, limit=limit)
 
     @mcp.tool()
-    def grammar_check_vro(text: str, limit: int | None = None) -> dict[str, Any]:
+    def grammar_check_vro(
+        text: str | None = None,
+        words: str | None = None,
+        word: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
         """
         Sentence-level Võro grammar check with GiellaLT/Divvun. Returns
-        {"errors": [...]} with structured error spans when the grammar checker
-        detects issues, including some typos. Each error includes the word, span,
-        compact code, and up to three suggestions. Returns at most 10 errors by
-        default; raise limit up to 50 when checking longer text. Use as a weak
-        warning signal, not a final authority.
+        {"errors": [...], "returned": int, "total_errors": int} with structured
+        error spans when the grammar checker detects issues, including some
+        typos. Each error includes the word, span, compact code, and up to three
+        suggestions. Returns at most 10 errors by default; raise limit up to 50
+        when checking longer text. Compare returned vs total_errors to see if
+        more errors exist beyond the limit. Use as a weak warning signal, not a
+        final authority. Accepts `text`, `words`, or `word` (aliases).
 
         Note: spellcheck_vro, grammar_check_vro, analyze_word, and suggest_correction
         use related but not identical Giella/Divvun checks. A word may be morphologically
         analyzable while still being flagged by the speller or grammar checker. Treat
         spell/grammar results as warnings, not final proof.
         """
-        return tools.grammar_check_vro(text, limit=limit)
+        value = text if text is not None else (words if words is not None else word)
+        if value is None:
+            return {"error": "missing_parameter", "detail": "Provide `text`, `words`, or `word`."}
+        return tools.grammar_check_vro(value, limit=limit)
 
     @mcp.tool()
     def translate_vro(text: str, source_lang: str | None = None, target_lang: str | None = None) -> dict[str, Any]:

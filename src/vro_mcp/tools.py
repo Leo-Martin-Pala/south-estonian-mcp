@@ -89,7 +89,7 @@ def _parse_spellcheck_lines(lines: list[str], limit: int | None = None) -> dict[
     unknown: list[dict[str, Any]] = []
     current: dict[str, Any] | None = None
     seen_words: set[str] = set()
-    truncated = False
+    total_unknown = 0
     for line in lines:
         stripped = line.strip()
         if not stripped:
@@ -100,9 +100,9 @@ def _parse_spellcheck_lines(lines: list[str], limit: int | None = None) -> dict[
                 current = None
                 continue
             seen_words.add(word)
+            total_unknown += 1
             if len(unknown) >= max_findings:
                 current = None
-                truncated = True
                 continue
             current = {"word": word, "suggestions": []}
             unknown.append(current)
@@ -112,16 +112,17 @@ def _parse_spellcheck_lines(lines: list[str], limit: int | None = None) -> dict[
         match = _SPELL_SUGGESTION_RE.match(stripped)
         if match and len(current["suggestions"]) < SUGGESTION_LIMIT:
             current["suggestions"].append(match.group("form"))
-    out: dict[str, Any] = {"unknown": unknown}
-    if truncated:
-        out["truncated"] = True
-    return out
+    return {
+        "unknown": unknown,
+        "returned": len(unknown),
+        "total_unknown": total_unknown,
+    }
 
 
 def _parse_grammar_lines(lines: list[str], limit: int | None = None) -> dict[str, Any]:
     max_findings = _finding_limit(limit)
     errors: list[dict[str, Any]] = []
-    truncated = False
+    total_errors = 0
     for line in lines:
         try:
             payload = json.loads(line)
@@ -132,8 +133,8 @@ def _parse_grammar_lines(lines: list[str], limit: int | None = None) -> dict[str
         for item in payload.get("errs", []):
             if not isinstance(item, list) or len(item) < 7:
                 continue
+            total_errors += 1
             if len(errors) >= max_findings:
-                truncated = True
                 continue
             suggestions = item[5] if isinstance(item[5], list) else []
             errors.append(
@@ -144,10 +145,11 @@ def _parse_grammar_lines(lines: list[str], limit: int | None = None) -> dict[str
                     "suggestions": suggestions[:SUGGESTION_LIMIT],
                 }
             )
-    out: dict[str, Any] = {"errors": errors}
-    if truncated:
-        out["truncated"] = True
-    return out
+    return {
+        "errors": errors,
+        "returned": len(errors),
+        "total_errors": total_errors,
+    }
 
 
 def _count_text(text: str) -> dict[str, int]:
