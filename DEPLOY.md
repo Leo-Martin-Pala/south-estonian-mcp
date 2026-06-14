@@ -153,14 +153,22 @@ claude mcp add --transport http --scope user vro "https://<workspace>--vro-mcp-s
 codex mcp add vro --url "https://<workspace>--vro-mcp-serve.modal.run/<secret>/mcp"
 ```
 
-### Claude web  (Pro/Max/Team/Enterprise)
-Settings → Connectors → Add custom connector → paste the full secret URL → leave
-Advanced/OAuth empty → Add. Then enable the `vro` tools in a chat.
+### Claude web
 
-### ChatGPT  (Plus/Pro, Developer Mode)
-Enable Developer Mode first (Settings → Apps → Advanced), then: Settings → Apps →
-Create app → paste the full secret URL → Authentication: "No authentication" →
-tick "I understand and wish to continue" → Create.
+Customize / Settings → Connectors → + → Add custom connector → enter a name and
+the full secret MCP endpoint URL → leave Advanced OAuth empty unless you add an
+OAuth layer → Add → Connect/authenticate if prompted. Then enable the connector
+in a chat.
+
+### ChatGPT
+
+Settings → Apps → Advanced settings → Developer mode → Create app → enter the
+app metadata and full secret MCP endpoint URL → choose Authentication: No
+Authentication, OAuth, or Mixed Authentication as appropriate → scan tools if
+shown → Create.
+
+Then start a new chat and select the app from the + / tools menu under Developer
+Mode. The Create app button appears only after Developer Mode is enabled.
 
 ---
 
