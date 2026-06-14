@@ -29,6 +29,9 @@ _DIRECTION_PAIRS = {
 PUBLIC_DIRECTIONS = tuple(_DIRECTION_PAIRS)
 
 COMMON_TERM_MATCH_THRESHOLD = 5000
+DEFAULT_SNIPPET_CHARS = 260
+MIN_SNIPPET_CHARS = 80
+MAX_SNIPPET_CHARS = 1000
 _APOSTROPHE_VARIANTS = str.maketrans({
     "´": "'",
     "ʼ": "'",
@@ -50,6 +53,12 @@ def _limit(value: int | None, default: int = 10, maximum: int = 50) -> int:
     if value is None:
         return default
     return max(1, min(int(value), maximum))
+
+
+def _snippet_char_limit(value: int | None) -> int:
+    if value is None:
+        return DEFAULT_SNIPPET_CHARS
+    return max(MIN_SNIPPET_CHARS, min(int(value), MAX_SNIPPET_CHARS))
 
 
 def normalize_public_direction(value: str | None) -> str | None:
@@ -351,17 +360,19 @@ class CorpusStore:
         query: str,
         source_type: str | None = None,
         limit: int | None = None,
-    ) -> list[dict[str, Any]]:
+        max_snippet_chars: int | None = None,
+    ) -> list[str]:
         query = query.strip()
         if not query:
             return []
         max_rows = _limit(limit)
+        snippet_chars = _snippet_char_limit(max_snippet_chars)
 
         with closing(_connect(self.path)) as conn:
             try:
-                return self._fts_search(conn, query, source_type, max_rows)
+                return self._fts_search(conn, query, source_type, max_rows, snippet_chars)
             except sqlite3.OperationalError:
-                return self._like_search(conn, query, source_type, max_rows)
+                return self._like_search(conn, query, source_type, max_rows, snippet_chars)
 
     def _fts_search(
         self,
@@ -369,7 +380,8 @@ class CorpusStore:
         query: str,
         source_type: str | None,
         limit: int,
-    ) -> list[dict[str, Any]]:
+        max_snippet_chars: int,
+    ) -> list[str]:
         fts_query = self._phrase_query(query)
         source_filter = "and s.source_type = ?" if source_type else ""
         count_params: list[Any] = [fts_query]
@@ -402,7 +414,7 @@ class CorpusStore:
             """,
             params,
         ).fetchall()
-        return [self._snippet(row["text"], query) for row in rows]
+        return [self._snippet(row["text"], query, max_snippet_chars) for row in rows]
 
     def _like_search(
         self,
@@ -410,7 +422,8 @@ class CorpusStore:
         query: str,
         source_type: str | None,
         limit: int,
-    ) -> list[dict[str, Any]]:
+        max_snippet_chars: int,
+    ) -> list[str]:
         source_filter = "and s.source_type = ?" if source_type else ""
         params: list[Any] = [f"%{query}%"]
         if source_type:
@@ -426,7 +439,7 @@ class CorpusStore:
             """,
             params,
         ).fetchall()
-        return [self._snippet(row["text"], query) for row in rows]
+        return [self._snippet(row["text"], query, max_snippet_chars) for row in rows]
 
     @staticmethod
     def _phrase_query(query: str) -> str:
@@ -436,7 +449,7 @@ class CorpusStore:
         return escaped
 
     @staticmethod
-    def _snippet(text: str, query: str, max_chars: int = 260) -> str:
+    def _snippet(text: str, query: str, max_chars: int = DEFAULT_SNIPPET_CHARS) -> str:
         normalized = " ".join(text.split())
         if len(normalized) <= max_chars:
             return normalized
@@ -454,12 +467,21 @@ class CorpusStore:
                 break
 
         if match_at < 0:
-            return f"{normalized[:max_chars].rstrip()} ..."
+            return f"{normalized[:max_chars - 4].rstrip()} ..."
 
-        before = 90
+        before = min(90, max_chars // 3)
         start = max(0, match_at - before)
         end = min(len(normalized), start + max_chars)
         start = max(0, end - max_chars)
+
+        for _ in range(2):
+            prefix_chars = 4 if start > 0 else 0
+            suffix_chars = 4 if end < len(normalized) else 0
+            window = max(1, max_chars - prefix_chars - suffix_chars)
+            start = max(0, match_at - min(before, max(0, (window - match_len) // 2)))
+            start = min(start, max(0, len(normalized) - window))
+            end = min(len(normalized), start + window)
+
         snippet = normalized[start:end].strip()
         if start:
             snippet = f"... {snippet}"

@@ -73,7 +73,10 @@ spell/grammar results as warnings, not final proof.
    reinterpret facts.
 
 2. **Produce an initial machine translation.** Use `translate_vro` to create a
-   Võro draft. Treat this as a rough translation, not final output.
+   Võro draft. Use canonical 3-letter language codes such as `est`, `eng`, and
+   `vro` when setting source/target languages; common 2-letter aliases such as
+   `et` and `en` are also accepted. Treat this as a rough translation, not final
+   output.
 
 3. **Detect suspicious or problematic words in the draft.**
 
@@ -119,14 +122,17 @@ spell/grammar results as warnings, not final proof.
    * `find_usage_examples` to check real Võro usage, preferring the source type
      matching the genre: encyclopedic → `wiki_article`;
      translated prose → `parallel_corpus_vro_side`; literature →
-     `tei_literature`.
+     `tei_literature`. Set `max_snippet_chars` lower for quick checks or higher
+     when surrounding context matters.
    * `analyze_word` to check whether a form is morphologically recognized.
    * `generate_forms` when the lemma is known but the required inflected form is
      uncertain.
    * `word_exists_in_bag` to check whether a surface form has attested usage.
    * `count_text` when the user asks for a target word count, character limit,
      or sentence-length constraint.
-   * `suggest_correction` for a single bad-looking or unknown form.
+   * `suggest_correction` for a single bad-looking or unknown form; if an
+     invalid form has `seen_in_word_bag`, treat it as attested but not
+     automatically standard.
    * `lint_estonian_leakage` for the in-depth check of specific words or phrases
      you want rule IDs, severities, messages, and hints for.
    * `spellcheck_vro` for token-level and `grammar_check_vro` for sentence-level

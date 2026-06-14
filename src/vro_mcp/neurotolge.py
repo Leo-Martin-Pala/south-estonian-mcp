@@ -8,10 +8,29 @@ from typing import Any
 
 VRO_TO_LANGS = {"eng", "est", "fin", "rus", "hun", "lav", "nor"}
 LANGS_TO_VRO = {"eng", "est", "fin", "rus", "lav", "hun", "nor"}
+LANGUAGE_ALIASES = {
+    "en": "eng",
+    "et": "est",
+    "fi": "fin",
+    "ru": "rus",
+    "hu": "hun",
+    "lv": "lav",
+    "no": "nor",
+    "nb": "nor",
+}
 SUPPORTED_VRO_PAIRS = {
     *(("vro", target) for target in VRO_TO_LANGS),
     *((source, "vro") for source in LANGS_TO_VRO),
 }
+
+
+def normalize_language_code(value: str | None) -> str | None:
+    if value is None:
+        return None
+    code = value.strip().lower().replace("_", "-")
+    if not code:
+        return None
+    return LANGUAGE_ALIASES.get(code, code)
 
 
 class NeurotolgeClient:
@@ -24,8 +43,10 @@ class NeurotolgeClient:
         if not text:
             return {"text": ""}
 
-        source = source_lang or ("est" if target_lang == "vro" else "vro")
-        target = target_lang or ("est" if source == "vro" else "vro")
+        requested_source = normalize_language_code(source_lang)
+        requested_target = normalize_language_code(target_lang)
+        source = requested_source or ("est" if requested_target == "vro" else "vro")
+        target = requested_target or ("est" if source == "vro" else "vro")
         if (source, target) not in SUPPORTED_VRO_PAIRS:
             return {
                 "error": "unsupported_translation_pair",
@@ -34,8 +55,9 @@ class NeurotolgeClient:
                 "supported_from_vro": sorted(VRO_TO_LANGS),
                 "supported_to_vro": sorted(LANGS_TO_VRO),
                 "detail": (
-                    "Use 3-letter API language codes. This MCP only exposes "
-                    "currently available live API pairs where one side is vro."
+                    "Use supported 3-letter API language codes or common "
+                    "2-letter aliases. This MCP only exposes currently "
+                    "available live API pairs where one side is vro."
                 ),
             }
         payload = {

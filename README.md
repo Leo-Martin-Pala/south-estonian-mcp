@@ -144,7 +144,7 @@ From least to most system-wide. Do the steps that apply, from the repo root.
 | Tool | What it does |
 | --- | --- |
 | `lookup_word` | Compact dictionary concept lookup (`en`/`et`/`vro` language lists), with exact lookup before term substring fallback. |
-| `find_usage_examples` | Full-text corpus search returning short text snippets. |
+| `find_usage_examples` | Full-text corpus search returning short text snippets; `max_snippet_chars` lets clients choose snippet length. |
 | `word_exists_in_bag` | Fast word-bag count check; `0` means absent. |
 | `count_text` | Lean text length counter returning `characters`, `words`, and `estimated_sentences` for drafting constraints. |
 | `find_unknown_words` | List word forms in a text absent from the word bag. |
@@ -155,8 +155,8 @@ From least to most system-wide. Do the steps that apply, from the repo root.
 | `grammar_check_vro` | Sentence-level grammar check returning `{"errors": [...]}` with spans, compact codes, and up to three suggestions per issue. Defaults to 10 errors; `limit` can raise this up to 50. |
 | `find_estonian_leakage` | Scan a larger text and return a slim, deduped list of word forms with Estonian-looking endings. |
 | `lint_estonian_leakage` | In-depth check of specific words/phrases: severities, messages, and hints. |
-| `suggest_correction` | Analyzer-verified correction alternatives for a bad/unknown form, capped to three ranked forms. |
-| `translate_vro` | Neurotõlge/TartuNLP translation. |
+| `suggest_correction` | Analyzer-verified correction alternatives for a bad/unknown form, capped to three ranked forms; accepts `form` or `word`; invalid forms include `seen_in_word_bag` when available. |
+| `translate_vro` | Neurotõlge/TartuNLP translation. Canonical language codes are `eng`, `est`, `fin`, `rus`, `hun`, `lav`, `nor`, with common 2-letter aliases accepted. |
 | `check_setup` | Compact setup health: healthy components are `true`; failures include diagnostics. |
 
 Most lookup tools accept a single word or a list for batched queries. Successful

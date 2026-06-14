@@ -212,12 +212,18 @@ class VroTools:
         words: str | list[str],
         source_type: str | None = None,
         limit: int = 3,
+        max_snippet_chars: int | None = None,
     ) -> dict[str, Any]:
         word_list, dropped = _prepare_batch(words, USAGE_CAP)
         per = _per_item_limit(limit, batched=len(word_list) > 1)
         try:
             results = {
-                w: self.corpus.find_usage_examples(w, source_type=source_type, limit=per)
+                w: self.corpus.find_usage_examples(
+                    w,
+                    source_type=source_type,
+                    limit=per,
+                    max_snippet_chars=max_snippet_chars,
+                )
                 for w in word_list
             }
         except sqlite3.Error as exc:
@@ -339,11 +345,28 @@ class VroTools:
         max_rows = _output_limit(limit, default=200, maximum=500)
         return self.estonian_leakage.find_in_text(text, limit=max_rows)
 
-    def suggest_correction(self, form: str) -> dict[str, Any]:
+    def suggest_correction(self, form: str | None = None, word: str | None = None) -> dict[str, Any]:
+        value = form if form is not None else word
+        if value is None:
+            return {"error": "missing_parameter", "detail": "Provide `form` or `word`."}
         try:
-            return self.correction_suggester.suggest_correction(form)
+            result = self.correction_suggester.suggest_correction(value)
         except sqlite3.Error as exc:
             return self._db_unavailable("dictionary", self.settings.dictionary_db, exc)
+        if result.get("valid") is not False:
+            return result
+        try:
+            bag_entry = self.word_bag.exists_many([value]).get(value, {})
+        except sqlite3.Error:
+            return result
+        seen = int(bag_entry.get("total_count", 0)) > 0
+        result["seen_in_word_bag"] = seen
+        if seen:
+            result["note"] = (
+                "Not analyzer-confirmed, but present in the word bag; "
+                "word-bag presence means seen, not necessarily standard."
+            )
+        return result
 
     def generate_forms(
         self,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import unittest
 import sqlite3
 import tempfile
@@ -120,6 +121,37 @@ class SmokeTests(unittest.TestCase):
         self.assertIsInstance(results, list)
         self.assertEqual(len(results), 1)
         self.assertIsInstance(results[0], str)
+
+    def test_find_usage_examples_accepts_snippet_length_cap(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "corpus.sqlite"
+            with sqlite3.connect(db_path) as conn:
+                conn.execute(
+                    """
+                    create table segments (
+                        id integer primary key,
+                        public_id text,
+                        source_slug text,
+                        source_type text,
+                        document_id text,
+                        segment_index integer,
+                        text text
+                    )
+                    """
+                )
+                conn.execute("create virtual table segments_fts using fts5(text)")
+                text = f"{'algus ' * 40}needle {'lopp ' * 40}"
+                row = (1, "p1", "test", "wiki_article", "d1", 1, text)
+                conn.execute("insert into segments values (?, ?, ?, ?, ?, ?, ?)", row)
+                conn.execute("insert into segments_fts(rowid, text) values (?, ?)", (1, text))
+            results = CorpusStore(db_path).find_usage_examples(
+                "needle",
+                limit=1,
+                max_snippet_chars=120,
+            )
+        self.assertEqual(len(results), 1)
+        self.assertIn("needle", results[0])
+        self.assertLessEqual(len(results[0]), 120)
 
     def test_word_exists_in_bag_runs(self) -> None:
         self._require_db("word_bag")
@@ -276,6 +308,34 @@ class SmokeTests(unittest.TestCase):
         self.assertLessEqual(len(result["alternatives"]), 3)
         self.assertNotIn("best", result)
         self.assertNotIn("candidates", result)
+
+    def test_suggest_correction_marks_invalid_form_seen_in_word_bag(self) -> None:
+        class FakeSuggester:
+            def suggest_correction(self, form: str) -> dict[str, object]:
+                return {"form": form, "valid": False, "alternatives": []}
+
+        class FakeWordBag:
+            def exists_many(self, words: list[str]) -> dict[str, dict[str, object]]:
+                return {words[0]: {"total_count": 7}}
+
+        tools = VroTools.__new__(VroTools)
+        tools.correction_suggester = FakeSuggester()
+        tools.word_bag = FakeWordBag()
+        result = tools.suggest_correction("seenform")
+        self.assertFalse(result["valid"])
+        self.assertTrue(result["seen_in_word_bag"])
+        self.assertIn("Not analyzer-confirmed", result["note"])
+
+    def test_suggest_correction_accepts_word_alias(self) -> None:
+        class FakeSuggester:
+            def suggest_correction(self, form: str) -> dict[str, object]:
+                return {"form": form, "valid": True, "alternatives": []}
+
+        tools = VroTools.__new__(VroTools)
+        tools.correction_suggester = FakeSuggester()
+        result = tools.suggest_correction(word="köüdet")
+        self.assertTrue(result["valid"])
+        self.assertEqual(result["form"], "köüdet")
 
     def test_spellcheck_tokenizes_sentence_input(self) -> None:
         self._require_giella("speller")
@@ -445,6 +505,31 @@ class SmokeTests(unittest.TestCase):
         result = self.tools.translate_vro("Tere", source_lang="deu", target_lang="vro")
         self.assertEqual(result["error"], "unsupported_translation_pair")
         self.assertNotIn("ger", result["supported_to_vro"])
+
+    def test_translate_accepts_two_letter_language_aliases(self) -> None:
+        class FakeResponse:
+            def __enter__(self) -> "FakeResponse":
+                return self
+
+            def __exit__(self, *_args: object) -> None:
+                return None
+
+            def read(self) -> bytes:
+                return b'{"translation":"Tere"}'
+
+        captured: dict[str, str] = {}
+
+        def fake_urlopen(request: object, timeout: float) -> FakeResponse:
+            captured["body"] = request.data.decode("utf-8")  # type: ignore[attr-defined]
+            captured["timeout"] = str(timeout)
+            return FakeResponse()
+
+        with patch("urllib.request.urlopen", fake_urlopen):
+            result = self.tools.translate_vro("Hello", source_lang="en", target_lang="vro")
+        self.assertEqual(result, {"text": "Tere"})
+        payload = json.loads(captured["body"])
+        self.assertEqual(payload["src"], "eng")
+        self.assertEqual(payload["tgt"], "vro")
 
     def test_missing_dictionary_db_is_structured(self) -> None:
         tools = VroTools(replace(load_settings(), dictionary_db=Path("/tmp/no-such-dict.sqlite")))

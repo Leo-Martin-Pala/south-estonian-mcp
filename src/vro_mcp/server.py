@@ -127,6 +127,7 @@ def create_server() -> Any:
         word: str | list[str] | None = None,
         source_type: str | None = None,
         limit: int = 3,
+        max_snippet_chars: int | None = None,
     ) -> dict[str, Any]:
         """
         Find real usage snippets from the local Võro corpus. Pass a single
@@ -135,12 +136,19 @@ def create_server() -> Any:
         Optional source_type filters: wiki_article for encyclopedia text,
         parallel_corpus_vro_side for translated/aligned text, and
         tei_literature for fiction/literature.
+        Set max_snippet_chars to choose the maximum returned snippet length
+        (bounded to 80..1000 characters).
         Accepts either `words` or `word` (alias).
         """
         value = words if words is not None else word
         if value is None:
             return {"error": "missing_parameter", "detail": "Provide `words` or `word`."}
-        return tools.find_usage_examples(value, source_type=source_type, limit=limit)
+        return tools.find_usage_examples(
+            value,
+            source_type=source_type,
+            limit=limit,
+            max_snippet_chars=max_snippet_chars,
+        )
 
     @mcp.tool()
     def word_exists_in_bag(
@@ -253,19 +261,24 @@ def create_server() -> Any:
         return tools.find_estonian_leakage(text, limit=limit)
 
     @mcp.tool()
-    def suggest_correction(form: str) -> dict[str, Any]:
+    def suggest_correction(form: str | None = None, word: str | None = None) -> dict[str, Any]:
         """
         Suggest compact Võro corrections for one bad or unknown form. Returns
         {"form": ..., "valid": bool, "alternatives": [...]} with up to three
-        analyzer-confirmed alternatives ranked best to worst. If valid is true,
-        the form already analyzes cleanly and alternatives is empty.
+        analyzer-confirmed alternatives ranked best to worst. Invalid forms also
+        include seen_in_word_bag when the word-bag database is available. If
+        valid is true, the form already analyzes cleanly and alternatives is empty.
+        Accepts either `form` or `word` (alias).
 
         Note: spellcheck_vro, grammar_check_vro, analyze_word, and suggest_correction
         use related but not identical Giella/Divvun checks. A word may be morphologically
         analyzable while still being flagged by the speller or grammar checker. Treat
         spell/grammar results as warnings, not final proof.
         """
-        return tools.suggest_correction(form)
+        value = form if form is not None else word
+        if value is None:
+            return {"error": "missing_parameter", "detail": "Provide `form` or `word`."}
+        return tools.suggest_correction(value)
 
     @mcp.tool()
     def generate_forms(
@@ -337,12 +350,14 @@ def create_server() -> Any:
     @mcp.tool()
     def translate_vro(text: str, source_lang: str | None = None, target_lang: str | None = None) -> dict[str, Any]:
         """
-        Translate text to or from Võro with Neurotõlge/TartuNLP. Use 3-letter
-        API language codes. From Võro supports target_lang eng, est, fin, rus,
-        hun, lav, nor. To Võro supports source_lang eng, est, fin, rus, lav,
-        hun, nor. If both source_lang and target_lang are omitted, it defaults
-        to translating from vro to est without giving an error. Successful
-        output omits raw API payloads and source/target languages.
+        Translate text to or from Võro with Neurotõlge/TartuNLP. Canonical
+        language codes are the 3-letter API codes: from Võro supports target_lang
+        eng, est, fin, rus, hun, lav, nor; to Võro supports source_lang eng, est,
+        fin, rus, lav, hun, nor. Common 2-letter aliases are also accepted:
+        en->eng, et->est, fi->fin, ru->rus, hu->hun, lv->lav, no/nb->nor.
+        If both source_lang and target_lang are omitted, it defaults to
+        translating from vro to est without giving an error. Successful output
+        omits raw API payloads and source/target languages.
         """
         return tools.translate_vro(text, source_lang=source_lang, target_lang=target_lang)
 
