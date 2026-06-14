@@ -256,11 +256,11 @@ class SmokeTests(unittest.TestCase):
     def test_spellcheck_tokenizes_sentence_input(self) -> None:
         self._require_giella("speller")
         result = self.tools.spellcheck_vro("Miä olõ hüä tekstt.")
-        unknown_words = [item["word"] for item in result]
+        unknown_words = [item["word"] for item in result["unknown"]]
         self.assertIn("tekstt", unknown_words)
         self.assertNotIn("miä", unknown_words)
 
-    def test_spellcheck_parser_compacts_numeric_scores(self) -> None:
+    def test_spellcheck_parser_returns_lean_deduped_suggestions(self) -> None:
         parsed = _parse_spellcheck_lines(
             [
                 '"tarton" is NOT in the lexicon:',
@@ -268,20 +268,15 @@ class SmokeTests(unittest.TestCase):
                 "tarto    10.000000",
                 "tarõn    10.800000",
                 "taro    12.345678",
+                "targõn    20.000000",
+                '"tarton" is NOT in the lexicon:',
+                'Corrections for "tarton":',
+                "tarto    10.000000",
             ]
         )
         self.assertEqual(
             parsed,
-            [
-                {
-                    "word": "tarton",
-                    "suggestions": [
-                        {"form": "tarto", "score": 10},
-                        {"form": "tarõn", "score": 10.8},
-                        {"form": "taro", "score": 12.35},
-                    ],
-                }
-            ],
+            {"unknown": [{"word": "tarton", "suggestions": ["tarto", "tarõn", "taro"]}]},
         )
 
     def test_generate_forms_runs_with_giella_tags(self) -> None:
@@ -317,7 +312,7 @@ class SmokeTests(unittest.TestCase):
     def test_grammar_parser_structures_json_lines(self) -> None:
         parsed = _parse_grammar_lines(
             [
-                '{"errs":[["tekstt",12,18,"typo","typo",["testt"],"typo"]],"text":"Miä olõ hüä tekstt."}'
+                '{"errs":[["tekstt",12,18,"typo","typo",["testt","teksti","tekstõ","test"],"typo"]],"text":"Miä olõ hüä tekstt."}'
             ]
         )
         self.assertEqual(
@@ -327,13 +322,10 @@ class SmokeTests(unittest.TestCase):
                     {
                         "word": "tekstt",
                         "span": [12, 18],
-                        "type": "typo",
                         "code": "typo",
-                        "suggestions": ["testt"],
-                        "message": "typo",
+                        "suggestions": ["testt", "teksti", "tekstõ"],
                     }
                 ],
-                "text": "Miä olõ hüä tekstt.",
             },
         )
 
@@ -342,6 +334,7 @@ class SmokeTests(unittest.TestCase):
         result = self.tools.grammar_check_vro("Miä olõ hüä tekstt.")
         self.assertIn("errors", result)
         self.assertNotIn("lines", result)
+        self.assertNotIn("text", result)
         self.assertTrue(any(error["word"] == "tekstt" for error in result["errors"]))
 
     def test_lookup_word_accepts_standard_direction(self) -> None:

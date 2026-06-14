@@ -150,8 +150,8 @@ From least to most system-wide. Do the steps that apply, from the repo root.
 | `find_unrecognized_words` | List text word forms that the GiellaLT analyzer returns as `+?`, with optional word-bag prefiltering. |
 | `analyze_word` | GiellaLT morphological analysis. |
 | `generate_forms` | GiellaLT generation for one exact lemma + tag analysis. |
-| `spellcheck_vro` | Token-level spellcheck returning structured unknown words and scored suggestions. |
-| `grammar_check_vro` | Sentence-level grammar check. |
+| `spellcheck_vro` | Token-level spellcheck returning `{"unknown": [...]}` with deduped words and up to three ranked suggestions per word. |
+| `grammar_check_vro` | Sentence-level grammar check returning `{"errors": [...]}` with spans, compact codes, and up to three suggestions per issue. |
 | `find_estonian_leakage` | Scan a larger text and return a slim, deduped list of word forms with Estonian-looking endings. |
 | `lint_estonian_leakage` | In-depth check of specific words/phrases: severities, messages, and hints. |
 | `suggest_correction` | Analyzer-verified fixes for a bad/unknown form. |

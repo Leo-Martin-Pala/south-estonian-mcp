@@ -30,6 +30,7 @@ ANALYZE_CAP = 100
 LEAKAGE_CAP = 100
 UNRECOGNIZED_LIMIT = 500
 _SPELL_SUGGESTION_RE = re.compile(r"^(?P<form>.+?)\s+(?P<score>-?\d+(?:\.\d+)?)$")
+SUGGESTION_LIMIT = 3
 
 
 def _prepare_batch(value: str | list[str] | None, cap: int) -> tuple[list[str], int]:
@@ -70,39 +71,33 @@ def _output_limit(limit: int | None, default: int = 50, maximum: int = UNRECOGNI
     return max(1, min(int(limit), maximum))
 
 
-def _compact_score(value: str) -> int | float:
-    score = round(float(value), 2)
-    return int(score) if score.is_integer() else score
-
-
-def _parse_spellcheck_lines(lines: list[str]) -> list[dict[str, Any]]:
+def _parse_spellcheck_lines(lines: list[str]) -> dict[str, Any]:
     unknown: list[dict[str, Any]] = []
     current: dict[str, Any] | None = None
+    seen_words: set[str] = set()
     for line in lines:
         stripped = line.strip()
         if not stripped:
             continue
         if stripped.startswith('"') and " is NOT in the lexicon" in stripped:
             word = stripped.split('"', 2)[1]
+            if word in seen_words:
+                current = None
+                continue
+            seen_words.add(word)
             current = {"word": word, "suggestions": []}
             unknown.append(current)
             continue
         if current is None or stripped.startswith("Corrections for "):
             continue
         match = _SPELL_SUGGESTION_RE.match(stripped)
-        if match:
-            current["suggestions"].append(
-                {
-                    "form": match.group("form"),
-                    "score": _compact_score(match.group("score")),
-                }
-            )
-    return unknown
+        if match and len(current["suggestions"]) < SUGGESTION_LIMIT:
+            current["suggestions"].append(match.group("form"))
+    return {"unknown": unknown}
 
 
 def _parse_grammar_lines(lines: list[str]) -> dict[str, Any]:
     errors: list[dict[str, Any]] = []
-    text: str | None = None
     for line in lines:
         try:
             payload = json.loads(line)
@@ -110,8 +105,6 @@ def _parse_grammar_lines(lines: list[str]) -> dict[str, Any]:
             return {"lines": lines}
         if not isinstance(payload, dict):
             return {"lines": lines}
-        if isinstance(payload.get("text"), str):
-            text = payload["text"]
         for item in payload.get("errs", []):
             if not isinstance(item, list) or len(item) < 7:
                 continue
@@ -120,16 +113,11 @@ def _parse_grammar_lines(lines: list[str]) -> dict[str, Any]:
                 {
                     "word": item[0],
                     "span": [item[1], item[2]],
-                    "type": item[3],
                     "code": item[4],
-                    "suggestions": suggestions,
-                    "message": item[6],
+                    "suggestions": suggestions[:SUGGESTION_LIMIT],
                 }
             )
-    out: dict[str, Any] = {"errors": errors}
-    if text is not None:
-        out["text"] = text
-    return out
+    return {"errors": errors}
 
 
 class VroTools:
@@ -328,7 +316,7 @@ class VroTools:
                 forms.append(parts[1].strip())
         return {"forms": forms}
 
-    def spellcheck_vro(self, text: str) -> dict[str, Any] | list[dict[str, Any]]:
+    def spellcheck_vro(self, text: str) -> dict[str, Any]:
         result = self.giella.spellcheck_vro(text)
         if not result.get("available"):
             return result

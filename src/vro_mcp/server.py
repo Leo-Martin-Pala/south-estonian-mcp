@@ -222,14 +222,13 @@ def create_server() -> Any:
         return tools.generate_forms(lemma, tags=tags)
 
     @mcp.tool()
-    def spellcheck_vro(text: str) -> dict[str, Any] | list[dict[str, Any]]:
+    def spellcheck_vro(text: str) -> dict[str, Any]:
         """
         Token-level Võro spellcheck with GiellaLT/Divvun. Checks each word form
-        against the speller lexicon and returns a list of unknown words plus
-        compact suggestions with numeric scores. Note that for scores, a lower
-        value is better (lower weight/cost means higher confidence/nearer match).
-        It does not judge sentence grammar; suggestions are capped to keep MCP
-        output compact and may be incomplete or wrong.
+        against the speller lexicon and returns {"unknown": [...]} with
+        deduplicated unknown words and up to three ranked correction suggestions
+        per word. It does not judge sentence grammar; suggestions may be
+        incomplete or wrong.
         """
         return tools.spellcheck_vro(text)
 
@@ -237,8 +236,10 @@ def create_server() -> Any:
     def grammar_check_vro(text: str) -> dict[str, Any]:
         """
         Sentence-level Võro grammar check with GiellaLT/Divvun. Returns
-        structured error spans when the grammar checker detects issues, including
-        some typos. Use as a weak warning signal, not a final authority.
+        {"errors": [...]} with structured error spans when the grammar checker
+        detects issues, including some typos. Each error includes the word, span,
+        compact code, and up to three suggestions. Use as a weak warning signal,
+        not a final authority.
         """
         return tools.grammar_check_vro(text)
 
