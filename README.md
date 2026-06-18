@@ -163,13 +163,6 @@ Most lookup tools accept a single word or a list for batched queries. Successful
 tool outputs are intentionally compact so MCP clients spend less context on
 internal IDs, debug metadata, and provenance fields.
 
-The open dictionary currently contains IDS concepts with English, Estonian, and
-Võro terms where available. Leave `lookup_word.direction` unset for a full
-concept lookup, or use `en-vro`, `et-vro`, `vro-en`, or `vro-et` for directed
-results. Exact normalized matches are preferred; when no exact entry exists,
-lookup can also match inside stored terms such as comma-separated English
-glosses.
-
 ## Resources
 
 Markdown references are exposed over MCP:
