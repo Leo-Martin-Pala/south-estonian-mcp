@@ -531,6 +531,38 @@ class SmokeTests(unittest.TestCase):
         self.assertEqual(payload["src"], "eng")
         self.assertEqual(payload["tgt"], "vro")
 
+    def test_translate_uses_configured_neurotolge_base_url(self) -> None:
+        class FakeResponse:
+            def __enter__(self) -> "FakeResponse":
+                return self
+
+            def __exit__(self, *_args: object) -> None:
+                return None
+
+            def read(self) -> bytes:
+                return b'{"translation":"Tere"}'
+
+        captured: dict[str, str] = {}
+
+        def fake_urlopen(request: object, timeout: float) -> FakeResponse:
+            captured["url"] = request.full_url  # type: ignore[attr-defined]
+            captured["body"] = request.data.decode("utf-8")  # type: ignore[attr-defined]
+            return FakeResponse()
+
+        settings = replace(
+            load_settings(),
+            neurotolge_base_url="http://127.0.0.1:8765/translation/v2",
+        )
+        tools = VroTools(settings)
+        with patch("urllib.request.urlopen", fake_urlopen):
+            result = tools.translate_vro("Hello", source_lang="eng", target_lang="vro")
+
+        self.assertEqual(result, {"text": "Tere"})
+        self.assertEqual(captured["url"], "http://127.0.0.1:8765/translation/v2")
+        payload = json.loads(captured["body"])
+        self.assertEqual(payload["src"], "eng")
+        self.assertEqual(payload["tgt"], "vro")
+
     def test_missing_dictionary_db_is_structured(self) -> None:
         tools = VroTools(replace(load_settings(), dictionary_db=Path("/tmp/no-such-dict.sqlite")))
         result = tools.lookup_word("world")

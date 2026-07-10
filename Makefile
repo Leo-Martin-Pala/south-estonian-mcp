@@ -83,28 +83,28 @@ release-giella: package-giella ## Publish the GiellaLT artifacts as a GitHub rel
 	rm -f $(GIELLA_ASSET)
 
 deploy: ## Deploy to Modal using the secret + settings from .env
-	scripts/deploy_modal.sh
+	./scripts/deploy_modal.sh
 
 deploy-new-secret: ## Generate a fresh secret URL, save it to .env, then deploy
-	NEW_SECRET=1 scripts/deploy_modal.sh
+	NEW_SECRET=1 ./scripts/deploy_modal.sh
 
 deploy-local-secret: ## Push the MCP_PATH secret defined in .env to Modal, then deploy
-	LOCAL_SECRET=1 scripts/deploy_modal.sh
+	LOCAL_SECRET=1 ./scripts/deploy_modal.sh
 
 deploy-release: ## Deploy using GitHub release data, skipping existing files
-	DATA_SOURCE=release scripts/deploy_modal.sh
+	DATA_SOURCE=release ./scripts/deploy_modal.sh
 
 deploy-release-force: ## Deploy and overwrite Modal data from GitHub releases
-	DATA_SOURCE=release FORCE_DATA=1 scripts/deploy_modal.sh
+	DATA_SOURCE=release FORCE_DATA=1 ./scripts/deploy_modal.sh
 
 deploy-local: ## Deploy and upload data from DATA_DIR, defaulting to ./data
-	DATA_SOURCE=local DATA_DIR="$(DATA_DIR)" scripts/deploy_modal.sh
+	DATA_SOURCE=local DATA_DIR="$(DATA_DIR)" ./scripts/deploy_modal.sh
 
 deploy-local-force: ## Deploy and overwrite Modal data from DATA_DIR
-	DATA_SOURCE=local FORCE_DATA=1 DATA_DIR="$(DATA_DIR)" scripts/deploy_modal.sh
+	DATA_SOURCE=local FORCE_DATA=1 DATA_DIR="$(DATA_DIR)" ./scripts/deploy_modal.sh
 
 deploy-none: ## Deploy code only; never inspect or change Modal data
-	DATA_SOURCE=none scripts/deploy_modal.sh
+	DATA_SOURCE=none ./scripts/deploy_modal.sh
 
 undeploy: ## Remove Modal app, volume, and secret
-	scripts/remove_modal.sh
+	./scripts/remove_modal.sh

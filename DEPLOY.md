@@ -193,6 +193,17 @@ check `modal app logs vro-mcp`.
 
 ---
 
+## Optional: self-host translation
+
+The MCP server does not bundle Neurotõlge models or workers, but
+`translate_vro` can use a compatible local or self-hosted backend via
+`VRO_NEUROTOLGE_BASE_URL`. See TartuNLP's
+[`translation-api`](https://github.com/TartuNLP/translation-api) and
+[`translation-worker`](https://github.com/TartuNLP/translation-worker)
+repositories for their setup instructions.
+
+---
+
 ## Updating later
 `scripts/deploy_modal.sh` touches data only when the volume is missing it, so
 routine redeploys are fast:

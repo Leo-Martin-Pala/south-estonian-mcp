@@ -98,6 +98,7 @@ DATA_DIR="$(setting DATA_DIR "$ROOT/data")"
 VRO_DATA_REPO_VALUE="$(setting VRO_DATA_REPO "Leo-Martin-Pala/voro-mcp")"
 VRO_DATA_TAG_VALUE="$(setting VRO_DATA_TAG "data-v1")"
 VRO_GIELLA_TAG_VALUE="$(setting VRO_GIELLA_TAG "giella-v1")"
+VRO_NEUROTOLGE_BASE_URL_VALUE="$(setting VRO_NEUROTOLGE_BASE_URL "")"
 
 if [[ "$LOCAL_SECRET" == "1" ]]; then
   if [[ -z "$MCP_PATH_VALUE" ]]; then
@@ -116,7 +117,11 @@ elif [[ -z "$MCP_PATH_VALUE" || "$NEW_SECRET" == "1" ]]; then
   chmod 600 "$ENV_FILE"
 fi
 
-"$MODAL_BIN" secret create "$SECRET_NAME" --force "MCP_PATH=$MCP_PATH_VALUE"
+secret_values=("MCP_PATH=$MCP_PATH_VALUE")
+if [[ -n "$VRO_NEUROTOLGE_BASE_URL_VALUE" ]]; then
+  secret_values+=("VRO_NEUROTOLGE_BASE_URL=$VRO_NEUROTOLGE_BASE_URL_VALUE")
+fi
+"$MODAL_BIN" secret create "$SECRET_NAME" --force "${secret_values[@]}"
 "$MODAL_BIN" volume create "$VOLUME_NAME" || true
 
 remote_root="$(volume_state)"

@@ -195,7 +195,7 @@ needed. For Modal deploy defaults, copy `.env.example` to `.env`.
 | `VRO_DICTIONARY_DB` | `./data/vro_dictionary.sqlite` | Dictionary SQLite path used by `lookup_word` and correction suggestions. |
 | `VRO_CORPUS_DB` | `./data/vro_corpus.sqlite` | Corpus SQLite path used by `find_usage_examples`. |
 | `VRO_WORD_BAG_DB` | `./data/vro_word_bag.sqlite` | Word-bag SQLite path used by seen/unknown word checks. |
-| `VRO_NEUROTOLGE_BASE_URL` | `https://api.tartunlp.ai/translation/v2` | Neurotõlge/TartuNLP translation API base URL. |
+| `VRO_NEUROTOLGE_BASE_URL` | `https://api.tartunlp.ai/translation/v2` | Neurotõlge/TartuNLP translation API base URL. Point this at a local or self-hosted compatible endpoint to avoid depending on the public service. |
 | `VRO_DATA_REPO` | `Leo-Martin-Pala/voro-mcp` | GitHub repository used for dataset and Giella release downloads. |
 | `VRO_DATA_TAG` | `data-v1` | GitHub release tag fetched for `vro-data.tar.xz` by `scripts/fetch_data.sh` and Modal release hydration. |
 | `VRO_GIELLA_TAG` | `giella-v1` | GitHub release tag fetched for `giella-share.tar.xz` by `scripts/fetch_giella.sh` and Modal release hydration. |
@@ -210,6 +210,16 @@ needed. For Modal deploy defaults, copy `.env.example` to `.env`.
 | `MODAL_SECRET_NAME` | `vro-mcp-secret` | Modal secret name storing `MCP_PATH`. |
 
 </details>
+
+### Translation backend resilience
+
+`translate_vro` is intentionally an HTTP client, not a bundled translation
+engine. The default points at the public Neurotõlge/TartuNLP endpoint, but you
+can point `VRO_NEUROTOLGE_BASE_URL` at a compatible local or self-hosted
+backend. See TartuNLP's
+[`translation-api`](https://github.com/TartuNLP/translation-api) and
+[`translation-worker`](https://github.com/TartuNLP/translation-worker)
+repositories for their setup instructions.
 
 ## Connect a client
 
