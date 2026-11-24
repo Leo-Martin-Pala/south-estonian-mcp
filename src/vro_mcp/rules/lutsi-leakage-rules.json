@@ -1,0 +1,130 @@
+{
+  "language": "lutsi",
+  "ruleset_id": "lutsi_estonian_leakage_v1_0",
+  "purpose": "Flag likely modern Standard Estonian morphological leakage in intended Lutsi text while respecting Lutsi -n/-h inessive, -lõ/-le allative, glottal stop q/', palatalization (l', n', s', t'), and dual UPA/practical spellings.",
+  "normalization": {
+    "lowercase": true,
+    "preserve_chars": ["q", "õ", "ä", "ö", "ü", "š", "ž", "ś", "ń", "ľ", "ŕ", "ĺ", "ť", "d́", "ę", "ǫ", "ə", "ʌ", "´", "'", "’"],
+    "token_regex": "[^\\W\\d_][^\\W\\d_'´’-]*['´’-]*[^\\W\\d_]*"
+  },
+  "rules": [
+    {
+      "id": "EST_ACTIVE_PAST_NUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}nud\\b",
+      "message": "Looks like Standard Estonian active past participle -nud. Lutsi uses -nu(q)/-nü(q) or palatalized -nu'/-nü'.",
+      "hint": "Rewrite with Lutsi active past participle morphology."
+    },
+    {
+      "id": "EST_PASSIVE_PAST_TUD_DUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}(tud|dud)\\b",
+      "message": "Looks like Standard Estonian passive past participle -tud/-dud. Lutsi uses -t/-d or -tu(q)/-du(q).",
+      "hint": "Rewrite with Lutsi passive past morphology."
+    },
+    {
+      "id": "EST_NEG_PAST_EI_NUD",
+      "severity": "error",
+      "scope": "window",
+      "regex": "(?iu)\\bei\\s+[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]+(nud|tud|dud)\\b",
+      "message": "Looks like Standard Estonian past negation ei + -nud/-tud. Lutsi past negation uses es + verb (es tieq, es olõq).",
+      "hint": "Use Lutsi es past negation."
+    },
+    {
+      "id": "EST_NEG_POLE_POLNUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b(pole|polnud|poleks|polevat)\\b",
+      "message": "Standard Estonian contracted negation pole/polnud/poleks/polevat is an Estonian intrusion in Lutsi.",
+      "hint": "Use Lutsi ei olõq / es olõq / olõ-õi."
+    },
+    {
+      "id": "EST_3SG_PRESENT_B",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}b\\b",
+      "message": "May be Standard Estonian 3sg present -b. Lutsi 3sg present is endingless or -s (om, and, kirotas), not -b.",
+      "hint": "Check attested Lutsi 3sg verb forms."
+    },
+    {
+      "id": "EST_3PL_PRESENT_VAD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}vad\\b",
+      "message": "Looks like Standard Estonian 3pl present -vad. Lutsi 3pl uses -va(q)/-vä(q), -sõ(q)/-se(q), or omma(q).",
+      "hint": "Replace Estonian -vad with Lutsi 3pl morphology."
+    },
+    {
+      "id": "EST_IMPERSONAL_TAKSE_DAKSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}(takse|dakse)\\b",
+      "message": "Looks like Standard Estonian impersonal -takse/-dakse. Lutsi impersonal uses -tas/-täs/-das/-däs.",
+      "hint": "Rewrite with Lutsi impersonal morphology."
+    },
+    {
+      "id": "EST_CONDITIONAL_PERSONAL",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}(ksin|ksime|ksite)\\b",
+      "message": "Looks like Standard Estonian conditional -ksin/-ksime/-ksite. Lutsi uses -si/-ssi.",
+      "hint": "Rewrite with Lutsi conditional morphology."
+    },
+    {
+      "id": "EST_ILLATIVE_SSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}sse\\b",
+      "message": "Looks like Standard Estonian illative -sse. Lutsi illative uses -he, -de/-te, or short/geminate illative.",
+      "hint": "Replace Estonian -sse with Lutsi illative morphology."
+    },
+    {
+      "id": "EST_PL_ILLATIVE_DESSE_TESSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}(desse|tesse)\\b",
+      "message": "Looks like Standard Estonian plural illative -desse/-tesse.",
+      "hint": "Use Lutsi plural illative morphology."
+    },
+    {
+      "id": "EST_PL_PARTITIVE_SID",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}sid\\b",
+      "message": "Looks like Standard Estonian plural partitive -sid.",
+      "hint": "Use Lutsi plural partitive (-sit/-it/-id or vowel plural)."
+    },
+    {
+      "id": "EST_MAS_FORM",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}mas\\b",
+      "message": "Looks like Estonian -mas supine. Lutsi supine inessive is -man/-män or -mah/-mäh.",
+      "hint": "Check Lutsi supine inessive (-man/-mah)."
+    },
+    {
+      "id": "EST_MATA_FORM",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}mata\\b",
+      "message": "Looks like Estonian -mata abessive.",
+      "hint": "Check Lutsi -malda/-mäldä abessive supine."
+    },
+    {
+      "id": "EST_TRANSLATIVE_KS",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}ks\\b",
+      "message": "May be Estonian translative -ks. Lutsi translative is -s.",
+      "hint": "Use Lutsi -s translative.",
+      "allowlist": ["maks", "seks", "kaks", "üks", "miks"]
+    }
+  ],
+  "do_not_flag_suffixes": [
+    {"suffix": "n/h", "reason": "Lutsi inessive uses -n or -h."},
+    {"suffix": "lõ/le", "reason": "Lutsi allative uses -lõ/-le."},
+    {"suffix": "q/'", "reason": "Practical Lutsi marks glottal stop with q or '; academic UPA preserves historical notation."}
+  ]
+}

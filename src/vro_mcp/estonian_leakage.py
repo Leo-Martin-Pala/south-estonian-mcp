@@ -10,8 +10,27 @@ from typing import Any
 from .tokenization import tokenize
 
 
-RULES_PATH = Path(__file__).resolve().parent / "rules" / "estonian-leakage-rules.json"
+RULES_DIR = Path(__file__).resolve().parent / "rules"
+RULES_PATH = RULES_DIR / "estonian-leakage-rules.json"
 SEVERITY_RANK = {"info": 1, "warning": 2, "error": 3}
+SOUTH_ESTONIAN_LANGS: tuple[str, ...] = ("vro", "seto", "mulgi", "tartu", "leivu", "lutsi", "kraasna")
+LANG_ALIASES: dict[str, str] = {
+    "vro": "vro",
+    "voru": "vro",
+    "voro": "vro",
+    "võro": "vro",
+    "võru": "vro",
+    "vor": "vro",
+    "seto": "seto",
+    "setu": "seto",
+    "mulgi": "mulgi",
+    "mulk": "mulgi",
+    "tartu": "tartu",
+    "tarto": "tartu",
+    "leivu": "leivu",
+    "lutsi": "lutsi",
+    "kraasna": "kraasna",
+}
 
 
 @dataclass(frozen=True)
@@ -29,10 +48,22 @@ def _normalize(text: str) -> str:
     return text.casefold().strip()
 
 
-@lru_cache(maxsize=1)
-def load_leakage_rules() -> dict[str, Any]:
-    """Load the YAML-compatible JSON ruleset without a third-party dependency."""
-    data = json.loads(RULES_PATH.read_text(encoding="utf-8"))
+def normalize_language_code(lang: str | None, *, default: str | None = "vro") -> str:
+    """Normalize any supported South Estonian language name or code."""
+    if lang is None or not str(lang).strip():
+        if default is None:
+            raise ValueError("Language code must not be empty.")
+        return default
+    raw = str(lang).casefold().strip()
+    mapped = LANG_ALIASES.get(raw)
+    if mapped is None:
+        supported = ", ".join(SOUTH_ESTONIAN_LANGS)
+        raise ValueError(f"Unsupported South Estonian language {lang!r}. Expected one of: {supported}.")
+    return mapped
+
+
+def _compile_ruleset(path: Path) -> dict[str, Any]:
+    data = json.loads(path.read_text(encoding="utf-8"))
     rules: list[LeakageRule] = []
     for raw in data.get("rules", []):
         rules.append(
@@ -48,14 +79,41 @@ def load_leakage_rules() -> dict[str, Any]:
         )
     return {
         "ruleset_id": data["ruleset_id"],
+        "language": data.get("language", "vro"),
         "purpose": data["purpose"],
         "rules": tuple(rules),
     }
 
 
+@lru_cache(maxsize=1)
+def load_leakage_rules() -> dict[str, Any]:
+    """Load the default Võro leakage ruleset without a third-party dependency."""
+    return _compile_ruleset(RULES_PATH)
+
+
+@lru_cache(maxsize=16)
+def load_language_leakage_rules(lang: str = "vro", rules_dir: str | Path | None = None) -> dict[str, Any]:
+    """Load the tailored leakage ruleset for a South Estonian language."""
+    canon = normalize_language_code(lang)
+    base_dir = Path(rules_dir) if rules_dir is not None else RULES_DIR
+    lang_path = base_dir / f"{canon}-leakage-rules.json"
+    if lang_path.exists():
+        return _compile_ruleset(lang_path)
+    if canon == "vro":
+        fallback = base_dir / "estonian-leakage-rules.json"
+        return _compile_ruleset(fallback if fallback.exists() else RULES_PATH)
+    raise FileNotFoundError(f"Leakage rules file not found for language {canon!r}: {lang_path}")
+
+
 class EstonianLeakageLinter:
-    def __init__(self) -> None:
-        self.ruleset = load_leakage_rules()
+    def __init__(self, lang: str | None = None, rules_dir: Path | None = None) -> None:
+        if lang is None and rules_dir is None:
+            self.lang = "vro"
+            self.ruleset = load_leakage_rules()
+        else:
+            self.lang = normalize_language_code(lang)
+            resolved_dir = str(rules_dir) if rules_dir is not None else None
+            self.ruleset = load_language_leakage_rules(self.lang, resolved_dir)
 
     def lint_words(self, words: str | list[str]) -> dict[str, list[dict[str, Any]]]:
         """In-depth leakage check for discrete words or short phrases.

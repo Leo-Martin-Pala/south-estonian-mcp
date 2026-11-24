@@ -2,17 +2,22 @@ from __future__ import annotations
 
 import json
 import unittest
-import sqlite3
-import tempfile
+
 from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
 from vro_mcp.config import load_settings
-from vro_mcp.db import CorpusStore, DictionaryStore, normalize_db_text
+from vro_mcp.db import normalize_db_text
 from vro_mcp.giella import GiellaAdapter
 from vro_mcp.server import _mcp_path_from_env, _read_resource
-from vro_mcp.tools import VroTools, _count_text, _parse_grammar_lines, _parse_spellcheck_lines
+from vro_mcp.tools import (
+    CORPUS_POLICY_ID,
+    VroTools,
+    _count_text,
+    _parse_grammar_lines,
+    _parse_spellcheck_lines,
+)
 
 
 DATA_HINT = "run `make data` (or `make setup`) to download the datasets"
@@ -44,125 +49,69 @@ class SmokeTests(unittest.TestCase):
             self.skipTest(f"Giella {', '.join(missing)} not installed — {GIELLA_HINT}")
 
     def test_lookup_word_runs(self) -> None:
-        self._require_db("dictionary")
+        self._require_db("south_estonian")
         out = self.tools.lookup_word("world", limit=1)
         results = out["world"]
         self.assertTrue(results)
-        self.assertEqual(results[0]["en"], ["world"])
-        self.assertIn("maailm", results[0]["vro"])
+        self.assertEqual(results[0]["lang"], "vro")
+        self.assertIn(results[0]["headword"], {"ilm", "maailm"})
+        self.assertIn({"target_lang": "en", "text": "world"}, results[0]["definitions"])
         self.assertNotIn("available_directions", results[0])
 
     def test_lookup_word_batched_is_keyed(self) -> None:
-        self._require_db("dictionary")
+        self._require_db("south_estonian")
         out = self.tools.lookup_word(["world", "water"])
         self.assertEqual(set(out), {"world", "water"})
         self.assertTrue(out["world"])
 
     def test_database_lookup_normalization_handles_palatalization_ticks(self) -> None:
-        self.assertEqual(normalize_db_text("B\u0301 b´ b’ bʼ Riḱ"), "b' b' b' b' rik'")
+        self.assertEqual(normalize_db_text("B\u0301 b´ b’ bʼ Riḱ"), "b b b b rik")
+        self.assertEqual(normalize_db_text("ät´t"), "ätt")
         self.assertEqual(normalize_db_text("Á"), "á")
 
-    def test_lookup_word_falls_back_to_subword_match(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            db_path = Path(tmp) / "dictionary.sqlite"
-            with sqlite3.connect(db_path) as conn:
-                conn.execute(
-                    "create table entries (entry_id text, source text, language text, word text, info text)"
-                )
-                conn.executemany(
-                    "insert into entries values (?, ?, ?, ?, ?)",
-                    [
-                        ("1", "test", "en", "church, temple", None),
-                        ("1", "test", "vro", "kerik", None),
-                    ],
-                )
-            results = DictionaryStore(db_path).lookup_word("church", direction="en-vro")
-        self.assertEqual(results[0]["en"], ["church, temple"])
-        self.assertEqual(results[0]["vro"], ["kerik"])
-
     def test_find_usage_examples_runs(self) -> None:
-        self._require_db("corpus")
+        self._require_db("south_estonian")
         out = self.tools.find_usage_examples("naasõ", limit=1)
         results = out["naasõ"]
         self.assertTrue(results)
-        self.assertIsInstance(results[0], str)
-        self.assertLessEqual(len(results[0]), 266)
-        self.assertNotIn("public_id", results[0])
+        self.assertIsInstance(results[0]["snippet"], str)
+        self.assertLessEqual(len(results[0]["snippet"]), 266)
+        self.assertIn("naasõ", results[0]["snippet"].casefold())
+        self.assertTrue(results[0]["public_id"])
+        self.assertTrue(results[0]["source_slug"])
 
-    def test_common_corpus_search_keeps_direct_keyed_output_shape(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            db_path = Path(tmp) / "corpus.sqlite"
-            with sqlite3.connect(db_path) as conn:
-                conn.execute(
-                    """
-                    create table segments (
-                        id integer primary key,
-                        public_id text,
-                        source_slug text,
-                        source_type text,
-                        document_id text,
-                        segment_index integer,
-                        text text
-                    )
-                    """
-                )
-                conn.execute("create virtual table segments_fts using fts5(text)")
-                rows = [
-                    (1, "p1", "test", "wiki_article", "d1", 1, "ja üks"),
-                    (2, "p2", "test", "wiki_article", "d1", 2, "ja kats"),
-                ]
-                conn.executemany("insert into segments values (?, ?, ?, ?, ?, ?, ?)", rows)
-                conn.executemany(
-                    "insert into segments_fts(rowid, text) values (?, ?)",
-                    [(row[0], row[-1]) for row in rows],
-                )
-            with patch("vro_mcp.db.COMMON_TERM_MATCH_THRESHOLD", 1):
-                results = CorpusStore(db_path).find_usage_examples("ja", limit=1)
-        self.assertIsInstance(results, list)
-        self.assertEqual(len(results), 1)
-        self.assertIsInstance(results[0], str)
-
-    def test_find_usage_examples_accepts_snippet_length_cap(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            db_path = Path(tmp) / "corpus.sqlite"
-            with sqlite3.connect(db_path) as conn:
-                conn.execute(
-                    """
-                    create table segments (
-                        id integer primary key,
-                        public_id text,
-                        source_slug text,
-                        source_type text,
-                        document_id text,
-                        segment_index integer,
-                        text text
-                    )
-                    """
-                )
-                conn.execute("create virtual table segments_fts using fts5(text)")
-                text = f"{'algus ' * 40}needle {'lopp ' * 40}"
-                row = (1, "p1", "test", "wiki_article", "d1", 1, text)
-                conn.execute("insert into segments values (?, ?, ?, ?, ?, ?, ?)", row)
-                conn.execute("insert into segments_fts(rowid, text) values (?, ?)", (1, text))
-            results = CorpusStore(db_path).find_usage_examples(
-                "needle",
-                limit=1,
-                max_snippet_chars=120,
-            )
-        self.assertEqual(len(results), 1)
-        self.assertIn("needle", results[0])
-        self.assertLessEqual(len(results[0]), 120)
+    def test_legacy_parallel_source_filter(self) -> None:
+        self._require_db("south_estonian")
+        out = self.tools.find_usage_examples("Võro", source_type="parallel_corpus_vro_side")
+        self.assertTrue(out["Võro"])
+        self.assertTrue(all(row["source_slug"] == "paraleelkorpus" for row in out["Võro"]))
 
     def test_word_exists_in_bag_runs(self) -> None:
-        self._require_db("word_bag")
+        if not self.tools.settings.south_estonian_db.exists():
+            self.skipTest("south_estonian.db not present")
         out = self.tools.word_exists_in_bag("Miä")
         self.assertGreater(out["Miä"], 0)
 
     def test_word_exists_in_bag_batched_is_keyed(self) -> None:
-        self._require_db("word_bag")
+        if not self.tools.settings.south_estonian_db.exists():
+            self.skipTest("south_estonian.db not present")
         out = self.tools.word_exists_in_bag(["Miä", "xyzzyvrotest"])
         self.assertGreater(out["Miä"], 0)
         self.assertEqual(out["xyzzyvrotest"], 0)
+
+    def test_word_exists_in_bag_with_lang_and_include_languages(self) -> None:
+        if not self.tools.settings.south_estonian_db.exists():
+            self.skipTest("south_estonian.db not present")
+        detailed = self.tools.word_exists_in_bag(
+            ["Miä", "xyzzyvrotest"],
+            include_languages=True,
+        )
+        self.assertGreater(detailed["Miä"]["total_count"], 0)
+        self.assertIn("vro", detailed["Miä"]["languages"])
+        self.assertIsInstance(detailed["Miä"]["languages"], list)
+        self.assertEqual(detailed["xyzzyvrotest"], {"total_count": 0, "languages": []})
+        filtered = self.tools.word_exists_in_bag("Miä", lang="seto")
+        self.assertIsInstance(filtered["Miä"], int)
 
     def test_count_text_counts_voro_prose_shape(self) -> None:
         text = "Miä olõ-i hüä. Tuust huul'maldaq 110,000 rubla!"
@@ -182,7 +131,8 @@ class SmokeTests(unittest.TestCase):
         )
 
     def test_find_unknown_words_runs(self) -> None:
-        self._require_db("word_bag")
+        if not self.tools.settings.south_estonian_db.exists():
+            self.skipTest("south_estonian.db not present")
         result = self.tools.find_unknown_words("Miä olõ hüä xyzzyvrotest", limit=10)
         self.assertIn("xyzzyvrotest", result["unknown"])
         self.assertEqual(result["checked"], 4)
@@ -209,11 +159,11 @@ class SmokeTests(unittest.TestCase):
         self.assertLess(result["checked"], 4)
 
     def test_find_unrecognized_words_analyzes_original_surface_after_db_normalization(self) -> None:
-        class FakeWordBag:
+        class FakeSouthEstonian:
             def __init__(self) -> None:
                 self.seen: list[str] = []
 
-            def _known_words(self, words: object) -> set[str]:
+            def known_words_in_bag(self, words: object, *, lang: str | None = None) -> set[str]:
                 self.seen = list(words)  # type: ignore[arg-type]
                 return set()
 
@@ -221,10 +171,11 @@ class SmokeTests(unittest.TestCase):
             def __init__(self) -> None:
                 self.checked: list[str] = []
 
-            def analyze_words(self, words: list[str]) -> dict[str, object]:
+            def analyze_words(self, words: list[str], *, lang: str = "vro") -> dict[str, object]:
                 self.checked = words
                 return {
                     "available": True,
+                    "lang": lang,
                     "results": {
                         "Tarton": {"recognized": True},
                         "piirte": {"recognized": False},
@@ -232,10 +183,11 @@ class SmokeTests(unittest.TestCase):
                 }
 
         tools = VroTools.__new__(VroTools)
-        tools.word_bag = FakeWordBag()
+        fake_se = FakeSouthEstonian()
+        tools._south_estonian_store = fake_se
         tools.giella = FakeGiella()
         result = tools.find_unrecognized_words("Tarton piirte", prefilter=True)
-        self.assertIn("tarton", tools.word_bag.seen)
+        self.assertIn("tarton", fake_se.seen)
         self.assertIn("Tarton", tools.giella.checked)
         self.assertEqual(result["unrecognized"], ["piirte"])
 
@@ -253,7 +205,7 @@ class SmokeTests(unittest.TestCase):
         self.assertTrue(out["kala"])
 
     def test_lint_estonian_leakage_flags_estonian_like_endings(self) -> None:
-        out = self.tools.lint_estonian_leakage(["teinud", "kirjutab", "kalaq"])
+        out = self.tools.check_purity_with_rules(words=["teinud", "kirjutab", "kalaq"])["results"]
         self.assertTrue(out["teinud"])
         self.assertEqual(
             out["teinud"][0]["severity"],
@@ -267,27 +219,30 @@ class SmokeTests(unittest.TestCase):
 
     def test_lint_estonian_leakage_does_not_tokenize_inputs(self) -> None:
         # A whole phrase is treated as one unit; the window rule fires via search.
-        out = self.tools.lint_estonian_leakage("ei teinud")
+        out = self.tools.check_purity_with_rules(words="ei teinud")["results"]
         self.assertEqual(set(out), {"ei teinud"})
         self.assertTrue(out["ei teinud"])
         self.assertEqual(out["ei teinud"][0]["severity"], "error")
 
     def test_lint_estonian_leakage_allowlist(self) -> None:
-        out = self.tools.lint_estonian_leakage("maks")
+        out = self.tools.check_purity_with_rules(words="maks")["results"]
         self.assertEqual(out["maks"], [])
 
     def test_find_estonian_leakage_slim_scan(self) -> None:
         text = "Tä läheb kodo. Üts asi om tehtud. Timä ei teinud taad. Tehtud sai tehtud."
-        out = self.tools.find_estonian_leakage(text)
+        out = self.tools.check_purity_with_rules(text=text)
         # Slim: surface strings only, deduped and frequency-sorted.
         self.assertEqual(out["flagged_words"][0], "tehtud")  # most frequent
         self.assertIn("läheb", out["flagged_words"])
         self.assertNotIn("flagged_phrases", out)
         self.assertNotIn("tokens", out)
         self.assertNotIn("matches", out)
+        self.assertNotIn("details", out)
+        detailed = self.tools.check_purity_with_rules(text=text, detail=True)
+        self.assertIn("tehtud", detailed["details"])
 
     def test_find_estonian_leakage_keeps_voro_words(self) -> None:
-        out = self.tools.find_estonian_leakage("Ma olõ-i tennüq taad tüüd mõistaq.")
+        out = self.tools.check_purity_with_rules(text="Ma olõ-i tennüq taad tüüd mõistaq.")
         self.assertEqual(out["flagged_words"], [])
         self.assertNotIn("flagged_phrases", out)
 
@@ -311,16 +266,22 @@ class SmokeTests(unittest.TestCase):
 
     def test_suggest_correction_marks_invalid_form_seen_in_word_bag(self) -> None:
         class FakeSuggester:
-            def suggest_correction(self, form: str) -> dict[str, object]:
-                return {"form": form, "valid": False, "alternatives": []}
+            def suggest_correction(self, form: str, *, lang: str = "vro") -> dict[str, object]:
+                return {"form": form, "lang": lang, "valid": False, "alternatives": []}
 
-        class FakeWordBag:
-            def exists_many(self, words: list[str]) -> dict[str, dict[str, object]]:
+        class FakeSouthEstonian:
+            def word_exists_in_bag_many(
+                self,
+                words: list[str],
+                *,
+                lang: str | None = None,
+                include_languages: bool = False,
+            ) -> dict[str, dict[str, object]]:
                 return {words[0]: {"total_count": 7}}
 
         tools = VroTools.__new__(VroTools)
         tools.correction_suggester = FakeSuggester()
-        tools.word_bag = FakeWordBag()
+        tools._south_estonian_store = FakeSouthEstonian()
         result = tools.suggest_correction("seenform")
         self.assertFalse(result["valid"])
         self.assertTrue(result["seen_in_word_bag"])
@@ -328,8 +289,8 @@ class SmokeTests(unittest.TestCase):
 
     def test_suggest_correction_accepts_word_alias(self) -> None:
         class FakeSuggester:
-            def suggest_correction(self, form: str) -> dict[str, object]:
-                return {"form": form, "valid": True, "alternatives": []}
+            def suggest_correction(self, form: str, *, lang: str = "vro") -> dict[str, object]:
+                return {"form": form, "lang": lang, "valid": True, "alternatives": []}
 
         tools = VroTools.__new__(VroTools)
         tools.correction_suggester = FakeSuggester()
@@ -339,7 +300,7 @@ class SmokeTests(unittest.TestCase):
 
     def test_spellcheck_tokenizes_sentence_input(self) -> None:
         self._require_giella("speller")
-        result = self.tools.spellcheck_vro("Miä olõ hüä tekstt.")
+        result = self.tools.spellcheck("Miä olõ hüä tekstt.", lang="vro")
         unknown_words = [item["word"] for item in result["unknown"]]
         self.assertIn("tekstt", unknown_words)
         self.assertNotIn("miä", unknown_words)
@@ -386,6 +347,27 @@ class SmokeTests(unittest.TestCase):
         result = self.tools.generate_forms("uma", tags="A+Sg+Ill")
         self.assertIn("umma", result.get("forms", []))
 
+    def test_generate_paradigm_runs_for_vro(self) -> None:
+        self._require_giella("generator")
+        vro_v = self.tools.generate_paradigm("olõma", lang="vro")
+        self.assertEqual(vro_v["pos"], "V")
+        self.assertIn("om", vro_v["present"]["Sg3"])
+        self.assertIn("ollaq", vro_v["non_finite"]["Inf"])
+
+    def test_generate_paradigm_runs_for_mulgi(self) -> None:
+        if not self.tools.giella.availability_by_language()["mulgi"]["generator"]["available"]:
+            self.skipTest("Mulgi Giella generator unavailable")
+        mulgi_n = self.tools.generate_paradigm("käsi", lang="mulgi")
+        self.assertEqual(mulgi_n["pos"], "N")
+        self.assertIn("käe", mulgi_n["singular"]["Gen"])
+
+    def test_generate_paradigm_runs_for_seto(self) -> None:
+        if not self.tools.giella.availability_by_language()["seto"]["generator"]["available"]:
+            self.skipTest("Seto Giella generator unavailable")
+        seto_v = self.tools.generate_paradigm("olõma", lang="seto")
+        self.assertEqual(seto_v["pos"], "V")
+        self.assertTrue(seto_v["present"]["Sg3"])
+
     def test_generate_forms_filters_failures(self) -> None:
         class FakeGiella:
             def __init__(self) -> None:
@@ -395,10 +377,13 @@ class SmokeTests(unittest.TestCase):
                 self,
                 lemma: str,
                 tags: str | None = None,
+                *,
+                lang: str = "vro",
             ) -> dict[str, object]:
                 self.call = (lemma, tags)
                 return {
                     "available": True,
+                    "lang": lang,
                     "lines": [
                         "kerik+N+Sg+Ine\tkerikun\t0",
                         "kerik+Sg+Ine\tkerik+Sg+Ine\t+?",
@@ -449,21 +434,22 @@ class SmokeTests(unittest.TestCase):
 
     def test_grammar_check_returns_structured_errors(self) -> None:
         self._require_giella("grammar")
-        result = self.tools.grammar_check_vro("Miä olõ hüä tekstt.")
+        result = self.tools.grammar_check("Miä olõ hüä tekstt.", lang="vro")
         self.assertIn("errors", result)
         self.assertNotIn("lines", result)
         self.assertNotIn("text", result)
         self.assertTrue(any(error["word"] == "tekstt" for error in result["errors"]))
 
     def test_lookup_word_accepts_standard_direction(self) -> None:
-        self._require_db("dictionary")
+        self._require_db("south_estonian")
         out = self.tools.lookup_word("vesi", direction="vro-en", limit=1)
-        self.assertEqual(out["vesi"][0]["direction"], "vro-en")
-        self.assertTrue(out["vesi"][0]["en"])
-        self.assertTrue(out["vesi"][0]["vro"])
+        self.assertEqual(out["vesi"][0]["lang"], "vro")
+        self.assertEqual(out["vesi"][0]["headword"], "vesi")
+        self.assertTrue(out["vesi"][0]["definitions"])
+        self.assertTrue(all(d["target_lang"] == "en" for d in out["vesi"][0]["definitions"]))
 
     def test_lookup_word_supports_standard_directions(self) -> None:
-        self._require_db("dictionary")
+        self._require_db("south_estonian")
         cases = {
             "en-vro": ("world", "en", "vro"),
             "et-vro": ("maailm", "et", "vro"),
@@ -475,9 +461,11 @@ class SmokeTests(unittest.TestCase):
                 out = self.tools.lookup_word(query, direction=direction, limit=1)
                 self.assertTrue(out[query])
                 result = out[query][0]
-                self.assertEqual(result["direction"], direction)
-                self.assertTrue(result[source_lang])
-                self.assertTrue(result[target_lang])
+                self.assertEqual(result["lang"], "vro")
+                self.assertTrue(result["headword"])
+                self.assertTrue(result["definitions"])
+                gloss_lang = source_lang if source_lang != "vro" else target_lang
+                self.assertTrue(all(d["target_lang"] == gloss_lang for d in result["definitions"]))
 
     def test_lookup_word_rejects_invalid_direction(self) -> None:
         out = self.tools.lookup_word("vesi", direction="ev")
@@ -502,7 +490,7 @@ class SmokeTests(unittest.TestCase):
             self.assertEqual(_mcp_path_from_env(), "/secret/mcp")
 
     def test_translate_rejects_unsupported_pair_locally(self) -> None:
-        result = self.tools.translate_vro("Tere", source_lang="deu", target_lang="vro")
+        result = self.tools.translate_mt("Tere", source_lang="deu", target_lang="vro")
         self.assertEqual(result["error"], "unsupported_translation_pair")
         self.assertNotIn("ger", result["supported_to_vro"])
 
@@ -525,8 +513,10 @@ class SmokeTests(unittest.TestCase):
             return FakeResponse()
 
         with patch("urllib.request.urlopen", fake_urlopen):
-            result = self.tools.translate_vro("Hello", source_lang="en", target_lang="vro")
-        self.assertEqual(result, {"text": "Tere"})
+            result = self.tools.translate_mt("Hello", source_lang="en", target_lang="vro")
+        self.assertEqual(result["text"], "Tere")
+        self.assertEqual(result["translated_text"], "Tere")
+        self.assertEqual(result["backend"], "neurotolge_api")
         payload = json.loads(captured["body"])
         self.assertEqual(payload["src"], "eng")
         self.assertEqual(payload["tgt"], "vro")
@@ -555,51 +545,85 @@ class SmokeTests(unittest.TestCase):
         )
         tools = VroTools(settings)
         with patch("urllib.request.urlopen", fake_urlopen):
-            result = tools.translate_vro("Hello", source_lang="eng", target_lang="vro")
+            result = tools.translate_mt("Hello", source_lang="eng", target_lang="vro")
 
-        self.assertEqual(result, {"text": "Tere"})
+        self.assertEqual(result["text"], "Tere")
+        self.assertEqual(result["backend"], "neurotolge_api")
         self.assertEqual(captured["url"], "http://127.0.0.1:8765/translation/v2")
         payload = json.loads(captured["body"])
         self.assertEqual(payload["src"], "eng")
         self.assertEqual(payload["tgt"], "vro")
 
-    def test_missing_dictionary_db_is_structured(self) -> None:
-        tools = VroTools(replace(load_settings(), dictionary_db=Path("/tmp/no-such-dict.sqlite")))
+    def test_translate_mt_auto_falls_back_to_local_on_api_error(self) -> None:
+        class FakeMT:
+            def translate(self, text: str, source_lang: str, target_lang: str) -> dict[str, object]:
+                return {
+                    "source_lang": source_lang,
+                    "target_lang": target_lang,
+                    "translated_text": "Täämbä",
+                }
+
+        tools = VroTools(
+            replace(
+                load_settings(),
+                neurotolge_base_url="http://127.0.0.1:1/unreachable",
+            )
+        )
+        tools._mt_runner = FakeMT()
+        result = tools.translate_mt("Täna", source_lang="et", target_lang="vro")
+        self.assertEqual(result["translated_text"], "Täämbä")
+        self.assertEqual(result["backend"], "local_smugri_fp16")
+        self.assertEqual(result["fallback_from"], "neurotolge_api")
+        self.assertTrue(result["fallback_used"])
+
+    def test_missing_south_estonian_db_is_structured_for_lookup(self) -> None:
+        tools = VroTools(replace(load_settings(), south_estonian_db=Path("/tmp/no-such-se.db")))
         result = tools.lookup_word("world")
         self.assertFalse(result["available"])
-        self.assertEqual(result["error"], "dictionary_db_unavailable")
-        self.assertEqual(result["database"], "dictionary")
+        self.assertEqual(result["error"], "south_estonian_db_unavailable")
+        self.assertEqual(result["database"], "south_estonian")
         self.assertIn("setup_hint", result)
 
-    def test_missing_corpus_db_is_structured(self) -> None:
-        tools = VroTools(replace(load_settings(), corpus_db=Path("/tmp/no-such-corpus.sqlite")))
+    def test_missing_south_estonian_db_is_structured_for_corpus(self) -> None:
+        tools = VroTools(replace(load_settings(), south_estonian_db=Path("/tmp/no-such-se.db")))
         result = tools.find_usage_examples("naasõ")
         self.assertFalse(result["available"])
-        self.assertEqual(result["error"], "corpus_db_unavailable")
-        self.assertEqual(result["database"], "corpus")
+        self.assertEqual(result["error"], "south_estonian_db_unavailable")
+        self.assertEqual(result["database"], "south_estonian")
         self.assertIn("setup_hint", result)
 
     def test_missing_word_bag_db_is_structured(self) -> None:
-        tools = VroTools(replace(load_settings(), word_bag_db=Path("/tmp/no-such-bag.sqlite")))
+        tools = VroTools(
+            replace(
+                load_settings(),
+                south_estonian_db=Path("/tmp/no-such-se.db"),
+            )
+        )
         result = tools.word_exists_in_bag("Miä")
         self.assertFalse(result["available"])
-        self.assertEqual(result["error"], "word_bag_db_unavailable")
-        self.assertEqual(result["database"], "word_bag")
+        self.assertEqual(result["error"], "south_estonian_db_unavailable")
+        self.assertEqual(result["database"], "south_estonian")
         self.assertIn("setup_hint", result)
 
     def test_find_unrecognized_words_prefilter_missing_word_bag_is_structured(self) -> None:
-        tools = VroTools(replace(load_settings(), word_bag_db=Path("/tmp/no-such-bag.sqlite")))
+        tools = VroTools(
+            replace(
+                load_settings(),
+                south_estonian_db=Path("/tmp/no-such-se.db"),
+            )
+        )
         result = tools.find_unrecognized_words("Miä olõ hüä", prefilter=True)
         self.assertFalse(result["available"])
-        self.assertEqual(result["error"], "word_bag_db_unavailable")
-        self.assertEqual(result["database"], "word_bag")
+        self.assertEqual(result["error"], "south_estonian_db_unavailable")
+        self.assertEqual(result["database"], "south_estonian")
         self.assertIn("setup_hint", result)
 
     def test_check_setup_reports_databases(self) -> None:
-        self._require_db("dictionary")
+        self._require_db("south_estonian")
         result = self.tools.check_setup()
+        self.assertEqual(result["corpus_policy"], CORPUS_POLICY_ID)
         self.assertIn("databases", result)
-        self.assertTrue(result["databases"]["dictionary"])
+        self.assertTrue(result["databases"]["south_estonian"])
 
 
 if __name__ == "__main__":

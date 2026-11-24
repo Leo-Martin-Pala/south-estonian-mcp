@@ -4,7 +4,6 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-from .db import DictionaryStore
 from .giella import GiellaAdapter
 from .tokenization import tokenize
 
@@ -29,35 +28,39 @@ class Candidate:
 
 
 class CorrectionSuggester:
-    def __init__(self, dictionary: DictionaryStore, giella: GiellaAdapter) -> None:
+    def __init__(self, dictionary: Any, giella: GiellaAdapter) -> None:
         self.dictionary = dictionary
         self.giella = giella
 
-    def suggest_correction(self, form: str) -> dict[str, Any]:
+    def suggest_correction(self, form: str, *, lang: str = "vro") -> dict[str, Any]:
         original = form.strip()
         if not original:
-            return {"form": original, "valid": False, "alternatives": []}
+            return {"form": original, "lang": lang, "valid": False, "alternatives": []}
 
-        original_analysis = self.giella.analyze_words([original])
+        original_analysis = self.giella.analyze_words([original], lang=lang)
         if self._is_weight_zero(original_analysis, original):
-            return {"form": original, "valid": True, "alternatives": []}
+            return {"form": original, "lang": lang, "valid": True, "alternatives": []}
 
         candidates: dict[str, Candidate] = {}
 
-        spelling = self.giella.spellcheck_vro(original)
-        for rank, item in enumerate(self._parse_speller_suggestions(spelling), start=1):
-            self._add_candidate(
-                candidates,
-                item["form"],
-                "speller",
-                20 + rank,
-                item["weight"],
-                {"weight": item["weight"], "rank": rank},
-            )
+        spelling = self.giella.spellcheck(original, lang=lang)
+        if spelling.get("available"):
+            for rank, item in enumerate(self._parse_speller_suggestions(spelling), start=1):
+                self._add_candidate(
+                    candidates,
+                    item["form"],
+                    "speller",
+                    20 + rank,
+                    item["weight"],
+                    {"weight": item["weight"], "rank": rank},
+                )
 
-        dictionary_entries = self.dictionary.find_correction_entries(original, limit=40)
+        try:
+            dictionary_entries = self.dictionary.find_correction_entries(original, limit=40, lang=lang)
+        except TypeError:
+            dictionary_entries = self.dictionary.find_correction_entries(original, limit=40)
         for entry_rank, entry in enumerate(dictionary_entries, start=1):
-            for token in self._vro_tokens_from_entry(entry):
+            for token in self._vro_tokens_from_entry(entry, lang=lang):
                 self._add_candidate(
                     candidates,
                     token,
@@ -67,8 +70,8 @@ class CorrectionSuggester:
                     {"concept": entry},
                 )
 
-        analyzed = self._analyze_candidates(candidates)
-        generated = self._generate_inflection_candidates(original, analyzed)
+        analyzed = self._analyze_candidates(candidates, lang=lang)
+        generated = self._generate_inflection_candidates(original, analyzed, lang=lang)
         for item in generated:
             self._add_candidate(
                 candidates,
@@ -79,12 +82,13 @@ class CorrectionSuggester:
                 item,
             )
 
-        analyzed = self._analyze_candidates(candidates)
+        analyzed = self._analyze_candidates(candidates, lang=lang)
         confirmed = [candidate for candidate in analyzed.values() if candidate.analyses]
         confirmed.sort(key=self._ranking_key)
 
         return {
             "form": original,
+            "lang": lang,
             "valid": False,
             "alternatives": [candidate.form for candidate in confirmed[:3]],
         }
@@ -93,6 +97,8 @@ class CorrectionSuggester:
         self,
         original: str,
         candidates: dict[str, Candidate],
+        *,
+        lang: str = "vro",
     ) -> list[dict[str, Any]]:
         tags = self._target_generation_tags(original)
         if not tags:
@@ -107,7 +113,7 @@ class CorrectionSuggester:
                     continue
                 seen_lemmas.add(lemma)
                 for tag in tags:
-                    result = self.giella.generate_forms(lemma, tags=tag)
+                    result = self.giella.generate_forms(lemma, tags=tag, lang=lang)
                     for form in self._parse_generated_forms(result):
                         generated.append(
                             {
@@ -120,11 +126,11 @@ class CorrectionSuggester:
                         )
         return generated
 
-    def _analyze_candidates(self, candidates: dict[str, Candidate]) -> dict[str, Candidate]:
+    def _analyze_candidates(self, candidates: dict[str, Candidate], *, lang: str = "vro") -> dict[str, Candidate]:
         unanalyzed = [candidate.form for candidate in candidates.values() if not candidate.analyses]
         if not unanalyzed:
             return candidates
-        result = self.giella.analyze_words(unanalyzed)
+        result = self.giella.analyze_words(unanalyzed, lang=lang)
         if not result.get("available"):
             return candidates
         for form, analysis in result.get("results", {}).items():
@@ -180,13 +186,16 @@ class CorrectionSuggester:
         return any(_line_has_weight_zero(line) for line in result.get("lines", []))
 
     @staticmethod
-    def _vro_tokens_from_entry(entry: dict[str, Any]) -> list[str]:
-        values: list[str] = []
-        values.extend(entry.get("vro", []))
+    def _vro_tokens_from_entry(entry: dict[str, Any], *, lang: str = "vro") -> list[str]:
+        raw = entry.get(lang) or entry.get("headwords") or entry.get("vro") or []
+        if isinstance(raw, str):
+            values = [raw]
+        else:
+            values = list(raw)
 
         tokens: list[str] = []
         for value in values:
-            for token in tokenize(value.replace("|", "")):
+            for token in tokenize(str(value).replace("|", "")):
                 cleaned = token.strip(".-()[]{}:;\"'")
                 if len(cleaned) >= 2:
                     tokens.append(cleaned)

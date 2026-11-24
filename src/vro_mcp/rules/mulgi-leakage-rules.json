@@ -1,0 +1,144 @@
+{
+  "language": "mulgi",
+  "ruleset_id": "mulgi_estonian_leakage_v1_0",
+  "purpose": "Flag likely Standard Estonian morphological and lexical leakage in intended Mulgi text, while allowing authentic Mulgi features (-b/-p 3sg present, q-less forms, -me/-mä ma-infinitive, -n/-nd participles, -n inessive, -ge comitative, -ss translative/conditional, -te/-de abessive).",
+  "normalization": {
+    "lowercase": true,
+    "preserve_chars": ["õ", "ä", "ö", "ü", "š", "ž", "´", "'", "’"],
+    "token_regex": "[^\\W\\d_][^\\W\\d_'´’-]*['´’-]*[^\\W\\d_]*"
+  },
+  "rules": [
+    {
+      "id": "EST_ACTIVE_PAST_NUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}nud\\b",
+      "message": "Looks like Standard Estonian active past participle -nud. Mulgi uses -n, -nd, or -nu/-nü (e.g. ollu/oln, tennü/tend), not -nud.",
+      "hint": "Use Mulgi active past participle morphology (-nu/-nü/-n/-nd)."
+    },
+    {
+      "id": "EST_PASSIVE_PAST_TUD_DUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}(tud|dud)\\b",
+      "message": "Looks like Standard Estonian passive past participle -tud/-dud. Mulgi uses -t/-d, -tu/-tü, or -du/-dü.",
+      "hint": "Rewrite with Mulgi passive participle (-t/-d/-tu/-tü/-du/-dü)."
+    },
+    {
+      "id": "EST_NEG_PAST_EI_NUD",
+      "severity": "error",
+      "scope": "window",
+      "regex": "(?iu)\\bei\\s+[^\\W\\d_]['´’\\-\\wõäöüšž]+(nud|tud|dud)\\b",
+      "message": "Looks like Standard Estonian past negation ei + -nud/-tud. Mulgi past negation uses es + verb (es tii, es ole).",
+      "hint": "Use Mulgi es past negation, not Estonian ei + -nud."
+    },
+    {
+      "id": "EST_NEG_POLE_POLNUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b(pole|polnud|poleks|polevat)\\b",
+      "message": "Standard Estonian contracted negation pole/polnud/poleks/polevat is an Estonianism in Mulgi.",
+      "hint": "Use Mulgi ei ole / es ole / ess ole."
+    },
+    {
+      "id": "EST_3PL_PRESENT_VAD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}vad\\b",
+      "message": "Looks like Standard Estonian 3pl present -vad. Mulgi 3pl present uses -ve/-va (e.g. tegeve, tuleva, eläve).",
+      "hint": "Use Mulgi 3pl ending (-ve/-va/-vä), not Standard Estonian -vad."
+    },
+    {
+      "id": "EST_IMPERSONAL_TAKSE_DAKSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}(takse|dakse)\\b",
+      "message": "Looks like Standard Estonian impersonal -takse/-dakse. Mulgi uses -tes/-tas/-des/-das (e.g. tetäs, üteldäs).",
+      "hint": "Replace -takse/-dakse with Mulgi -tas/-täs/-tes."
+    },
+    {
+      "id": "EST_SIMPLE_PAST_PERSONAL",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}(sin|sime|site)\\b",
+      "message": "May be Standard Estonian simple past -sin/-sime/-site (Mulgi commonly uses -si/-sime/-site in some subvarieties, or -i/-ssi; check local Karksi/Halliste/Helme/Tarvastu/Paistu paradigm).",
+      "hint": "Verify against genuine Mulgi past forms rather than copying Standard Estonian.",
+      "allowlist": ["masin"]
+    },
+    {
+      "id": "EST_CONDITIONAL_PERSONAL",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}(ksin|ksime|ksite)\\b",
+      "message": "Looks like Standard Estonian conditional -ksin/-ksime/-ksite. Mulgi conditional uses -ss/-ssi/-se (e.g. oless, tess).",
+      "hint": "Rewrite with Mulgi conditional -ss/-ssi."
+    },
+    {
+      "id": "EST_ILLATIVE_SSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}sse\\b",
+      "message": "Looks like Standard Estonian illative -sse. Mulgi uses short/geminate illative or -de/-te/-he (e.g. tupa, linna, metsä, kätte).",
+      "hint": "Use a Mulgi illative form instead of Estonian -sse.",
+      "allowlist": ["kasse", "lusse"]
+    },
+    {
+      "id": "EST_PL_ILLATIVE_DESSE_TESSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}(desse|tesse)\\b",
+      "message": "Looks like Standard Estonian plural illative -desse/-tesse.",
+      "hint": "Use Mulgi plural illative (-tes/-de/-he or stem illative)."
+    },
+    {
+      "id": "EST_PL_PARTITIVE_SID",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}sid\\b",
+      "message": "May be Standard Estonian plural partitive -sid. Mulgi prefers vowel plural (-e/-i/-u) or -sit/-id.",
+      "hint": "Check whether a Mulgi vowel plural or -id/-sit partitive is more idiomatic."
+    },
+    {
+      "id": "EST_MAS_FORM",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}mas\\b",
+      "message": "Looks like Standard Estonian -mas supine. Mulgi supine inessive is -men/-man/-män (or -meh).",
+      "hint": "Check whether this should be Mulgi -men/-man/-män."
+    },
+    {
+      "id": "EST_MATA_FORM",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}mata\\b",
+      "message": "Looks like Standard Estonian -mata abessive. Mulgi supine abessive typically uses -mete/-made/-malda or -te/-de.",
+      "hint": "Check whether Mulgi uses -mete/-malda or -te/-de."
+    },
+    {
+      "id": "EST_TRANSLATIVE_KS",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}ks\\b",
+      "message": "Looks like Standard Estonian translative -ks. Mulgi translative uses -ss or -s.",
+      "hint": "Rewrite translative noun/adjective ending with Mulgi -ss or -s.",
+      "allowlist": ["maks", "seks", "kaks", "üks", "miks"]
+    },
+    {
+      "id": "EST_COMITATIVE_GA_LEXICAL_EST",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b(see|need|väga|palju|nüüd|miks|kuidas|kes|mis)\\b",
+      "message": "Check whether Standard Estonian pronoun/adverb leaked where Mulgi prefers sii, nii, väige, pallu, nüid, misperäst, kuis (note: kes/mis overlap in some contexts).",
+      "hint": "Use Mulgi sii (= see), nii (= need), mia/mina, sia, nüid/nüüd, pallu where authentic.",
+      "allowlist": ["mis", "kes"]
+    }
+  ],
+  "do_not_flag_suffixes": [
+    {"suffix": "b/p", "reason": "Mulgi 3sg present legitimately uses -b/-p (or endingless in some types)."},
+    {"suffix": "me/mä", "reason": "Mulgi ma-infinitive ends in -me/-mä (e.g. Karksi eläme, tegeme), not only 1pl."},
+    {"suffix": "n", "reason": "Mulgi inessive is -n (kodon, mõtsan) and past participle can end in -n/-nd."},
+    {"suffix": "ge", "reason": "Mulgi comitative is -ge / -ga."},
+    {"suffix": "ss", "reason": "Mulgi translative and conditional both use -ss."},
+    {"suffix": "te/de", "reason": "Mulgi abessive is -te/-de."}
+  ]
+}

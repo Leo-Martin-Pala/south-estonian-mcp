@@ -1,0 +1,141 @@
+{
+  "language": "tartu",
+  "ruleset_id": "tartu_estonian_leakage_v1_0",
+  "purpose": "Flag likely Standard Estonian morphological leakage in intended Tartu dialect text while preserving Tartu features (no written q glottal stop, endingless/-s 3sg, -va/-se 3pl, -de/-he illative, -ss/-st/-s translative, epenthetic üits/kaits).",
+  "normalization": {
+    "lowercase": true,
+    "preserve_chars": ["õ", "ä", "ö", "ü", "š", "ž", "´", "'", "’"],
+    "token_regex": "[^\\W\\d_][^\\W\\d_'´’-]*['´’-]*[^\\W\\d_]*"
+  },
+  "rules": [
+    {
+      "id": "EST_ACTIVE_PAST_NUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}nud\\b",
+      "message": "Looks like Standard Estonian active past participle -nud. Tartu uses -nu/-nü (olnu, tennü), without final -d.",
+      "hint": "Rewrite active past participle with Tartu -nu/-nü."
+    },
+    {
+      "id": "EST_PASSIVE_PAST_TUD_DUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}(tud|dud)\\b",
+      "message": "Looks like Standard Estonian passive past participle -tud/-dud. Tartu uses -t/-d or -tu/-tü/-du/-dü.",
+      "hint": "Rewrite with Tartu passive past morphology (-t/-d/-tu/-tü/-du/-dü)."
+    },
+    {
+      "id": "EST_NEG_PAST_EI_NUD",
+      "severity": "error",
+      "scope": "window",
+      "regex": "(?iu)\\bei\\s+[^\\W\\d_]['´’\\-\\wõäöüšž]+(nud|tud|dud)\\b",
+      "message": "Looks like Standard Estonian past negation ei + -nud/-tud. Tartu past negation uses es + verb (es ole, es tii).",
+      "hint": "Use Tartu es past negation."
+    },
+    {
+      "id": "EST_NEG_POLE_POLNUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b(pole|polnud|poleks|polevat)\\b",
+      "message": "Standard Estonian pole/polnud/poleks/polevat is Estonian leakage in Tartu dialect.",
+      "hint": "Use Tartu ei ole / es ole / ei oless."
+    },
+    {
+      "id": "EST_3SG_PRESENT_B",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}b\\b",
+      "message": "May be Standard Estonian 3sg present -b. Traditional Tartu 3sg present is endingless or -s (eläs, kõneles, tulõ).",
+      "hint": "Check whether Tartu expects an endingless or -s verb form.",
+      "allowlist": ["klub", "pub", "veeb", "seeb"]
+    },
+    {
+      "id": "EST_3PL_PRESENT_VAD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}vad\\b",
+      "message": "Looks like Standard Estonian 3pl present -vad. Tartu 3pl present uses -va/-vä or -se/-sõ.",
+      "hint": "Use Tartu 3pl ending (-va/-vä or -se/-sõ)."
+    },
+    {
+      "id": "EST_IMPERSONAL_TAKSE_DAKSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}(takse|dakse)\\b",
+      "message": "Looks like Standard Estonian impersonal -takse/-dakse. Tartu uses -tas/-täs/-das/-däs.",
+      "hint": "Rewrite with Tartu impersonal -tas/-täs/-das."
+    },
+    {
+      "id": "EST_CONDITIONAL_PERSONAL",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}(ksin|ksime|ksite)\\b",
+      "message": "Looks like Standard Estonian conditional -ksin/-ksime/-ksite. Tartu conditional uses -ss/-ssi.",
+      "hint": "Use Tartu conditional morphology (-ss/-ssi)."
+    },
+    {
+      "id": "EST_ILLATIVE_SSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}sse\\b",
+      "message": "Looks like Standard Estonian illative -sse. Tartu uses -de/-he or short/geminate illative.",
+      "hint": "Replace Estonian -sse with Tartu illative (-de/-he or short form).",
+      "allowlist": ["kasse", "lusse"]
+    },
+    {
+      "id": "EST_PL_ILLATIVE_DESSE_TESSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}(desse|tesse)\\b",
+      "message": "Looks like Standard Estonian plural illative -desse/-tesse.",
+      "hint": "Use Tartu plural illative (-de/-he or stem form)."
+    },
+    {
+      "id": "EST_PL_PARTITIVE_SID",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}sid\\b",
+      "message": "Looks like Standard Estonian plural partitive -sid. Tartu normally uses -it/-id, vowel plural, or -sit.",
+      "hint": "Use Tartu plural partitive morphology."
+    },
+    {
+      "id": "EST_MAS_FORM",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}mas\\b",
+      "message": "Looks like Estonian -mas supine. Tartu supine inessive is -man/-män.",
+      "hint": "Rewrite with Tartu -man/-män."
+    },
+    {
+      "id": "EST_MATA_FORM",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}mata\\b",
+      "message": "Looks like Estonian -mata abessive. Tartu uses -malda/-mäldä (or -mada).",
+      "hint": "Check whether Tartu -malda/-mäldä belongs here."
+    },
+    {
+      "id": "EST_TRANSLATIVE_KS",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšž]{2,}ks\\b",
+      "message": "May be Estonian translative -ks. Tartu translative uses -st, -ss, or -s.",
+      "hint": "Use Tartu translative -st/-ss/-s.",
+      "allowlist": ["maks", "seks", "kaks", "üks", "miks"]
+    },
+    {
+      "id": "EST_LEXICAL_FUNCTION_WORDS",
+      "severity": "info",
+      "scope": "token",
+      "regex": "(?iu)\\b(üks|kaks|nüüd|väga|palju|midagi)\\b",
+      "message": "Check whether Standard Estonian lexical item leaked into Tartu (where üits, kaits, nüid, väiga, pallu, midägi are common).",
+      "hint": "Check authentic Tartu lexical/epenthetic forms (üits, kaits, midägi)."
+    }
+  ],
+  "do_not_flag_suffixes": [
+    {"suffix": "da/ta", "reason": "Tartu does not mark glottal stop q in orthography, so infinitives/plurals naturally lack -q."},
+    {"suffix": "n", "reason": "Tartu inessive is -n."},
+    {"suffix": "de", "reason": "Tartu illative can end in -de."},
+    {"suffix": "st/ss", "reason": "Tartu translative can end in -st or -ss."}
+  ]
+}

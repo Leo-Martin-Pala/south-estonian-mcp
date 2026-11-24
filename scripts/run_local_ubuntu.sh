@@ -36,9 +36,7 @@ if [[ "$SKIP_APT" != "1" ]]; then
     hfst hfst-ospell cg3 divvun-gramcheck perl gawk bash
 fi
 
-if [[ ! -r "$ROOT/data/vro_dictionary.sqlite" \
-   || ! -r "$ROOT/data/vro_corpus.sqlite" \
-   || ! -r "$ROOT/data/vro_word_bag.sqlite" ]]; then
+if [[ ! -r "$ROOT/data/south_estonian_public.db" ]]; then
   if [[ "$SKIP_DATA_FETCH" == "1" ]]; then
     echo "SQLite datasets are missing and SKIP_DATA_FETCH=1; aborting." >&2
     exit 1
@@ -46,9 +44,6 @@ if [[ ! -r "$ROOT/data/vro_dictionary.sqlite" \
   "$ROOT/scripts/fetch_data.sh"
 fi
 
-need_file "$ROOT/data/vro_dictionary.sqlite"
-need_file "$ROOT/data/vro_corpus.sqlite"
-need_file "$ROOT/data/vro_word_bag.sqlite"
 
 if [[ ! -r "$ROOT/data/giella-share/giella/vro/analyser-gt-desc.hfstol" ]]; then
   if [[ "$SKIP_GIELLA" == "1" ]]; then
@@ -64,9 +59,9 @@ python3 -m venv "$ROOT/.venv"
 "$ROOT/.venv/bin/pip" install -U pip
 "$ROOT/.venv/bin/pip" install -e "$ROOT"
 
-"$ROOT/.venv/bin/vro-mcp-check" || true
+"$ROOT/.venv/bin/south-estonian-mcp-check" || true
 
-BIN="$ROOT/.venv/bin/vro-mcp-server"
+BIN="$ROOT/.venv/bin/south-estonian-mcp"
 
 cat <<EOF
 

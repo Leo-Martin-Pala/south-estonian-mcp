@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_NAME="${MODAL_APP_NAME:-vro-mcp}"
-VOLUME_NAME="${MODAL_VOLUME_NAME:-vro-data}"
-SECRET_NAME="${MODAL_SECRET_NAME:-vro-mcp-secret}"
+APP_NAME="${MODAL_APP_NAME:-south-estonian-mcp}"
+VOLUME_NAME="${MODAL_VOLUME_NAME:-south-estonian-mcp-data}"
+SECRET_NAME="${MODAL_SECRET_NAME:-south-estonian-mcp-secret}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 if command -v modal >/dev/null; then

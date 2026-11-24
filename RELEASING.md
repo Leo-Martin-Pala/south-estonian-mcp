@@ -1,38 +1,29 @@
-# Publishing releases (maintainer)
+# Building and publishing the public dataset
 
-Nothing under `data/` is in git. The SQLite datasets and the compiled GiellaLT
-models ship as separate GitHub release assets; `scripts/fetch_data.sh` and
-`scripts/fetch_giella.sh` pull them back down.
-
-Tracked in git: `src/`, `resources/`, `tools/giella/bin/`, `scripts/`,
-`pyproject.toml`, `modal_app.py`, and the docs. The whole `data/` folder is
-ignored (datasets are released separately; Giella models are generated).
-
-## The dataset
-
-The databases ship as one asset with the dataset `LICENSE` and `NOTICE` bundled
-alongside them, so the CC-BY-SA-4.0 attribution travels with the data. Once your
-local `data/` holds all five files (after `make data`), publish with:
+Build from a unified South Estonian snapshot using the reviewed
+[source manifest](src/vro_mcp/sources-public.json). The source database is opened
+read-only. The build creates a fresh database, adds source attribution, and
+rebuilds the full-text and vector indexes, word frequencies, and cognate groups.
 
 ```sh
-make release-data DATA_TAG=data-v1
+PYTHONPATH=src .venv/bin/python scripts/build_public_data.py /path/to/source.db \
+  --wiki-dump /path/to/fiu_vrowiki-pages-articles-multistream.xml \
+  --documents /path/to/fiction-metadata.jsonl \
+  --documents /path/to/setomaa-metadata.jsonl \
+  --publisher-parallel /path/to/paralleelkorpus-master \
+  --estonian-ids /path/to/ids_et_dictionary.tsv
+
+python3 src/vro_mcp/public_data.py data/south_estonian_public.db
+make test
+make package-data
 ```
 
-That builds `vro-data.tar.xz` and creates the GitHub release. For later updates
-bump the tag (`DATA_TAG=data-v2`) and set the matching `VRO_DATA_TAG` default in
-`scripts/fetch_data.sh` so downloads point at the new archive.
-
-## The GiellaLT artifacts
-
-The compiled GiellaLT models ship as a separate asset, since they are GPL-3.0
-(the dataset is CC-BY-SA-4.0). Build them once with `make giella-build` (this
-also writes the GPL-3.0 `LICENSE` and a provenance `NOTICE` into
-`data/giella-share/`), then publish:
+Repeat `--wiki-dump` for older snapshots needed to identify pages, in
+chronological order, and `--documents` for each source metadata file.
+GiellaLT artifacts are released separately with `make package-giella`.
+Use a fresh GitHub release tag for each dataset revision, then update
+`VRO_DATA_TAG` defaults when publishing a new server version.
 
 ```sh
-make release-giella GIELLA_TAG=giella-v1
+make release-data DATA_TAG=data-v2
 ```
-
-That archives `data/giella-share/` (license + notice included) and creates the
-release. Bump `GIELLA_TAG` and the matching `VRO_GIELLA_TAG` default in
-`scripts/fetch_giella.sh` when you rebuild.

@@ -1,0 +1,130 @@
+{
+  "language": "kraasna",
+  "ruleset_id": "kraasna_estonian_leakage_v1_0",
+  "purpose": "Flag likely modern Standard Estonian morphological leakage in intended Kraasna text while preserving Kraasna -h/-n inessive, archaic -s translative, es past negation, om, and academic UPA/historical transcriptions.",
+  "normalization": {
+    "lowercase": true,
+    "preserve_chars": ["q", "õ", "ä", "ö", "ü", "š", "ž", "ś", "ń", "ľ", "ŕ", "ĺ", "ť", "d́", "ę", "ǫ", "ə", "ʌ", "χ", "γ", "´", "'", "’"],
+    "token_regex": "[^\\W\\d_][^\\W\\d_'´’-]*['´’-]*[^\\W\\d_]*"
+  },
+  "rules": [
+    {
+      "id": "EST_ACTIVE_PAST_NUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]{2,}nud\\b",
+      "message": "Looks like Standard Estonian active past participle -nud. Kraasna uses -nu/-nü/-nU(q).",
+      "hint": "Rewrite with Kraasna active past participle morphology (-nu/-nü/-nU')."
+    },
+    {
+      "id": "EST_PASSIVE_PAST_TUD_DUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]{2,}(tud|dud)\\b",
+      "message": "Looks like Standard Estonian passive past participle -tud/-dud. Kraasna uses -t/-d or -tu/-du.",
+      "hint": "Use Kraasna passive past morphology."
+    },
+    {
+      "id": "EST_NEG_PAST_EI_NUD",
+      "severity": "error",
+      "scope": "window",
+      "regex": "(?iu)\\bei\\s+[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]+(nud|tud|dud)\\b",
+      "message": "Looks like Standard Estonian past negation ei + -nud/-tud. Kraasna uses es + verb (es olõq).",
+      "hint": "Use Kraasna es past negation."
+    },
+    {
+      "id": "EST_NEG_POLE_POLNUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b(pole|polnud|poleks|polevat)\\b",
+      "message": "Standard Estonian contracted negation pole/polnud/poleks/polevat is an Estonian intrusion in Kraasna.",
+      "hint": "Use Kraasna ei/es + olõ forms."
+    },
+    {
+      "id": "EST_3SG_PRESENT_B",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]{2,}b\\b",
+      "message": "May be Standard Estonian 3sg present -b. Kraasna 3sg present is endingless or -s (om, and, eläs).",
+      "hint": "Check attested Kraasna verb forms."
+    },
+    {
+      "id": "EST_3PL_PRESENT_VAD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]{2,}vad\\b",
+      "message": "Looks like Standard Estonian 3pl present -vad. Kraasna 3pl uses -va(q)/-sõ(q)/omma.",
+      "hint": "Replace Estonian -vad with Kraasna 3pl morphology."
+    },
+    {
+      "id": "EST_IMPERSONAL_TAKSE_DAKSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]{2,}(takse|dakse)\\b",
+      "message": "Looks like Standard Estonian impersonal -takse/-dakse. Kraasna uses -tAs/-dAs.",
+      "hint": "Rewrite with Kraasna impersonal morphology."
+    },
+    {
+      "id": "EST_CONDITIONAL_PERSONAL",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]{2,}(ksin|ksime|ksite)\\b",
+      "message": "Looks like Standard Estonian conditional -ksin/-ksime/-ksite. Kraasna uses -si/-ssi.",
+      "hint": "Rewrite with Kraasna conditional morphology."
+    },
+    {
+      "id": "EST_ILLATIVE_SSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]{2,}sse\\b",
+      "message": "Looks like Standard Estonian illative -sse. Kraasna illative uses -he, -de/-te, or short illative.",
+      "hint": "Replace Estonian -sse with Kraasna illative morphology."
+    },
+    {
+      "id": "EST_PL_ILLATIVE_DESSE_TESSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]{2,}(desse|tesse)\\b",
+      "message": "Looks like Standard Estonian plural illative -desse/-tesse.",
+      "hint": "Use Kraasna plural illative morphology."
+    },
+    {
+      "id": "EST_PL_PARTITIVE_SID",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]{2,}sid\\b",
+      "message": "Looks like Standard Estonian plural partitive -sid.",
+      "hint": "Use Kraasna plural partitive (-sit/-it/-id or vowel plural)."
+    },
+    {
+      "id": "EST_MAS_FORM",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]{2,}mas\\b",
+      "message": "Looks like Estonian -mas supine. Kraasna supine inessive uses -mah/-man.",
+      "hint": "Check Kraasna supine inessive (-mah/-man)."
+    },
+    {
+      "id": "EST_MATA_FORM",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]{2,}mata\\b",
+      "message": "Looks like Estonian -mata abessive.",
+      "hint": "Check Kraasna -malda/-mäldä abessive."
+    },
+    {
+      "id": "EST_TRANSLATIVE_KS",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌχγ]{2,}ks\\b",
+      "message": "May be Standard Estonian translative -ks. Kraasna translative is -s.",
+      "hint": "Use Kraasna archaic -s translative.",
+      "allowlist": ["maks", "seks", "kaks", "üks", "miks"]
+    }
+  ],
+  "do_not_flag_suffixes": [
+    {"suffix": "h/n", "reason": "Kraasna inessive characteristically uses -h or -n."},
+    {"suffix": "s", "reason": "Kraasna translative is -s and s-conjugation 3sg present is -s."},
+    {"suffix": "st", "reason": "Kraasna elative uses -st."}
+  ]
+}

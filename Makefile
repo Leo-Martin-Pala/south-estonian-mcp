@@ -5,7 +5,7 @@ SHELL := /bin/bash
 # Release tags. Keep in sync with the VRO_DATA_TAG / VRO_GIELLA_TAG defaults in
 # scripts/fetch_data.sh and scripts/fetch_giella.sh. Override on the command
 # line, e.g. `make release-data DATA_TAG=data-v2`.
-DATA_TAG ?= data-v1
+DATA_TAG ?= data-v2
 DATA_ASSET := vro-data.tar.xz
 GIELLA_TAG ?= giella-v1
 GIELLA_ASSET := giella-share.tar.xz
@@ -40,7 +40,7 @@ test: ## Run the smoke tests
 	PYTHONPATH=src python -m unittest discover -s tests
 
 local-url: ## Print local MCP path plus Claude, Codex, and JSON client config
-	@bin="$(CURDIR)/.venv/bin/vro-mcp-server"; \
+	@bin="$(CURDIR)/.venv/bin/south-estonian-mcp"; \
 	 [[ -x "$$bin" ]] || echo "(not built yet, run 'make install' first)"; \
 	 echo "Local MCP server binary:"; \
 	 echo "  $$bin"; \
@@ -62,15 +62,16 @@ local-url: ## Print local MCP path plus Claude, Codex, and JSON client config
 	   "    }" \
 	   "  }"
 
-package-data: ## Build the dataset release archive from data/
-	tar cJf $(DATA_ASSET) -C data \
-	  vro_dictionary.sqlite vro_corpus.sqlite vro_word_bag.sqlite LICENSE NOTICE
+package-data: ## Build the reviewed public dataset release archive
+	@set -eu; stage=$$(mktemp -d); trap 'rm -rf "$$stage"' EXIT; \
+	  python3 src/vro_mcp/public_data.py data/south_estonian_public.db "$$stage/NOTICE"; \
+	  cp data/LICENSE "$$stage/LICENSE"; \
+	  tar cJf $(DATA_ASSET) -C data south_estonian_public.db -C "$$stage" LICENSE NOTICE
 
-release-data: package-data ## Publish the dataset as a GitHub release (DATA_TAG=...)
+release-data: package-data ## Publish the public dataset as a GitHub release (DATA_TAG=...)
 	gh release create $(DATA_TAG) $(DATA_ASSET) \
-	  --title "Võro dataset ($(DATA_TAG))" \
-	  --notes $$'Võro datasets for the MCP server.\n\n`vro-data.tar.xz`: dictionary, corpus, and word-bag SQLite DBs + LICENSE/NOTICE.\n\nFetch with `scripts/fetch_data.sh`. CC-BY-SA-4.0. Sources and attribution in the bundled NOTICE.'
-	rm -f $(DATA_ASSET)
+	  --title "South Estonian public dataset ($(DATA_TAG))" \
+	  --notes 'Public corpus, human parallel examples, and dictionaries. CC BY-SA 4.0 compilation. Source-level licenses and credit are in the bundled NOTICE.'
 
 package-giella: ## Build the giella-share release archive from data/giella-share/
 	test -f data/giella-share/LICENSE || { echo "data/giella-share/LICENSE missing; build with 'make giella-build' first"; exit 1; }

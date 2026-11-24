@@ -6,7 +6,7 @@
 set -eu
 
 # Bump this default tag whenever you publish a new giella-share release.
-REPO="${VRO_DATA_REPO:-Leo-Martin-Pala/voro-mcp}"
+REPO="${VRO_DATA_REPO:-Leo-Martin-Pala/south-estonian-mcp}"
 TAG="${VRO_GIELLA_TAG:-giella-v1}"
 ASSET="giella-share.tar.xz"
 

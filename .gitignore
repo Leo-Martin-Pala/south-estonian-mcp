@@ -1,6 +1,8 @@
 .venv/
 .env
 .env.tmp
+.env.public
+.env.public.tmp
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -22,3 +24,6 @@ data/
 .cache/
 /vro-data.tar.xz
 /giella-share.tar.xz
+
+# Optional locally installed model weights.
+/models/

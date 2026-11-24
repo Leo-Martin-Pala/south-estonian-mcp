@@ -2,12 +2,30 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-MODEL="${VRO_ANALYZER_MODEL:-$REPO_ROOT/data/giella-share/giella/vro/analyser-gt-desc.hfstol}"
+SHARE_DIR="${VRO_GIELLA_SHARE_DIR:-$REPO_ROOT/data/giella-share}"
+LANG_CODE="${GIELLA_LANG:-vro}"
+
+if [[ "${1:-}" == "--lang" && -n "${2:-}" ]]; then
+  LANG_CODE="$2"
+  shift 2
+fi
+
+if [[ "$LANG_CODE" == "vro" && -n "${VRO_ANALYZER_MODEL:-}" ]]; then
+  MODEL="$VRO_ANALYZER_MODEL"
+else
+  MODEL="$SHARE_DIR/giella/$LANG_CODE/analyser-gt-desc.hfstol"
+fi
+
+HFST_BIN="$(command -v hfst-optimized-lookup || true)"
+if [[ -z "$HFST_BIN" && -x "$REPO_ROOT/../giellalt-south-estonian/.tools/apertium/bin/hfst-optimized-lookup" ]]; then
+  HFST_BIN="$REPO_ROOT/../giellalt-south-estonian/.tools/apertium/bin/hfst-optimized-lookup"
+fi
 
 if [[ "${1:-}" == "--check" ]]; then
-  command -v hfst-optimized-lookup >/dev/null || { echo "missing hfst-optimized-lookup" >&2; exit 1; }
-  test -r "$MODEL" || { echo "missing analyzer model: $MODEL" >&2; exit 1; }
+  [[ -n "$HFST_BIN" ]] || { echo "missing hfst-optimized-lookup" >&2; exit 1; }
+  test -r "$MODEL" || { echo "missing analyzer model ($LANG_CODE): $MODEL" >&2; exit 1; }
   exit 0
 fi
 
-exec hfst-optimized-lookup -q "$MODEL"
+[[ -n "$HFST_BIN" ]] || { echo "missing hfst-optimized-lookup" >&2; exit 127; }
+exec "$HFST_BIN" -q "$MODEL"

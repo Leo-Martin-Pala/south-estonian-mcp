@@ -57,7 +57,7 @@ the file wins, if that file is available; tools can lag the standard. When the
 file is unavailable, treat tool outputs as evidence and warnings, not absolute
 truth.
 
-Note: spellcheck_vro, grammar_check_vro, analyze_word, and suggest_correction use
+Note: spellcheck, grammar_check, analyze_word, and suggest_correction use
 related but not identical Giella/Divvun checks. A word may be morphologically
 analyzable while still being flagged by the speller or grammar checker. Treat
 spell/grammar results as warnings, not final proof.
@@ -72,7 +72,7 @@ spell/grammar results as warnings, not final proof.
    places, military/political terms, quotes, source names). Do not "improve" or
    reinterpret facts.
 
-2. **Produce an initial machine translation.** Use `translate_vro` to create a
+2. **Produce an initial machine translation.** Use `translate_mt` to create a
    Võro draft. Use canonical 3-letter language codes such as `est`, `eng`, and
    `vro` when setting source/target languages; common 2-letter aliases such as
    `et` and `en` are also accepted. Treat this as a rough translation, not final
@@ -84,11 +84,11 @@ spell/grammar results as warnings, not final proof.
      automatically wrong).
    * Run `find_unrecognized_words` ("unrecognized" = not recognized by the Giella
      analyzer, not automatically wrong).
-   * Run `find_estonian_leakage` to scan the whole draft for word forms with
-     Standard Estonian-looking endings ("flagged" = ending looks Estonian, not
-     automatically wrong). This returns a slim, deduped list; pass any flagged
-     item to `lint_estonian_leakage` later if you want the rule and hint behind
-     it.
+   * Run `check_purity_with_rules(text=..., lang="vro")` to scan the whole draft for
+     word forms with Standard Estonian-looking endings ("flagged" = ending looks
+     Estonian, not automatically wrong). This returns a slim, deduped list by
+     default; pass `detail=True` (or pass `words=[...]`) if you want the rule
+     and hint behind flagged items.
    * Build a list of suspicious tokens and phrases. Do not automatically change
      proper nouns, acronyms, foreign names, URLs, source names, or quoted titles
      just because they are unknown.
@@ -120,10 +120,11 @@ spell/grammar results as warnings, not final proof.
 
    * `lookup_word` for dictionary lookup, especially single-word terms.
    * `find_usage_examples` to check real Võro usage, preferring the source type
-     matching the genre: encyclopedic → `wiki_article`;
-     translated prose → `parallel_corpus_vro_side`; literature →
-     `tei_literature`. Set `max_snippet_chars` lower for quick checks or higher
-     when surrounding context matters.
+     matching the genre: news → `newspaper_article`; encyclopedic → `wiki_article`;
+     spoken/dialect → `spoken_dialect_concordance`; literature →
+     `tei_literature`; PDF extraction → `pdf_extracted_text`. Aligned and parallel
+     translation material is intentionally unavailable. Set `max_snippet_chars`
+     lower for quick checks or higher when surrounding context matters.
    * `analyze_word` to check whether a form is morphologically recognized.
    * `generate_forms` when the lemma is known but the required inflected form is
      uncertain.
@@ -133,9 +134,10 @@ spell/grammar results as warnings, not final proof.
    * `suggest_correction` for a single bad-looking or unknown form; if an
      invalid form has `seen_in_word_bag`, treat it as attested but not
      automatically standard.
-   * `lint_estonian_leakage` for the in-depth check of specific words or phrases
-     you want rule IDs, severities, messages, and hints for.
-   * `spellcheck_vro` for token-level and `grammar_check_vro` for sentence-level
+   * `check_purity_with_rules(words=..., lang="vro")` for the in-depth check of
+     specific words or phrases you want rule IDs, severities, messages, and
+     hints for.
+   * `spellcheck` for token-level and `grammar_check` for sentence-level
      warnings.
    * Treat all tool outputs as evidence and warnings, not absolute truth.
 
@@ -156,7 +158,7 @@ spell/grammar results as warnings, not final proof.
 
 7. **Final quality check.** Re-read the whole translation as a text, not just
    individual words: check sentence flow, coherence, referents, tense, agreement,
-   and style. Run `spellcheck_vro` or `grammar_check_vro` on smaller passages if
+   and style. Run `spellcheck` or `grammar_check` on smaller passages if
    anything seems doubtful, and re-check corrected forms with `analyze_word`,
    `word_exists_in_bag`, or corpus examples when needed. Confirm no facts, dates,
    names, numbers, or attributions were changed, and that no machine-translation

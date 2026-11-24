@@ -1,0 +1,1556 @@
+{
+  "lang": "vro",
+  "schema_version": 1,
+  "nominal_columns": [
+    "sg_nom",
+    "sg_gen",
+    "sg_part",
+    "sg_ill",
+    "pl_gen",
+    "pl_part",
+    "pl_ill",
+    "pl_all"
+  ],
+  "verbal_columns": [
+    "inf_ma",
+    "inf_da",
+    "act_ptcp",
+    "pass_ptcp",
+    "prs_1sg",
+    "prs_3sg",
+    "pst_1sg",
+    "pst_3sg"
+  ],
+  "types": {
+    "1": {
+      "type": "1",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "suhvli",
+        "sg_gen": ".suhvli",
+        "sg_part": ".suhvlit",
+        "sg_ill": ".suhvlihe",
+        "pl_gen": ".suhvliidõ",
+        "pl_part": ".suhvliid",
+        "pl_ill": ".suhvlihe .suhvliihe",
+        "pl_all": ".suhvlilõ .suhvliilõ"
+      },
+      "models": [
+        "suhvli"
+      ]
+    },
+    "2": {
+      "type": "2",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "hans'a",
+        "sg_gen": "hans'a",
+        "sg_part": "hans'at",
+        "sg_ill": "hans'ahtõ",
+        "pl_gen": "hans'adõ",
+        "pl_part": "hans'asit",
+        "pl_ill": "hans'adõhe",
+        "pl_all": "hans'adõlõ"
+      },
+      "models": [
+        "hans'a"
+      ]
+    },
+    "3": {
+      "type": "3",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "oppaja",
+        "sg_gen": "oppaja",
+        "sg_part": "oppajat",
+        "sg_ill": "oppajahe",
+        "pl_gen": "oppajidõ",
+        "pl_part": "oppajit",
+        "pl_ill": "oppajihe",
+        "pl_all": "oppajilõ"
+      },
+      "models": [
+        "oppaja"
+      ]
+    },
+    "4": {
+      "type": "4",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kipõn'",
+        "sg_gen": "kibõna",
+        "sg_part": "kibõnat",
+        "sg_ill": "kibõnahe",
+        "pl_gen": "kibõnidõ",
+        "pl_part": "kibõnit",
+        "pl_ill": "kibõnihe",
+        "pl_all": "kibõnilõ"
+      },
+      "models": [
+        "kipõn'"
+      ]
+    },
+    "5": {
+      "type": "5",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "inemine",
+        "sg_gen": "inemise",
+        "sg_part": "inemist",
+        "sg_ill": "ine.miste",
+        "pl_gen": "ine.miisi (inemiste)",
+        "pl_part": "ine.miisi",
+        "pl_ill": "ine.miisihe",
+        "pl_all": "inemiisile (inemistele)"
+      },
+      "models": [
+        "inemine"
+      ]
+    },
+    "6": {
+      "type": "6",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": ". kuldnõ",
+        "sg_gen": ".kuldsõ",
+        "sg_part": ".kuldsõt",
+        "sg_ill": ".kuldsõhe",
+        "pl_gen": ".kuldsidõ",
+        "pl_part": ".kuldsit",
+        "pl_ill": ".kuldsihe",
+        "pl_all": ".kuldsilõ"
+      },
+      "models": [
+        ". kuldnõ"
+      ]
+    },
+    "7": {
+      "type": "7",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "alonõ",
+        "sg_gen": "alodsõ",
+        "sg_part": "alost",
+        "sg_ill": "alotsõhe",
+        "pl_gen": "alotsidõ (alostõ)",
+        "pl_part": "alotsit",
+        "pl_ill": "alotsihe (alostõhe)",
+        "pl_all": "alotsilõ (alostõlõ)"
+      },
+      "models": [
+        "alonõ"
+      ]
+    },
+    "8": {
+      "type": "8",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "võrokõnõ",
+        "sg_gen": "võrokõsõ",
+        "sg_part": "võrokõist",
+        "sg_ill": "võro.kõistõ",
+        "pl_gen": "võro.kõisi (võrokõistõ)",
+        "pl_part": "võro.kõisi",
+        "pl_ill": "võro.kõisihe",
+        "pl_all": "võrokõisilõ (võrokõistõlõ)"
+      },
+      "models": [
+        "võrokõnõ"
+      ]
+    },
+    "9": {
+      "type": "9",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "ehitüs",
+        "sg_gen": "ehitüse",
+        "sg_part": "ehitüst",
+        "sg_ill": "ehi.tüste",
+        "pl_gen": "ehi.tüisi (ehitüste)",
+        "pl_part": "ehi.tüisi",
+        "pl_ill": "ehi.tüisihe",
+        "pl_all": "ehitüisile (ehitüstele)"
+      },
+      "models": [
+        "ehitüs"
+      ]
+    },
+    "10": {
+      "type": "10",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": ". tervüs",
+        "sg_gen": ".tervü .tervüse",
+        "sg_part": ".tervüt .tervüst",
+        "sg_ill": ".tervühe .tervüste",
+        "pl_gen": ".tervüide .tervüisi (.tervüste)",
+        "pl_part": ".tervüid .tervüisi",
+        "pl_ill": ".tervüihe .tervüisihe (.tervüstehe)",
+        "pl_all": ".tervüile .tervüisile (.tervüstele)"
+      },
+      "models": [
+        ". tervüs"
+      ]
+    },
+    "11": {
+      "type": "11",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kotus",
+        "sg_gen": "kotu(s)sõ",
+        "sg_part": "kotust",
+        "sg_ill": "kotussõhe",
+        "pl_gen": "kotussidõ (kotustõ)",
+        "pl_part": "kotussit",
+        "pl_ill": "kotussihe (kotustõhe)",
+        "pl_all": "kotussilõ (kotustõlõ)"
+      },
+      "models": [
+        "kotus"
+      ]
+    },
+    "12": {
+      "type": "12",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "repän'",
+        "sg_gen": "rebäse",
+        "sg_part": "rebäst",
+        "sg_ill": "rebäsehe",
+        "pl_gen": "rebäside (rebäste)",
+        "pl_part": "rebäsit",
+        "pl_ill": "rebäsihe (rebästehe)",
+        "pl_all": "rebäsile (rebästele)"
+      },
+      "models": [
+        "repän'"
+      ]
+    },
+    "13": {
+      "type": "13",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "hõrak",
+        "sg_gen": "hõraga hõragu",
+        "sg_part": "hõrakat hõrakut",
+        "sg_ill": "hõrakahe hõrakuhe",
+        "pl_gen": "hõrakidõ",
+        "pl_part": "hõrakit",
+        "pl_ill": "hõrakihe",
+        "pl_all": "hõrakilõ"
+      },
+      "models": [
+        "hõrak"
+      ]
+    },
+    "14": {
+      "type": "14",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "makõ",
+        "sg_gen": "(magõhõ) makõ",
+        "sg_part": "magõhõt makõt",
+        "sg_ill": "magõhõhe makkõhe",
+        "pl_gen": "magõhidõ makkidõ",
+        "pl_part": "magõhit makkit",
+        "pl_ill": "magõhihe makkihe",
+        "pl_all": "magõhilõ makkilõ"
+      },
+      "models": [
+        "makõ"
+      ]
+    },
+    "15": {
+      "type": "15",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "(.) rits'k(as)",
+        "sg_gen": ".rits'ka",
+        "sg_part": ".rits'kat rits'kast",
+        "sg_ill": ".rits'kahe",
+        "pl_gen": ".rits'kidõ (rits'kastõ)",
+        "pl_part": ".rits'kit",
+        "pl_ill": ".rits'kihe (rits'kastõhe)",
+        "pl_all": ".rits'kilõ (rits'kastõlõ)"
+      },
+      "models": [
+        "(.) rits'k(as)"
+      ]
+    },
+    "16": {
+      "type": "16",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "asõ",
+        "sg_gen": "asõmõ asõma",
+        "sg_part": "asõnd",
+        "sg_ill": "asõmõhe asõmahe",
+        "pl_gen": "asõmidõ (asõndõ)",
+        "pl_part": "asõmit",
+        "pl_ill": "asõmihe (asõndõhe)",
+        "pl_all": "asõmilõ (asõndõlõ)"
+      },
+      "models": [
+        "asõ"
+      ]
+    },
+    "17": {
+      "type": "17",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "hapu",
+        "sg_gen": ".hapnõ .hapna",
+        "sg_part": "hapund",
+        "sg_ill": ".hapnõhe .hapnahe",
+        "pl_gen": ".hapnidõ (hapundõ)",
+        "pl_part": ".hapnit",
+        "pl_ill": ".hapnihe (hapundõhe)",
+        "pl_all": ".hapnilõ (hapundõlõ)"
+      },
+      "models": [
+        "hapu"
+      ]
+    },
+    "18": {
+      "type": "18",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "läteq",
+        "sg_gen": "lätte",
+        "sg_part": "lätet",
+        "sg_ill": "lättehe",
+        "pl_gen": "lättide (lätete)",
+        "pl_part": "lättit",
+        "pl_ill": "lättihe (lätetehe)",
+        "pl_all": "lättile (lätetele)"
+      },
+      "models": [
+        "läteq"
+      ]
+    },
+    "19": {
+      "type": "19",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kommõq",
+        "sg_gen": ".kombõ",
+        "sg_part": "kommõt",
+        "sg_ill": ".kombõhe",
+        "pl_gen": ".kombidõ (kommõtõ)",
+        "pl_part": ".kombit",
+        "pl_ill": ".kombihe (kommõtõhe)",
+        "pl_all": ".kombilõ (kommõtõlõ)"
+      },
+      "models": [
+        "kommõq"
+      ]
+    },
+    "20": {
+      "type": "20",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "herneh",
+        "sg_gen": ".herne",
+        "sg_part": "herneht",
+        "sg_ill": ".hernehe",
+        "pl_gen": ".hernide (hernehte)",
+        "pl_part": ".hernit",
+        "pl_ill": ".hernihe (hernehtehe)",
+        "pl_all": ".hernile (hernehtele)"
+      },
+      "models": [
+        "herneh"
+      ]
+    },
+    "21": {
+      "type": "21",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "laiõh",
+        "sg_gen": ".laidõ",
+        "sg_part": "laiõht",
+        "sg_ill": ".laidõhe",
+        "pl_gen": ".laididõ (laiõhtõ)",
+        "pl_part": ".laidit",
+        "pl_ill": ".laidihe (laiõhtõhe)",
+        "pl_all": ".laidilõ (laiõhtõlõ)"
+      },
+      "models": [
+        "laiõh"
+      ]
+    },
+    "22": {
+      "type": "22",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "saabas",
+        "sg_gen": ".saapa",
+        "sg_part": "saabast",
+        "sg_ill": ".saapahe",
+        "pl_gen": ".saapidõ (saabastõ)",
+        "pl_part": ".saapit",
+        "pl_ill": ".saapihe (saabastõhe)",
+        "pl_all": ".saapilõ (saabastõlõ)"
+      },
+      "models": [
+        "saabas"
+      ]
+    },
+    "23": {
+      "type": "23",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "hammas",
+        "sg_gen": ".hamba",
+        "sg_part": "hammast",
+        "sg_ill": ".hambahe",
+        "pl_gen": ".hambidõ (hammastõ)",
+        "pl_part": ".hambit",
+        "pl_ill": ".hambihe (hammastõhe)",
+        "pl_all": ".hambilõ (hammastõlõ)"
+      },
+      "models": [
+        "hammas"
+      ]
+    },
+    "24": {
+      "type": "24",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "tarõ",
+        "sg_gen": "tarõ",
+        "sg_part": "tarrõ",
+        "sg_ill": ".tarrõ",
+        "pl_gen": "tarri",
+        "pl_part": "tarri",
+        "pl_ill": ".tarri(he)",
+        "pl_all": "ta(r)rilõ"
+      },
+      "models": [
+        "tarõ"
+      ]
+    },
+    "25": {
+      "type": "25",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "igä",
+        "sg_gen": "iä",
+        "sg_part": "ikä",
+        "sg_ill": "ikkä",
+        "pl_gen": "iki",
+        "pl_part": "iki",
+        "pl_ill": "ikki(he)",
+        "pl_all": "ikile"
+      },
+      "models": [
+        "igä"
+      ]
+    },
+    "26": {
+      "type": "26",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "pini",
+        "sg_gen": "pini",
+        "sg_part": "pinni",
+        "sg_ill": ".pinni",
+        "pl_gen": "pinne",
+        "pl_part": "pinne",
+        "pl_ill": ".pinne(he)",
+        "pl_all": "pi(n)nele"
+      },
+      "models": [
+        "pini"
+      ]
+    },
+    "27": {
+      "type": "27",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "häbü",
+        "sg_gen": "häü",
+        "sg_part": "häpü",
+        "sg_ill": ".häppü",
+        "pl_gen": "häpe häpä",
+        "pl_part": "häpe häpä",
+        "pl_ill": "häppe(he) häppä(he)",
+        "pl_all": "häpele häpäle"
+      },
+      "models": [
+        "häbü"
+      ]
+    },
+    "28": {
+      "type": "28",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kana",
+        "sg_gen": "kana",
+        "sg_part": "kanna",
+        "sg_ill": ".kanna",
+        "pl_gen": "kanno kannu",
+        "pl_part": "kanno kannu",
+        "pl_ill": ".kanno(he) .kannu(he)",
+        "pl_all": "ka(n)nolõ ka(n)nulõ"
+      },
+      "models": [
+        "kana"
+      ]
+    },
+    "29": {
+      "type": "29",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "sõda",
+        "sg_gen": "sõ:a",
+        "sg_part": "sõta",
+        "sg_ill": "sõtta",
+        "pl_gen": "sõto sõtu",
+        "pl_part": "sõto sõtu",
+        "pl_ill": "sõtto(he) sõttu(he)",
+        "pl_all": "sõtolõ sõtulõ"
+      },
+      "models": [
+        "sõda"
+      ]
+    },
+    "30": {
+      "type": "30",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "hain",
+        "sg_gen": "haina",
+        "sg_part": ".haina",
+        "sg_ill": ".haina",
+        "pl_gen": ".haino .hainu",
+        "pl_part": ".haino .hainu",
+        "pl_ill": ".haino(he) .hainu(he)",
+        "pl_all": "hainolõ hainulõ"
+      },
+      "models": [
+        "hain"
+      ]
+    },
+    "31": {
+      "type": "31",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "puhm",
+        "sg_gen": "puhma",
+        "sg_part": ".puhma",
+        "sg_ill": ".puhma",
+        "pl_gen": ".puhmõ",
+        "pl_part": ".puhmõ",
+        "pl_ill": ".puhmõ(he)",
+        "pl_all": "puhmõlõ"
+      },
+      "models": [
+        "puhm"
+      ]
+    },
+    "32": {
+      "type": "32",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kuld",
+        "sg_gen": "kulla",
+        "sg_part": ".kulda",
+        "sg_ill": ".kulda",
+        "pl_gen": ".kuldõ",
+        "pl_part": ".kuldõ",
+        "pl_ill": ".kuldõ(he)",
+        "pl_all": "kullõlõ"
+      },
+      "models": [
+        "kuld"
+      ]
+    },
+    "33": {
+      "type": "33",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "jalg",
+        "sg_gen": "jala",
+        "sg_part": ".jalga",
+        "sg_ill": ".jalga",
+        "pl_gen": ".jalgo .jalgu",
+        "pl_part": ".jalgo .jalgu",
+        "pl_ill": ".jalgo(he) .jalgu(he)",
+        "pl_all": "jalolõ jalulõ"
+      },
+      "models": [
+        "jalg"
+      ]
+    },
+    "34": {
+      "type": "34",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "särg'",
+        "sg_gen": "säre",
+        "sg_part": ".särge",
+        "sg_ill": ".särge",
+        "pl_gen": ".särgi",
+        "pl_part": ".särgi",
+        "pl_ill": ".särgi(he)",
+        "pl_all": "särile"
+      },
+      "models": [
+        "särg'"
+      ]
+    },
+    "35": {
+      "type": "35",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "silm",
+        "sg_gen": "silmä",
+        "sg_part": ".silmä",
+        "sg_ill": ".silmä",
+        "pl_gen": ".silmi",
+        "pl_part": ".silmi",
+        "pl_ill": ".silmi(he)",
+        "pl_all": "silmile"
+      },
+      "models": [
+        "silm"
+      ]
+    },
+    "36": {
+      "type": "36",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kand",
+        "sg_gen": "kanno",
+        "sg_part": ".kando",
+        "sg_ill": ".kando",
+        "pl_gen": ".kandõ .kanda",
+        "pl_part": ".kandõ .kanda",
+        "pl_ill": ".kandõ(he) .kandahe",
+        "pl_all": "kannõlõ kannalõ"
+      },
+      "models": [
+        "kand"
+      ]
+    },
+    "37": {
+      "type": "37",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kuu:l'",
+        "sg_gen": "kooli",
+        "sg_part": "kuu:li",
+        "sg_ill": "kuu:li",
+        "pl_gen": "kuu:lõ",
+        "pl_part": "kuu:lõ",
+        "pl_ill": "kuu:lõ(he)",
+        "pl_all": "koolõlõ"
+      },
+      "models": [
+        "kuu:l'"
+      ]
+    },
+    "38": {
+      "type": "38",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kanarik",
+        "sg_gen": "kanarigu",
+        "sg_part": "kanarikku",
+        "sg_ill": "kanarikku",
+        "pl_gen": "kanarikkõ kanarikka",
+        "pl_part": "kanarikkõ kanarikka",
+        "pl_ill": "kanarikkõ(he) kanarikka(he)",
+        "pl_all": "kanarigõlõ kanarigalõ"
+      },
+      "models": [
+        "kanarik"
+      ]
+    },
+    "39": {
+      "type": "39",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "väits'",
+        "sg_gen": "väidse",
+        "sg_part": "väist",
+        "sg_ill": ".väiste",
+        "pl_gen": ".väitsi väiste",
+        "pl_part": ".väitsi",
+        "pl_ill": ".väitsi(he)",
+        "pl_all": "väidsile väistele"
+      },
+      "models": [
+        "väits'"
+      ]
+    },
+    "40": {
+      "type": "40",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kii:l'",
+        "sg_gen": "keele",
+        "sg_part": "kii:lt",
+        "sg_ill": "kii:lde",
+        "pl_gen": "kii:li (keelte)",
+        "pl_part": "kii:li",
+        "pl_ill": "kii:li(he)",
+        "pl_all": "keelile (keeltele)"
+      },
+      "models": [
+        "kii:l'"
+      ]
+    },
+    "41": {
+      "type": "41",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "hüdsi",
+        "sg_gen": "hüdse",
+        "sg_part": "hüst",
+        "sg_ill": ".hüste",
+        "pl_gen": "hütsi (hüste)",
+        "pl_part": "hütsi",
+        "pl_ill": ".hütsi(he)",
+        "pl_all": "hüdsile (hüstele)"
+      },
+      "models": [
+        "hüdsi"
+      ]
+    },
+    "42": {
+      "type": "42",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "käsi",
+        "sg_gen": "käe",
+        "sg_part": "kätt",
+        "sg_ill": "kätte",
+        "pl_gen": "kässi (käte)",
+        "pl_part": "kässi",
+        "pl_ill": ".kässi(he)",
+        "pl_all": "kä(s)sile (kätele)"
+      },
+      "models": [
+        "käsi"
+      ]
+    },
+    "43": {
+      "type": "43",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "asi",
+        "sg_gen": "as'a",
+        "sg_part": ".asja",
+        "sg_ill": ".asja",
+        "pl_gen": ".asjo .asju",
+        "pl_part": ".asjo .asju",
+        "pl_ill": ".asjo(he) .asju(he)",
+        "pl_all": "as'olõ as'ulõ"
+      },
+      "models": [
+        "asi"
+      ]
+    },
+    "44": {
+      "type": "44",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "vari",
+        "sg_gen": "var'o",
+        "sg_part": ".varjo",
+        "sg_ill": ".varjo",
+        "pl_gen": ".varjõ .varja",
+        "pl_part": ".varjõ .varja",
+        "pl_ill": ".varjõ(he) .varja(he)",
+        "pl_all": "var'õlõ var'alõ"
+      },
+      "models": [
+        "vari"
+      ]
+    },
+    "45": {
+      "type": "45",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "nagõl nakl",
+        "sg_gen": "nagla",
+        "sg_part": ".nakla",
+        "sg_ill": ".nakla",
+        "pl_gen": ".naklo .naklu",
+        "pl_part": ".naklo .naklu",
+        "pl_ill": ".naklo(he) .naklu(he)",
+        "pl_all": "naglolõ naglulõ"
+      },
+      "models": [
+        "nagõl nakl"
+      ]
+    },
+    "46": {
+      "type": "46",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kogõr kokr",
+        "sg_gen": "kogrõ",
+        "sg_part": ".kokrõ",
+        "sg_ill": ".kokrõ",
+        "pl_gen": ".kokrõ",
+        "pl_part": ".kokri",
+        "pl_ill": ".kokri(he)",
+        "pl_all": "kogrilõ"
+      },
+      "models": [
+        "kogõr kokr"
+      ]
+    },
+    "47": {
+      "type": "47",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kubõl kupl",
+        "sg_gen": "kubla",
+        "sg_part": ".kupla",
+        "sg_ill": ".kupla",
+        "pl_gen": ".kuplõ",
+        "pl_part": ".kuplõ",
+        "pl_ill": ".kuplõ(he)",
+        "pl_all": "kublõlõ"
+      },
+      "models": [
+        "kubõl kupl"
+      ]
+    },
+    "48": {
+      "type": "48",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kask",
+        "sg_gen": ".kaska",
+        "sg_part": ".kaskat",
+        "sg_ill": ".kaskahe",
+        "pl_gen": ".kaskidõ",
+        "pl_part": ".kaskit",
+        "pl_ill": ".kaskihe",
+        "pl_all": ".kaskilõ"
+      },
+      "models": [
+        "kask"
+      ]
+    },
+    "49": {
+      "type": "49",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "täüs'",
+        "sg_gen": "tävve",
+        "sg_part": "täüt",
+        "sg_ill": ".täüde",
+        "pl_gen": ".täüsi (täüte)",
+        "pl_part": ".täüsi",
+        "pl_ill": ".täüsi(he)",
+        "pl_all": "tävvile (täütele)"
+      },
+      "models": [
+        "täüs'"
+      ]
+    },
+    "50": {
+      "type": "50",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "kuu",
+        "sg_gen": "kuu",
+        "sg_part": "kuud",
+        "sg_ill": ".kuuh(t)õ",
+        "pl_gen": "kuiõ",
+        "pl_part": "kuid",
+        "pl_ill": ".kuih(t)õ",
+        "pl_all": "kuilõ"
+      },
+      "models": [
+        "kuu"
+      ]
+    },
+    "51": {
+      "type": "51",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "üü:",
+        "sg_gen": "üü:",
+        "sg_part": "üü:d",
+        "sg_ill": "üü:h(t)e",
+        "pl_gen": "öie",
+        "pl_part": "öid",
+        "pl_ill": ".öih(t)e",
+        "pl_all": "öile"
+      },
+      "models": [
+        "üü:"
+      ]
+    },
+    "52": {
+      "type": "52",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "tüü:",
+        "sg_gen": "tüü:",
+        "sg_part": "tüü:d",
+        "sg_ill": "tüü:hü tühüq",
+        "pl_gen": "töie",
+        "pl_part": "töid",
+        "pl_ill": "töih(t)e",
+        "pl_all": "töile"
+      },
+      "models": [
+        "tüü:"
+      ]
+    },
+    "53": {
+      "type": "53",
+      "pos_group": "nominal",
+      "forms": {
+        "sg_nom": "täi",
+        "sg_gen": "täi",
+        "sg_part": "täid",
+        "sg_ill": ".täih(t)e",
+        "pl_gen": "täie",
+        "pl_part": ".täie",
+        "pl_ill": ".täih(t)e",
+        "pl_all": ".täele"
+      },
+      "models": [
+        "täi"
+      ]
+    },
+    "54": {
+      "type": "54",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "süü:mä",
+        "inf_da": "süvväq",
+        "act_ptcp": "söönüq",
+        "pass_ptcp": "süü:d",
+        "prs_1sg": "süü:",
+        "prs_3sg": "süü: (sööse)",
+        "pst_1sg": ".sei(e)",
+        "pst_3sg": ".sei(e)"
+      },
+      "models": [
+        "süü:mä"
+      ]
+    },
+    "55": {
+      "type": "55",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". saama",
+        "inf_da": "saiaq",
+        "act_ptcp": "saanuq",
+        "pass_ptcp": "saad",
+        "prs_1sg": "saa",
+        "prs_3sg": "saa (saasõ)",
+        "pst_1sg": ".sai(õ)",
+        "pst_3sg": ".sai(õ)"
+      },
+      "models": [
+        ". saama"
+      ]
+    },
+    "56": {
+      "type": "56",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "valama",
+        "inf_da": "vallaq",
+        "act_ptcp": "valanuq",
+        "pass_ptcp": "valõt",
+        "prs_1sg": "vala",
+        "prs_3sg": "vala",
+        "pst_1sg": "vali",
+        "pst_3sg": "vali"
+      },
+      "models": [
+        "valama"
+      ]
+    },
+    "57": {
+      "type": "57",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "kosima",
+        "inf_da": "kossiq",
+        "act_ptcp": "kosinuq",
+        "pass_ptcp": "kosit",
+        "prs_1sg": "kosi",
+        "prs_3sg": "kosi",
+        "pst_1sg": "kosõ",
+        "pst_3sg": "kosõ"
+      },
+      "models": [
+        "kosima"
+      ]
+    },
+    "58": {
+      "type": "58",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "tulõma",
+        "inf_da": "tullaq",
+        "act_ptcp": "tulnuq tulluq",
+        "pass_ptcp": "tult",
+        "prs_1sg": "tulõ",
+        "prs_3sg": "tulõ",
+        "pst_1sg": "tulli .tull'e",
+        "pst_3sg": "tull' .tull'e"
+      },
+      "models": [
+        "tulõma"
+      ]
+    },
+    "59": {
+      "type": "59",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "pügämä",
+        "inf_da": "pükäq",
+        "act_ptcp": "pügänüq",
+        "pass_ptcp": "pöet",
+        "prs_1sg": "püä",
+        "prs_3sg": "pügä",
+        "pst_1sg": ".pöi(e)",
+        "pst_3sg": "pügi"
+      },
+      "models": [
+        "pügämä"
+      ]
+    },
+    "60": {
+      "type": "60",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "tegemä",
+        "inf_da": "tetäq",
+        "act_ptcp": "tennüq",
+        "pass_ptcp": "tett",
+        "prs_1sg": "tii:",
+        "prs_3sg": "tege",
+        "pst_1sg": ".tei(e) (.tekse)",
+        "pst_3sg": "tekk' (tegi, .tekse)"
+      },
+      "models": [
+        "tegemä"
+      ]
+    },
+    "61": {
+      "type": "61",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". nõstma",
+        "inf_da": ".nõstaq",
+        "act_ptcp": ".nõstnuq",
+        "pass_ptcp": "nõstõt",
+        "prs_1sg": "nõsta",
+        "prs_3sg": "nõst",
+        "pst_1sg": "nõsti .nõstsõ",
+        "pst_3sg": "nõst' .nõstsõ"
+      },
+      "models": [
+        ". nõstma"
+      ]
+    },
+    "62": {
+      "type": "62",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "rapahutma",
+        "inf_da": "rapahutaq",
+        "act_ptcp": "rapahutnuq",
+        "pass_ptcp": "rapahudõt",
+        "prs_1sg": "rapahuda",
+        "prs_3sg": "rapahut",
+        "pst_1sg": "rapahudi",
+        "pst_3sg": "rapahut'"
+      },
+      "models": [
+        "rapahutma"
+      ]
+    },
+    "63": {
+      "type": "63",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". rist'mä",
+        "inf_da": ".ristiq",
+        "act_ptcp": ".rist'nüq",
+        "pass_ptcp": "ristit",
+        "prs_1sg": "risti",
+        "prs_3sg": "rist'",
+        "pst_1sg": "riste .rist'se",
+        "pst_3sg": ".riste .rist'se"
+      },
+      "models": [
+        ". rist'mä"
+      ]
+    },
+    "64": {
+      "type": "64",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". hirnma",
+        "inf_da": ".hirnuq",
+        "act_ptcp": ".hirnnuq",
+        "pass_ptcp": "hirnut",
+        "prs_1sg": "hirnu",
+        "prs_3sg": "hirn",
+        "pst_1sg": "hirnõ .hirnsõ",
+        "pst_3sg": "hirn' .hirnsõ"
+      },
+      "models": [
+        ". hirnma"
+      ]
+    },
+    "65": {
+      "type": "65",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". laskma",
+        "inf_da": ".laskõq",
+        "act_ptcp": ".lasknuq",
+        "pass_ptcp": "last",
+        "prs_1sg": "lasõ",
+        "prs_3sg": "lask",
+        "pst_1sg": "lasi .lasksõ",
+        "pst_3sg": "lask' .lasksõ"
+      },
+      "models": [
+        ". laskma"
+      ]
+    },
+    "66": {
+      "type": "66",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". püüdmä",
+        "inf_da": "(.)püüdäq",
+        "act_ptcp": ".püüdnüq",
+        "pass_ptcp": "püvvet",
+        "prs_1sg": "püvvä",
+        "prs_3sg": "püüd",
+        "pst_1sg": "püvvi .püüdse",
+        "pst_3sg": "püüd' .püüdse"
+      },
+      "models": [
+        ". püüdmä"
+      ]
+    },
+    "67": {
+      "type": "67",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". jäämä",
+        "inf_da": "jäiäq",
+        "act_ptcp": "jäänüq",
+        "pass_ptcp": "jääd",
+        "prs_1sg": "jää",
+        "prs_3sg": "jääs (jääse)",
+        "pst_1sg": ".jäi(e)",
+        "pst_3sg": ".jäi(e)"
+      },
+      "models": [
+        ". jäämä"
+      ]
+    },
+    "68": {
+      "type": "68",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". vaoma",
+        "inf_da": ".vaodaq vaioq",
+        "act_ptcp": ".vaonuq",
+        "pass_ptcp": "vaot",
+        "prs_1sg": "vao",
+        "prs_3sg": "vaos",
+        "pst_1sg": ".vaio",
+        "pst_3sg": ".vaio"
+      },
+      "models": [
+        ". vaoma"
+      ]
+    },
+    "69": {
+      "type": "69",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "elämä",
+        "inf_da": "elläq",
+        "act_ptcp": "elänüq",
+        "pass_ptcp": "elet",
+        "prs_1sg": "elä",
+        "prs_3sg": "eläs",
+        "pst_1sg": ".elli",
+        "pst_3sg": ".elli"
+      },
+      "models": [
+        "elämä"
+      ]
+    },
+    "70": {
+      "type": "70",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "väsümä",
+        "inf_da": "vässüq",
+        "act_ptcp": "väsünüq",
+        "pass_ptcp": "väsüt",
+        "prs_1sg": "väsü",
+        "prs_3sg": "väsüs",
+        "pst_1sg": ".vässü",
+        "pst_3sg": ".vässü"
+      },
+      "models": [
+        "väsümä"
+      ]
+    },
+    "71": {
+      "type": "71",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "kasuma",
+        "inf_da": "kassuq",
+        "act_ptcp": "kasunuq",
+        "pass_ptcp": "kasut",
+        "prs_1sg": "kasu",
+        "prs_3sg": "kasus",
+        "pst_1sg": ".kasvi",
+        "pst_3sg": ".kasvi"
+      },
+      "models": [
+        "kasuma"
+      ]
+    },
+    "72": {
+      "type": "72",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "nõsõma",
+        "inf_da": "nõstaq",
+        "act_ptcp": "nõsnuq",
+        "pass_ptcp": "nõst",
+        "prs_1sg": "nõsõ",
+        "prs_3sg": "nõsõs",
+        "pst_1sg": ".nõssi",
+        "pst_3sg": ".nõssi"
+      },
+      "models": [
+        "nõsõma"
+      ]
+    },
+    "73": {
+      "type": "73",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". istma",
+        "inf_da": ".istuq",
+        "act_ptcp": ".istnuq",
+        "pass_ptcp": "istut",
+        "prs_1sg": "istu",
+        "prs_3sg": "istus",
+        "pst_1sg": ".istõ .istsõ",
+        "pst_3sg": ".istõ .istsõ"
+      },
+      "models": [
+        ". istma"
+      ]
+    },
+    "74": {
+      "type": "74",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". lõpma",
+        "inf_da": "lõppõq",
+        "act_ptcp": ".lõpnuq",
+        "pass_ptcp": "lõpõt",
+        "prs_1sg": "lõpõ",
+        "prs_3sg": "lõpõs",
+        "pst_1sg": "lõppi",
+        "pst_3sg": "lõppi"
+      },
+      "models": [
+        ". lõpma"
+      ]
+    },
+    "75": {
+      "type": "75",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". argnõma",
+        "inf_da": "arõdaq",
+        "act_ptcp": "arõnuq",
+        "pass_ptcp": "arõt",
+        "prs_1sg": ".argnõ",
+        "prs_3sg": ".argnõs",
+        "pst_1sg": ".argsi",
+        "pst_3sg": "arõs'"
+      },
+      "models": [
+        ". argnõma"
+      ]
+    },
+    "76": {
+      "type": "76",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". puhksama",
+        "inf_da": "puhastaq",
+        "act_ptcp": "puhasnuq",
+        "pass_ptcp": "puhast",
+        "prs_1sg": ".puhksa",
+        "prs_3sg": ".puhksas",
+        "pst_1sg": ".puhksi",
+        "pst_3sg": "puhas'"
+      },
+      "models": [
+        ". puhksama"
+      ]
+    },
+    "77": {
+      "type": "77",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". sõimama",
+        "inf_da": "sõimadaq",
+        "act_ptcp": "sõimanuq",
+        "pass_ptcp": "sõimat",
+        "prs_1sg": ".sõima",
+        "prs_3sg": ".sõimas",
+        "pst_1sg": ".sõimssi",
+        "pst_3sg": "sõimas'"
+      },
+      "models": [
+        ". sõimama"
+      ]
+    },
+    "78": {
+      "type": "78",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". taplõma",
+        "inf_da": "tapõldaq",
+        "act_ptcp": "tapõlnuq",
+        "pass_ptcp": "tapõld",
+        "prs_1sg": ".taplõ",
+        "prs_3sg": ".taplõs",
+        "pst_1sg": ".tapli",
+        "pst_3sg": "tapõl'"
+      },
+      "models": [
+        ". taplõma"
+      ]
+    },
+    "79": {
+      "type": "79",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". sündümä",
+        "inf_da": ".sündüdäq",
+        "act_ptcp": ".sündünüq",
+        "pass_ptcp": "sünnüt",
+        "prs_1sg": "sünnü",
+        "prs_3sg": "sünnüs",
+        "pst_1sg": ".sündü",
+        "pst_3sg": ".sündü"
+      },
+      "models": [
+        ". sündümä"
+      ]
+    },
+    "80": {
+      "type": "80",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". nälgümä",
+        "inf_da": ".nälgüdäq",
+        "act_ptcp": ".nälgünüq",
+        "pass_ptcp": ".nälgüt",
+        "prs_1sg": ".nälgü",
+        "prs_3sg": ".nälgüs",
+        "pst_1sg": ".nälgü",
+        "pst_3sg": ".nälgü"
+      },
+      "models": [
+        ". nälgümä"
+      ]
+    },
+    "81": {
+      "type": "81",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": ". kaotama",
+        "inf_da": ".kaotaq",
+        "act_ptcp": ".kaotanuq",
+        "pass_ptcp": ".kaotõt",
+        "prs_1sg": ".kaoda",
+        "prs_3sg": ".kaotas",
+        "pst_1sg": ".kaodi",
+        "pst_3sg": "kaot'"
+      },
+      "models": [
+        ". kaotama"
+      ]
+    },
+    "82": {
+      "type": "82",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "kergütämä",
+        "inf_da": "kergütäq",
+        "act_ptcp": "kergütänüq",
+        "pass_ptcp": "kergütet",
+        "prs_1sg": "kergüdä",
+        "prs_3sg": "kergütäs",
+        "pst_1sg": "kergüdi",
+        "pst_3sg": "kergüt'"
+      },
+      "models": [
+        "kergütämä"
+      ]
+    },
+    "83": {
+      "type": "83",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "hirnahtama",
+        "inf_da": "hirnahtaq",
+        "act_ptcp": "hirnahtanuq",
+        "pass_ptcp": "hirnahtõt",
+        "prs_1sg": "hirnahta",
+        "prs_3sg": "hirnahtas",
+        "pst_1sg": "hirnahti",
+        "pst_3sg": "hirnaht'"
+      },
+      "models": [
+        "hirnahtama"
+      ]
+    },
+    "84": {
+      "type": "84",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "unõh(t)uma",
+        "inf_da": "unõh(t)udaq",
+        "act_ptcp": "unõh(t)unuq",
+        "pass_ptcp": "unõh(t)ut",
+        "prs_1sg": "unõh(t)u",
+        "prs_3sg": "unõh(t)us",
+        "pst_1sg": "unõh(t)u",
+        "pst_3sg": "unõh(t)u"
+      },
+      "models": [
+        "unõh(t)uma"
+      ]
+    },
+    "85": {
+      "type": "85",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "kõ:nõlõma kõ:nõlama",
+        "inf_da": "kõ:nõldaq",
+        "act_ptcp": "kõ:nõlnuq",
+        "pass_ptcp": "kõ:nõld",
+        "prs_1sg": "kõ:nõlõ kõ:nõla",
+        "prs_3sg": "kõ:nõlõs kõ:nõlas",
+        "pst_1sg": "kõ:nõli",
+        "pst_3sg": "kõ:nõl' kõ:nõli"
+      },
+      "models": [
+        "kõ:nõlõma kõ:nõlama"
+      ]
+    },
+    "86": {
+      "type": "86",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "ehite(l))lemä",
+        "inf_da": "ehitelläq",
+        "act_ptcp": "ehitelnüq ehitellüq",
+        "pass_ptcp": "ehiteld",
+        "prs_1sg": "ehite(l)e",
+        "prs_3sg": "ehite(l)les",
+        "pst_1sg": "ehite(l)li",
+        "pst_3sg": "ehite(l)li"
+      },
+      "models": [
+        "ehite(l))lemä"
+      ]
+    },
+    "87": {
+      "type": "87",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "helisemä helisämä",
+        "inf_da": "helistäq",
+        "act_ptcp": "helisnüq",
+        "pass_ptcp": "helist",
+        "prs_1sg": "helise helisä",
+        "prs_3sg": "helises helisäs",
+        "pst_1sg": "helisi",
+        "pst_3sg": "helisi"
+      },
+      "models": [
+        "helisemä helisämä"
+      ]
+    },
+    "88": {
+      "type": "88",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "siba(ha)ma",
+        "inf_da": "sibadaq sipaq",
+        "act_ptcp": "sibanuq",
+        "pass_ptcp": "sibat",
+        "prs_1sg": "sipa sibaha",
+        "prs_3sg": "sipa(s) sibahas",
+        "pst_1sg": "sibasi",
+        "pst_3sg": "sibasi"
+      },
+      "models": [
+        "siba(ha)ma"
+      ]
+    },
+    "89": {
+      "type": "89",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "harinõma",
+        "inf_da": "haridaq harinõdaq",
+        "act_ptcp": "harinuq",
+        "pass_ptcp": "harit harinõt",
+        "prs_1sg": "harinõ",
+        "prs_3sg": "harinõs",
+        "pst_1sg": "harisi",
+        "pst_3sg": "harisi"
+      },
+      "models": [
+        "harinõma"
+      ]
+    },
+    "90": {
+      "type": "90",
+      "pos_group": "verbal",
+      "forms": {
+        "inf_ma": "manitsõma manitsama",
+        "inf_da": "manidaq manitsaq",
+        "act_ptcp": "maninuq manitsnuq",
+        "pass_ptcp": "manit manitsõt",
+        "prs_1sg": "manidsõ",
+        "prs_3sg": "manitsõs",
+        "pst_1sg": "manidsi",
+        "pst_3sg": "manits'"
+      },
+      "models": [
+        "manitsõma manitsama"
+      ]
+    }
+  }
+}

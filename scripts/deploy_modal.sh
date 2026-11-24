@@ -2,11 +2,12 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APP_NAME="${MODAL_APP_NAME:-vro-mcp}"
-VOLUME_NAME="${MODAL_VOLUME_NAME:-vro-data}"
-SECRET_NAME="${MODAL_SECRET_NAME:-vro-mcp-secret}"
+APP_NAME="${MODAL_APP_NAME:-south-estonian-mcp}"
+VOLUME_NAME="${MODAL_VOLUME_NAME:-south-estonian-mcp-data}"
+SECRET_NAME="${MODAL_SECRET_NAME:-south-estonian-mcp-secret}"
 MCP_PATH_VALUE="${MCP_PATH:-}"
-ENV_FILE="$ROOT/.env"
+ENV_FILE="$ROOT/.env.public"
+export MODAL_APP_NAME="$APP_NAME" MODAL_VOLUME_NAME="$VOLUME_NAME" MODAL_SECRET_NAME="$SECRET_NAME"
 
 need_cmd() {
   command -v "$1" >/dev/null || {
@@ -49,10 +50,7 @@ volume_state() {
 
 volume_has_data() {
   local remote_root="$1"
-  echo "$remote_root" | grep -q 'dictionary.sqlite' \
-    && echo "$remote_root" | grep -q 'corpus.sqlite' \
-    && echo "$remote_root" | grep -q 'word_bag.sqlite' \
-    && echo "$remote_root" | grep -q 'giella-share'
+  [[ "$remote_root" == *south_estonian_public.db* ]]
 }
 
 upload_local_data() {
@@ -65,17 +63,14 @@ upload_local_data() {
     return
   fi
 
-  need_file "$data_dir/vro_dictionary.sqlite"
-  need_file "$data_dir/vro_corpus.sqlite"
-  need_file "$data_dir/vro_word_bag.sqlite"
-  "$MODAL_BIN" volume put "$VOLUME_NAME" "$data_dir/vro_dictionary.sqlite" /dictionary.sqlite --force
-  "$MODAL_BIN" volume put "$VOLUME_NAME" "$data_dir/vro_corpus.sqlite" /corpus.sqlite --force
-  "$MODAL_BIN" volume put "$VOLUME_NAME" "$data_dir/vro_word_bag.sqlite" /word_bag.sqlite --force
+  need_file "$data_dir/south_estonian_public.db"
+  python3 "$ROOT/src/vro_mcp/public_data.py" "$data_dir/south_estonian_public.db"
+  "$MODAL_BIN" volume put "$VOLUME_NAME" "$data_dir/south_estonian_public.db" /south_estonian_public.db --force
 
   if [[ -d "$data_dir/giella-share" ]]; then
     "$MODAL_BIN" volume put "$VOLUME_NAME" "$data_dir/giella-share" /giella-share --force
   else
-    echo "$data_dir/giella-share is missing; deploying without Giella runtime artifacts." >&2
+    echo "$data_dir/giella-share is missing; existing volume artifacts will be used if present." >&2
   fi
 }
 
@@ -95,8 +90,8 @@ LOCAL_SECRET="$(setting LOCAL_SECRET "0")"
 DATA_SOURCE="$(setting DATA_SOURCE "release")"
 FORCE_DATA="$(setting FORCE_DATA "0")"
 DATA_DIR="$(setting DATA_DIR "$ROOT/data")"
-VRO_DATA_REPO_VALUE="$(setting VRO_DATA_REPO "Leo-Martin-Pala/voro-mcp")"
-VRO_DATA_TAG_VALUE="$(setting VRO_DATA_TAG "data-v1")"
+VRO_DATA_REPO_VALUE="$(setting VRO_DATA_REPO "Leo-Martin-Pala/south-estonian-mcp")"
+VRO_DATA_TAG_VALUE="$(setting VRO_DATA_TAG "data-v2")"
 VRO_GIELLA_TAG_VALUE="$(setting VRO_GIELLA_TAG "giella-v1")"
 VRO_NEUROTOLGE_BASE_URL_VALUE="$(setting VRO_NEUROTOLGE_BASE_URL "")"
 
@@ -156,22 +151,7 @@ else
 fi
 rm -f "$DEPLOY_LOG"
 
-cat <<EOF
-
-Deployed $APP_NAME.
-MCP secret path:
-$MCP_PATH_VALUE
-EOF
-
+printf '\nDeployed %s. The route is stored in %s.\n' "$APP_NAME" "$ENV_FILE"
 if [[ -n "$MODAL_APP_URL" ]]; then
-  cat <<EOF
-
-Full MCP endpoint:
-$MODAL_APP_URL$MCP_PATH_VALUE
-EOF
-else
-  cat <<EOF
-
-Your full endpoint is the Modal app URL printed above plus that path.
-EOF
+  printf 'Modal app URL: %s\n' "$MODAL_APP_URL"
 fi

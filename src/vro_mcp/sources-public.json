@@ -1,0 +1,75 @@
+{
+  "fiu_vrowiki": {
+    "kind": "corpus",
+    "title": "Vikipeediä (Võro Wikipedia)",
+    "credit": "Võro Wikipedia contributors",
+    "url": "https://fiu-vro.wikipedia.org/",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "changes": "Extracted main-namespace articles, cleaned markup and segmented text."
+  },
+  "ilukirjanduskorpus": {
+    "kind": "corpus",
+    "title": "Corpus of Fiction in Võro and Seto languages",
+    "credit": "Original authors and editors as identified by the corpus, compiled by Sulev Iva and the University of Tartu",
+    "url": "https://doi.org/10.15155/1-00-0000-0000-0000-00186L",
+    "license": "CC-BY-SA-3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "changes": "Extracted and normalized TEI text and segmented the works."
+  },
+  "setomaa_newspaper_corpus_cc": {
+    "kind": "corpus",
+    "title": "Setomaa newspaper corpus (2006–2013)",
+    "credit": "Setomaa article authors and editors, compiled by Kaur Männamaa",
+    "url": "https://doi.org/10.15155/1-00-0000-0000-0000-0019CL",
+    "license": "CC-BY-SA-3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "changes": "Selected the archive's Seto-labelled articles, cleaned markup and segmented text."
+  },
+  "paraleelkorpus": {
+    "kind": "corpus",
+    "title": "Parallel Corpus of Võro and Estonian languages",
+    "credit": "Sulev Iva and the University of Tartu, with original authors and translators",
+    "url": "https://doi.org/10.15155/1-00-0000-0000-0000-001A0L",
+    "license": "CC-BY-SA-3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "translation_engine": "paraleelkorpus",
+    "changes": "Extracted Võro text and aligned human Estonian translations from the publisher's parallel files."
+  },
+  "mulk_muigas": {
+    "kind": "corpus",
+    "title": "Mulk muigas: mulgi nallakogu",
+    "credit": "Kalle Gaston (compiler), Kaarnakiwi, 2021",
+    "url": "https://www.digar.ee/arhiiv/et/raamatud/184835",
+    "license": "Public Domain",
+    "license_url": "https://www.digar.ee/arhiiv/et/raamatud/184835",
+    "changes": "Extracted and segmented text from the edition marked Public Domain by DIGAR."
+  },
+  "ids_vro": {
+    "kind": "dictionary",
+    "title": "Võro IDS wordlist",
+    "credit": "Leon Cosgrove and Sulev Iva, in Key and Comrie (eds.), Intercontinental Dictionary Series, 2020",
+    "url": "https://ids.clld.org/providers/ids-cosgrovevoro",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Imported and normalized Võro forms and concept glosses. Standard Estonian IDS terms (https://ids.clld.org/contributions/127, CC BY 4.0) are joined by concept ID."
+  },
+  "fiu_vrowiki_dictionary": {
+    "kind": "dictionary",
+    "title": "Vikipeediä article leads and Wikidata labels",
+    "credit": "Võro Wikipedia contributors and Wikidata contributors",
+    "url": "https://fiu-vro.wikipedia.org/",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "changes": "Removed wiki markup and normalized the lead sentence. Wikidata labels, titles and item identifiers are CC0 (https://www.wikidata.org/wiki/Wikidata:Licensing)."
+  },
+  "eki_vms_dictionary": {
+    "kind": "dictionary",
+    "title": "Väike murdesõnastik",
+    "credit": "Eesti Keele Instituut, Väike murdesõnastik I–II (1982/1989), electronic edition",
+    "url": "https://arhiiv.eki.ee/litsents/vaba/dl.cgi?D=vms",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Selected entries attested in South Estonian locations, normalized lookup keys and retained locality evidence. EKI lists the source on its reuse downloads page (https://arhiiv.eki.ee/litsents/)."
+  }
+}

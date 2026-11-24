@@ -1,0 +1,104 @@
+# Public data coverage and licenses
+
+The public build uses licenses and public-domain notices that support
+redistribution and adaptation, including commercial use. The builder admits
+sources by exact identity. The private unified snapshot is the denominator.
+The public totals include the publisher line-aligned parallel recovery, so they
+measure available coverage after the upgrade. The counts are rows and may
+include several senses or examples for the same term.
+
+| Variety | Corpus units public / private | Dictionary entries public / private | Stored translations public / private |
+| --- | ---: | ---: | ---: |
+| Võro | 83,755 / 407,339 | 9,182 / 151,755 | 7,252 / 209,325 |
+| Seto | 10,144 / 139,502 | 1,732 / 64,888 | 0 / 212,947 |
+| Mulgi | 27 / 141,255 | 1,999 / 38,938 | 0 / 20,395 |
+| Tartu | 0 / 8,617 | 2,302 / 14,845 | 0 / 8,387 |
+| Leivu | 0 / 253 | 449 / 1,877 | 0 / 46 |
+| Lutsi | 0 / 2,561 | 718 / 3,010 | 0 / 1,477 |
+| Kraasna | 0 / 147 | 43 / 173 | 0 / 106 |
+| **Total** | **93,926 / 699,674** | **16,425 / 275,486** | **7,252 / 452,683** |
+
+The public build has 86.58% fewer corpus units, 94.04% fewer dictionary entry
+rows, and 98.40% fewer stored translations than the private snapshot.
+Stored translations in the public build are human Võro–Estonian examples.
+They include 7,238 pairs from the publisher's line-aligned archive and 14
+previously verified pairs. Three archive files with unequal line counts were
+skipped for automatic line alignment. The private denominator also includes
+machine and LLM translations whose target-side provenance is incomplete.
+
+The earlier public release had 43,503 corpus segments. The new total is 2.16
+times as large by row count, with different segmentation. The earlier
+dictionary had 6,637 language-term rows in a concept schema. Its row count is
+in a different unit from the unified entry count. The new release adds
+1,306 Estonian IDS glosses joined by concept and has dictionary coverage in all
+seven varieties.
+
+The release builder prints the counts from the input and rebuilt database.
+It reconstructs word frequencies and search indexes from approved content.
+It includes 23,557 vectors for corpus units, 13,819 vectors for dictionary
+definitions, and 14 vectors for translations. The remaining rows are available
+through full-text search.
+
+## License evidence
+
+- **Väike murdesõnastik.** EKI distributes the exact electronic text and
+  locality files on its reuse downloads page. The local import points to the
+  same `vms.t` source. The public build includes 12,509 entries with EKI credit
+  under the site's standard CC BY 4.0 terms.
+  [EKI reuse terms](https://arhiiv.eki.ee/litsents/)
+  [Edition download](https://arhiiv.eki.ee/litsents/vaba/dl.cgi?D=vms)
+- **Mulk muigas.** DIGAR marks the exact 2021 edition Public Domain. This
+  contributes 27 Mulgi corpus units.
+  [National Library catalog](https://www.digar.ee/arhiiv/et/raamatud/184835)
+- **Setomaa.** The permitted corpus is the licensed 2006–2013 distribution.
+  The extraction memo records that the download agreement identified CC BY-SA
+  3.0. The separate collected PDF source has 77,065 private units and needs
+  its own grant or exact matches against the licensed archive.
+  [META-SHARE distribution](https://metashare.ut.ee/repository/browse/setomaa-newspaper-corpus/3303e60ca0d411eebb4773db10791bcf2d01e0b55ce2419db34ef402460a1c99/)
+- **Synaq.** The official catalog lists the portal under a proprietary license.
+  The Synaq scrape contributes 65,309 private dictionary entries. Seek a
+  license for a specific dictionary export from the Võro Institute.
+  [META-SHARE record](https://metashare.ut.ee/repository/browse/sunaqorg-web-dictionary-of-voro-and-seto-languages/4b3cdd6ca0d411eebb4773db10791bcf741086378b9d4181b1395028dc86e5c2/)
+- **EKI dictionaries.** The EMS catalog says CC BY for an `a–pari` edition
+  whose availability is under negotiation. The 2011 Old Võru record says
+  CC BY with a Share Alike restriction and is also under negotiation. The
+  Mulgi record describes the 2013 edition, alongside academic/noncommercial
+  restrictions. The 2025 Mulgi import and the SESS query interface need an
+  explicit grant for their respective editions.
+  [EMS](https://metashare.ut.ee/repository/browse/dictionary-of-estonian-dialects/366a688ca0d411eebb4773db10791bcf139297a68a5244c7ad493eb7528123f6/)
+  [Old Võru](https://metashare.ut.ee/repository/browse/the-dictionary-of-old-voru-dialect/1d52ecf8a0d411eebb4773db10791bcf646c54ddd9dd4004a4377915f5dc4b8f/)
+  [Mulgi 2013](https://metashare.ut.ee/repository/browse/the-dictionary-of-the-mulgi-dialect/04eb195ca0d411eebb4773db10791bcf49f63692e3f54a6a8b9ddbe8050d182d/)
+  [SESS](https://arhiiv.eki.ee/dict/setoeri/)
+- **Estonian Dialect Corpus.** The catalog specifies restricted use under
+  CLARIN ACA. The four local varieties account for 46,628 units.
+  [META-SHARE record](https://metashare.ut.ee/repository/browse/estonian-dialect-corpus/fa3c4b2aa0d311eebb4773db10791bcfd02e3a0c0eca4e46bf2eeccb5187625d/)
+- **SMUGRI-4.** The 216,980 Võro and Seto corpus rows carry a coarse local
+  CC BY-NC-SA label. The provider reports mixed licenses on the underlying
+  works. Verify the license and attribution per original component, and
+  verify the target side before sharing pairs.
+  [Provider data card](https://huggingface.co/datasets/tartuNLP/smugri4-data)
+- **Uma Leht.** The 116,361 imported units have no verified redistribution
+  grant. The catalog lists the corpus search service as proprietary.
+  [META-SHARE catalog](https://metashare.ut.ee/repository/search/?q=eesti+korpus&selected_facets=availabilityFilter_exact%3ANot+Available+Through+Meta+Share&selected_facets=licenceFilter_exact%3AProprietary&selected_facets=resourceTypeFilter_exact%3AtoolService&sort=resourcetype_asc)
+- **Lutsi historical material.** Kallas's 1900 source is a promising candidate
+  for a fresh extraction. The existing 927 units came from a modern annotated
+  web edition. Match the original printing before importing them.
+  [Archive editions](https://www.folklore.ee/muinasjutt/)
+
+The two Facebook sources account for 1,780 corpus units and 1,675 translations.
+They are excluded along with sources lacking a verified grant. The temporary
+WordNet tools and data are outside this release.
+
+## Highest-impact improvements
+
+1. Recover permissively licensed SMUGRI components by matching provider
+   files to the original publications. This is the largest available pool of
+   corpus rows. Keep explicit evidence for both sides of each translation.
+2. Ask EKI for exact reusable exports of EMS, Mulgi and Seto. A grant covering
+   the imported EMS alone would yield up to 48,291 dictionary rows across the
+   varieties, including the ones with the least public data. Ask the Võro
+   Institute for the Synaq dictionary export in parallel.
+3. Complete embedding coverage and promote attributable GiellaLT Seto and
+   Mulgi builds. Pair these with published human examples for the varieties
+   with little prose, starting with the original Kallas Lutsi material and
+   a verified Mulgi archive.

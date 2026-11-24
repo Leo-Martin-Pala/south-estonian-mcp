@@ -95,7 +95,7 @@ cp -f "$BUILD_DIR/giella-core/LICENSE" "$ARTIFACT_DIR/LICENSE"
   echo
   echo "Compiled GiellaLT/Divvun runtime artifacts (FSTs, CG grammars, spellers)"
   echo "for Võro, generated from the GiellaLT source repositories below. These"
-  echo "files are not part of the vro-mcp-server code (MIT) or dataset"
+  echo "files are not part of the south-estonian-mcp code (MIT) or dataset"
   echo "(CC-BY-SA-4.0)."
   echo
   echo "## License"

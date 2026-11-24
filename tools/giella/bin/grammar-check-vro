@@ -2,16 +2,28 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-ARCHIVE="${VRO_GRAMMAR_MODEL:-$REPO_ROOT/data/giella-share/voikko/4/vro.zcheck}"
+SHARE_DIR="${VRO_GIELLA_SHARE_DIR:-$REPO_ROOT/data/giella-share}"
+LANG_CODE="${GIELLA_LANG:-vro}"
+
+if [[ "${1:-}" == "--lang" && -n "${2:-}" ]]; then
+  LANG_CODE="$2"
+  shift 2
+fi
+
+if [[ "$LANG_CODE" == "vro" && -n "${VRO_GRAMMAR_MODEL:-}" ]]; then
+  ARCHIVE="$VRO_GRAMMAR_MODEL"
+else
+  ARCHIVE="$SHARE_DIR/voikko/4/$LANG_CODE.zcheck"
+fi
 
 if [[ "${1:-}" == "--check" ]]; then
-  command -v divvun-checker >/dev/null || { echo "missing divvun-checker; rebuild lang-vro with --enable-grammarchecker after installing it" >&2; exit 1; }
-  test -r "$ARCHIVE" || { echo "missing grammar archive: $ARCHIVE" >&2; exit 1; }
+  command -v divvun-checker >/dev/null || { echo "missing divvun-checker; rebuild lang-$LANG_CODE with --enable-grammarchecker after installing it" >&2; exit 1; }
+  test -r "$ARCHIVE" || { echo "missing grammar archive ($LANG_CODE): $ARCHIVE" >&2; exit 1; }
   exit 0
 fi
 
 if ! command -v divvun-checker >/dev/null; then
-  echo "grammar_check_vro is not available: install divvun-checker and rebuild lang-vro with --enable-grammarchecker." >&2
+  echo "grammar_check ($LANG_CODE) is not available: install divvun-checker and rebuild lang-$LANG_CODE with --enable-grammarchecker." >&2
   exit 127
 fi
 

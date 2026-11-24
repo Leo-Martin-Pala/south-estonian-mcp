@@ -4,15 +4,16 @@
 set -eu
 
 # Bump this default tag whenever you publish a new dataset release.
-REPO="${VRO_DATA_REPO:-Leo-Martin-Pala/voro-mcp}"
-TAG="${VRO_DATA_TAG:-data-v1}"
+REPO="${VRO_DATA_REPO:-Leo-Martin-Pala/south-estonian-mcp}"
+TAG="${VRO_DATA_TAG:-data-v2}"
 ASSET="vro-data.tar.xz"
 
 cd "$(dirname "$0")/.."
 mkdir -p data
 
 tmp="$(mktemp)"
-trap 'rm -f "$tmp"' EXIT
+staging="$(mktemp -d data/.public-dataset.XXXXXX)"
+trap 'rm -f "$tmp"; rm -rf "$staging"' EXIT
 
 echo "Fetching $ASSET from $REPO@$TAG ..."
 if command -v gh >/dev/null 2>&1; then
@@ -21,6 +22,9 @@ else
     curl -fL "https://github.com/$REPO/releases/download/$TAG/$ASSET" -o "$tmp"
 fi
 
-tar xJf "$tmp" -C data
-echo "Done. data/ now contains:"
-ls -1 data/*.sqlite
+tar xJf "$tmp" -C "$staging" south_estonian_public.db LICENSE NOTICE
+python3 src/vro_mcp/public_data.py "$staging/south_estonian_public.db"
+mv "$staging/LICENSE" data/LICENSE
+mv "$staging/NOTICE" data/NOTICE
+mv "$staging/south_estonian_public.db" data/south_estonian_public.db
+ls -lh data/south_estonian_public.db

@@ -1,0 +1,352 @@
+{
+  "lang": "mulgi",
+  "schema_version": 1,
+  "nominal_columns": [
+    "sg_nom",
+    "sg_gen",
+    "sg_part",
+    "sg_ill",
+    "pl_gen",
+    "pl_part"
+  ],
+  "types": {
+    "kirme": {
+      "type": "kirme",
+      "pos_group": "nominal",
+      "gradation_group": "strengthening_gradation",
+      "forms": {
+        "sg_nom": "kirme",
+        "sg_gen": ".kirme",
+        "sg_part": "kirmet",
+        "sg_ill": ".kirmes(e)",
+        "pl_gen": "kirmete ~ .kirmide",
+        "pl_part": ".kirmit"
+      }
+    },
+    "ammas": {
+      "type": "ammas",
+      "pos_group": "nominal",
+      "gradation_group": "strengthening_gradation",
+      "forms": {
+        "sg_nom": "ammas",
+        "sg_gen": ".amba",
+        "sg_part": "ammast",
+        "sg_ill": ".ambas(e)",
+        "pl_gen": "ammaste ~ .ambide",
+        "pl_part": ".ambit"
+      }
+    },
+    "iste": {
+      "type": "iste",
+      "pos_group": "nominal",
+      "gradation_group": "strengthening_gradation",
+      "forms": {
+        "sg_nom": "iste",
+        "sg_gen": ".istme",
+        "sg_part": "istet",
+        "sg_ill": ".istmes(e)",
+        "pl_gen": "istete ~ .istmide",
+        "pl_part": ".istmit"
+      }
+    },
+    "tüdär": {
+      "type": "tüdär",
+      "pos_group": "nominal",
+      "gradation_group": "strengthening_gradation",
+      "forms": {
+        "sg_nom": "tüdär",
+        "sg_gen": ".tütre",
+        "sg_part": "tüdärt ~ tüdärd",
+        "sg_ill": ".tütres(e)",
+        "pl_gen": "tüdärte ~ tüdärde ~ .tütride",
+        "pl_part": ".tütrit"
+      }
+    },
+    "aam": {
+      "type": "aam",
+      "pos_group": "nominal",
+      "gradation_group": "weakening_gradation",
+      "forms": {
+        "sg_nom": "aam",
+        "sg_gen": "aami",
+        "sg_part": ".aami",
+        "sg_ill": "aamis(e) ~ .aami",
+        "pl_gen": ".aame",
+        "pl_part": ".aame"
+      }
+    },
+    "mägi": {
+      "type": "mägi",
+      "pos_group": "nominal",
+      "gradation_group": "weakening_gradation",
+      "forms": {
+        "sg_nom": "mägi",
+        "sg_gen": "mäe",
+        "sg_part": "mäge",
+        "sg_ill": ".mäkke",
+        "pl_gen": "mägede",
+        "pl_part": "mägesit"
+      }
+    },
+    "jalg": {
+      "type": "jalg",
+      "pos_group": "nominal",
+      "gradation_group": "weakening_gradation",
+      "forms": {
+        "sg_nom": "jalg",
+        "sg_gen": "jala",
+        "sg_part": ".jalga",
+        "sg_ill": "jalas(e) ~ .jalga",
+        "pl_gen": ".jalge",
+        "pl_part": ".jalgu"
+      }
+    },
+    "ader": {
+      "type": "ader",
+      "pos_group": "nominal",
+      "gradation_group": "weakening_gradation",
+      "forms": {
+        "sg_nom": "ader",
+        "sg_gen": "adra",
+        "sg_part": ".atra",
+        "sg_ill": "adras(e) ~ .atra",
+        "pl_gen": ".atre",
+        "pl_part": ".atru"
+      }
+    },
+    "padi": {
+      "type": "padi",
+      "pos_group": "nominal",
+      "gradation_group": "weakening_gradation",
+      "forms": {
+        "sg_nom": "padi",
+        "sg_gen": "padja",
+        "sg_part": ".patja",
+        "sg_ill": "padjas(e) ~ .patja",
+        "pl_gen": ".patju ~ .patje",
+        "pl_part": ".patju ~ .patje"
+      }
+    },
+    "var's": {
+      "type": "var's",
+      "pos_group": "nominal",
+      "gradation_group": "weakening_gradation",
+      "forms": {
+        "sg_nom": "var's",
+        "sg_gen": "varre",
+        "sg_part": "vart",
+        "sg_ill": "varres(e) ~ .varde",
+        "pl_gen": "varte ~ .varsi",
+        "pl_part": ".varsi"
+      }
+    },
+    "kasuk": {
+      "type": "kasuk",
+      "pos_group": "nominal",
+      "gradation_group": "non_initial_syllable_gradation",
+      "forms": {
+        "sg_nom": "kasuk",
+        "sg_gen": "kasugu ~ kasuku",
+        "sg_part": "kasukut",
+        "sg_ill": "kasugus(e) ~ kasukus(e)",
+        "pl_gen": "kasukide",
+        "pl_part": "kasukit"
+      }
+    },
+    "käker't": {
+      "type": "käker't",
+      "pos_group": "nominal",
+      "gradation_group": "non_initial_syllable_gradation",
+      "forms": {
+        "sg_nom": "käker't",
+        "sg_gen": "käkerdi ~ käkerti",
+        "sg_part": "käkertit",
+        "sg_ill": "käkerdis(e) ~ käkertis(e)",
+        "pl_gen": "käkertide",
+        "pl_part": "käkertit"
+      }
+    },
+    "arilik": {
+      "type": "arilik",
+      "pos_group": "nominal",
+      "gradation_group": "non_initial_syllable_gradation",
+      "forms": {
+        "sg_nom": "arilik",
+        "sg_gen": "ariligu ~ ariliku",
+        "sg_part": "arilikku",
+        "sg_ill": "ariligus(e) ~ arilikus(e)",
+        "pl_gen": "arilike",
+        "pl_part": "arilikke"
+      }
+    },
+    "aus": {
+      "type": "aus",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": "aus",
+        "sg_gen": ".ause",
+        "sg_part": ".auset",
+        "sg_ill": ".auses(e)",
+        "pl_gen": ".auside",
+        "pl_part": ".ausit"
+      }
+    },
+    ".aaste": {
+      "type": ".aaste",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": ".aaste",
+        "sg_gen": ".aaste",
+        "sg_part": ".aastet",
+        "sg_ill": ".aastes(e)",
+        "pl_gen": ".aastide",
+        "pl_part": ".aastit"
+      }
+    },
+    "võle": {
+      "type": "võle",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": "võle",
+        "sg_gen": "võle",
+        "sg_part": "võlet",
+        "sg_ill": "võles(e)",
+        "pl_gen": "võlede",
+        "pl_part": "võlesit"
+      }
+    },
+    "kipe": {
+      "type": "kipe",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": "kipe",
+        "sg_gen": "kipe",
+        "sg_part": "kipet",
+        "sg_ill": "kipes(e)",
+        "pl_gen": "kipede",
+        "pl_part": ".kippit"
+      }
+    },
+    "tuli": {
+      "type": "tuli",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": "tuli",
+        "sg_gen": "tule",
+        "sg_part": "tuld",
+        "sg_ill": ".tulle",
+        "pl_gen": "tulede",
+        "pl_part": "tulesit"
+      }
+    },
+    ".köster": {
+      "type": ".köster",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": ".köster",
+        "sg_gen": ".köstre",
+        "sg_part": ".köstert ~ .kösterd",
+        "sg_ill": ".köstres(e)",
+        "pl_gen": ".köstride",
+        "pl_part": ".köstrit"
+      }
+    },
+    ".irmus": {
+      "type": ".irmus",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": ".irmus",
+        "sg_gen": ".irmse",
+        "sg_part": ".irmust",
+        "sg_ill": ".irmses(e)",
+        "pl_gen": ".irmside",
+        "pl_part": ".irmsit"
+      }
+    },
+    "paise": {
+      "type": "paise",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": "paise",
+        "sg_gen": ".paisme",
+        "sg_part": ".paismet",
+        "sg_ill": ".paismes(e)",
+        "pl_gen": ".paismide",
+        "pl_part": ".paismit"
+      }
+    },
+    "naine": {
+      "type": "naine",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": "naine",
+        "sg_gen": "naise",
+        "sg_part": ".naist",
+        "sg_ill": "naises(e)",
+        "pl_gen": "naiste",
+        "pl_part": ".naisi"
+      }
+    },
+    "latsek": {
+      "type": "latsek",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": "latsek",
+        "sg_gen": "latsekse",
+        "sg_part": "latsekest",
+        "sg_ill": "latsekses(e)",
+        "pl_gen": "latsekside",
+        "pl_part": "latseksit"
+      }
+    },
+    "kuninges": {
+      "type": "kuninges",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": "kuninges",
+        "sg_gen": "kuninge",
+        "sg_part": "kuninget",
+        "sg_ill": "kuninges(e)",
+        "pl_gen": "kuningide",
+        "pl_part": "kuningit"
+      }
+    },
+    "aru": {
+      "type": "aru",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": "aru",
+        "sg_gen": "aru",
+        "sg_part": "aru",
+        "sg_ill": "arus(e)",
+        "pl_gen": "arude",
+        "pl_part": "arusit"
+      }
+    },
+    "maa": {
+      "type": "maa",
+      "pos_group": "nominal",
+      "gradation_group": "non_gradational",
+      "forms": {
+        "sg_nom": "maa",
+        "sg_gen": "maa",
+        "sg_part": "maad",
+        "sg_ill": "maas(e) ~ maha",
+        "pl_gen": "maie ~ maade",
+        "pl_part": "maid ~ maasit"
+      }
+    }
+  }
+}

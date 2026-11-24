@@ -1,287 +1,73 @@
-<h1 align="center">Võro MCP Server</h1>
+# South Estonian MCP
 
-<p align="center">
-  Give Claude, Codex, ChatGPT, and other MCP clients tools for working with the Võro language.
-</p>
+MCP tools for Võro, Seto, Mulgi, Tartu, Leivu, Lutsi, and Kraasna. Look up
+dictionary entries and related forms, find attested usage, check a draft, or
+consult grammar and inflection references from an MCP client.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/MCP-server-blue" />
-  <img src="https://img.shields.io/badge/Python-3.11+-blue" />
-  <img src="https://img.shields.io/badge/License-MIT-green" />
-  <img src="https://img.shields.io/badge/Data-CC--BY--SA--4.0-orange" />
-  <img src="https://img.shields.io/badge/GiellaLT-GPL--3.0-orange" />
-</p>
+## Install and connect
 
-<p align="center">
-  <img src="assets/chatgpt-using-mcp-example.gif" alt="ChatGPT using the Võro MCP server" width="100%" />
-</p>
-
-An MCP server for working with the Võro language: local dictionary and corpus
-lookup, GiellaLT-backed analysis/spellcheck/grammar tools, and Neurotõlge
-translation.
-
-## What it's for
-
-This MCP server gives language models practical tools for working with the Võro language. Võro is a lower-resource language, so general-purpose language models may make more mistakes with it than with widely supported languages such as English, or even Estonian.
-
-By connecting the model to dictionaries, corpus search, morphological analysis, spellchecking, grammar checking, translation, and form generation, this server helps improve the model’s ability to understand, generate, correct, and translate Võro text.
-
-It can be useful for tasks such as Võro translation, checking and improving generated text, exploring real usage examples, generating word forms, detecting unknown words, and supporting people who are learning or working with the Võro language.
-
-## Install
-
-### Quick setup
-
-On Debian/Ubuntu, one command does the whole setup.
+Use Python 3.11 or later. From this checkout:
 
 ```sh
-make setup        # scripts/run_local_ubuntu.sh; see `make help` for every task
+make install
+make data
+.venv/bin/south-estonian-mcp-check
+codex mcp add south-estonian -- "$PWD/.venv/bin/south-estonian-mcp"
 ```
 
-You need `make`, Python, and the usual shell tools installed first. The setup
-target installs the HFST/Divvun system binaries (adding the Apertium package
-repo first if your system can't already find `divvun-gramcheck`), downloads the
-SQLite datasets and the prebuilt Giella models, creates `.venv`, and installs
-the package. Smoke-test it with `make test`.
+Use `claude mcp add south-estonian -- "$PWD/.venv/bin/south-estonian-mcp"` for
+Claude Code. For a client that takes a JSON command, run `make local-url`.
+Update existing MCP client configurations to use the new `south-estonian-mcp` command.
 
-`make test` runs straight from the checkout (no install needed). Tests that need
-the SQLite datasets or the Giella tools **skip with a hint** when those aren't
-present, so a bare clone still reports green — run `make data` and `make giella`
-(or the full `make setup`) to actually exercise them.
-
-<details>
-<summary><strong>Manual setup</strong> (other platforms, or to see the pieces)</summary>
-
-<br />
-
-1. **System binaries** the Giella tools shell out to: `hfst-optimized-lookup`,
-   `hfst-ospell`, `cg3`, `divvun-checker`. On Debian/Ubuntu they come from the
-   Apertium nightly apt repo:
-
-   ```sh
-   curl -fsSL https://apertium.projectjj.com/apt/install-nightly.sh | sudo bash
-   sudo apt-get install -y hfst hfst-ospell cg3 divvun-gramcheck perl gawk bash
-   ```
-
-2. **The package**, into a virtualenv (`make install`):
-
-   ```sh
-   python3 -m venv .venv
-   . .venv/bin/activate
-   pip install -e .
-   ```
-
-3. **Data and models**, they are pulled from GitHub releases:
-
-   ```sh
-   scripts/fetch_data.sh
-   scripts/fetch_giella.sh
-   ```
-
-4. **Verify** the external tools resolved (prints JSON and exits):
-
-   ```sh
-   vro-mcp-check
-   ```
-
-</details>
-
-<details>
-<summary><strong>Remove a local setup</strong> (undo <code>make setup</code>)</summary>
-
-<br />
-
-From least to most system-wide. Do the steps that apply, from the repo root.
-
-1. **Client registration** — unregister the server from whichever MCP client you
-   added it to:
-
-   ```sh
-   claude mcp remove vro    # Claude Code
-   codex mcp remove vro     # Codex CLI
-   ```
-
-2. **Local install** — delete the virtualenv:
-
-   ```sh
-   rm -rf .venv
-   ```
-
-3. **Downloads** — the SQLite datasets and Giella models (large; re-fetchable
-   with `make data` / `make giella`):
-
-   ```sh
-   rm -rf data                 # SQLite datasets + the data/giella-share models
-   rm -rf .cache/giella-build  # only if you built Giella from source
-   rm -f .env                  # only if you created one for deployment
-   ```
-
-   To drop the code too, delete the directory you cloned into.
-
-4. **The Apertium/Divvun apt repo** — only if `make setup` added it (it skips
-   this when `divvun-gramcheck` was already installable). Find the source it
-   dropped and remove it:
-
-   ```sh
-   ls /etc/apt/sources.list.d/ | grep -i apertium
-   sudo rm -f /etc/apt/sources.list.d/apertium*.list
-   sudo apt-get update
-   ```
-
-5. **System packages** — remove only the Võro-specific binaries. Leave shared
-   tools (`python3`, `git`, `make`, `perl`, `gawk`, …) in place, since other
-   software may depend on them:
-
-   ```sh
-   sudo apt-get remove hfst hfst-ospell cg3 divvun-gramcheck
-   sudo apt-get autoremove        # optional: drop now-unused dependencies
-   ```
-
-</details>
+On Debian or Ubuntu, `make setup` also installs the GiellaLT binaries and
+downloads the existing Võro runtime bundle. See [DEPLOY.md](DEPLOY.md) for the
+hosted service and [RELEASING.md](RELEASING.md) for dataset builds.
 
 ## Tools
 
-| Tool | What it does |
+| Task | Tools |
 | --- | --- |
-| `lookup_word` | Compact dictionary concept lookup (`en`/`et`/`vro` language lists), with exact lookup before term substring fallback. |
-| `find_usage_examples` | Full-text corpus search returning short text snippets; `max_snippet_chars` lets clients choose snippet length. |
-| `word_exists_in_bag` | Fast word-bag count check; `0` means absent. |
-| `count_text` | Lean text length counter returning `characters`, `words`, and `estimated_sentences` for drafting constraints. |
-| `find_unknown_words` | List word forms in a text absent from the word bag. |
-| `find_unrecognized_words` | List text word forms that the GiellaLT analyzer returns as `+?`, with optional word-bag prefiltering. |
-| `analyze_word` | GiellaLT morphological analysis. |
-| `generate_forms` | GiellaLT generation for one exact lemma + tag analysis. |
-| `spellcheck_vro` | Token-level spellcheck returning `{"unknown": [...]}` with deduped words and up to three ranked suggestions per word. Defaults to 10 unknown words; `limit` can raise this up to 50. |
-| `grammar_check_vro` | Sentence-level grammar check returning `{"errors": [...]}` with spans, compact codes, and up to three suggestions per issue. Defaults to 10 errors; `limit` can raise this up to 50. |
-| `find_estonian_leakage` | Scan a larger text and return a slim, deduped list of word forms with Estonian-looking endings. |
-| `lint_estonian_leakage` | In-depth check of specific words/phrases: severities, messages, and hints. |
-| `suggest_correction` | Analyzer-verified correction alternatives for a bad/unknown form, capped to three ranked forms; accepts `form` or `word`; invalid forms include `seen_in_word_bag` when available. |
-| `translate_vro` | Neurotõlge/TartuNLP translation. Canonical language codes are `eng`, `est`, `fin`, `rus`, `hun`, `lav`, `nor`, with common 2-letter aliases accepted. |
-| `check_setup` | Compact setup health: healthy components are `true`; failures include diagnostics. |
+| Find a form or meaning | `lookup_words`, `search_dictionary_semantic`, `find_cognates` |
+| Find real usage or human translations | `search_corpus`, `get_word_usage_examples`, `search_parallel_examples`, `word_exists_in_bag` |
+| Review a draft | `lint_text`, `check_purity_with_rules`, `find_unknown_words`, `find_unrecognized_words`, `count_text` |
+| Analyze and generate forms | `analyze_word`, `generate_forms`, `generate_paradigm`, `suggest_correction` |
+| Check spelling and grammar | `spellcheck`, `grammar_check` |
+| Translate and classify | `translate_mt`, `classify_language` |
+| Read references or inspect setup | `get_grammar_resource`, `get_language_stats`, `check_setup` |
 
-Most lookup tools accept a single word or a list for batched queries. Successful
-tool outputs are intentionally compact so MCP clients spend less context on
-internal IDs, debug metadata, and provenance fields.
+Võro morphology and proofing use GiellaLT. The same tools support Seto and
+Mulgi when their corresponding artifacts are installed. The standard
+`giella-v1` download provides Võro. Grammar guides and rule-based checks cover
+all seven varieties. `translate_mt` uses Neurotõlge for supported Võro API
+directions, with optional local models for offline translation and Seto transfer.
 
-## Resources
+The public data release has dictionary entries across all seven varieties.
+Corpus search covers Võro and Seto, with a small Mulgi sample. Parallel search
+returns human Võro–Estonian pairs. Use `get_language_stats` to inspect coverage
+by language and source. See the [coverage and license audit](docs/public-data-audit.md)
+and [source manifest](src/vro_mcp/sources-public.json).
 
-Markdown references are exposed over MCP:
+## Optional models
 
-- `vro://grammar/noun-cases`: noun/adjective/numeral/pronoun declension.
-- `vro://grammar/verb-conjugation`: verb conjugation, moods, tenses, voice.
-- `vro://grammar/orthography-and-standard`: writing system (alphabet, glottal
-  stop `q`, palatalization, high õ, length and negation spelling) and Võro
-  Institute standard-language orientation.
-- `vro://guide/translator-prompt`: translator/post-editor prompt and workflow
-  for producing Võro text with these tools.
-
-## Configuration
-
-The data lives under `data/` and is fetched for you. `make setup` (or `make
-data` + `make giella`) downloads everything, so you normally configure nothing.
-The fetch scripts honour `VRO_DATA_REPO`, `VRO_DATA_TAG`, and `VRO_GIELLA_TAG`
-to point at a different release.
-
-All path defaults are repo-local; override them with environment variables when
-needed. For Modal deploy defaults, copy `.env.example` to `.env`.
-
-<details>
-<summary><strong>Advanced configuration</strong></summary>
-
-<br />
-
-| Variable | Default | Description |
-| --- | --- | --- |
-| `VRO_DICTIONARY_DB` | `./data/vro_dictionary.sqlite` | Dictionary SQLite path used by `lookup_word` and correction suggestions. |
-| `VRO_CORPUS_DB` | `./data/vro_corpus.sqlite` | Corpus SQLite path used by `find_usage_examples`. |
-| `VRO_WORD_BAG_DB` | `./data/vro_word_bag.sqlite` | Word-bag SQLite path used by seen/unknown word checks. |
-| `VRO_NEUROTOLGE_BASE_URL` | `https://api.tartunlp.ai/translation/v2` | Neurotõlge/TartuNLP translation API base URL. Point this at a local or self-hosted compatible endpoint to avoid depending on the public service. |
-| `VRO_DATA_REPO` | `Leo-Martin-Pala/voro-mcp` | GitHub repository used for dataset and Giella release downloads. |
-| `VRO_DATA_TAG` | `data-v1` | GitHub release tag fetched for `vro-data.tar.xz` by `scripts/fetch_data.sh` and Modal release hydration. |
-| `VRO_GIELLA_TAG` | `giella-v1` | GitHub release tag fetched for `giella-share.tar.xz` by `scripts/fetch_giella.sh` and Modal release hydration. |
-| `MCP_PATH` | `/mcp` locally; generated in `.env` for Modal deploys | Secret hosted HTTP path segment for Modal; local stdio clients do not need it. |
-| `DATA_SOURCE` | `release` | Modal deploy data source: `release`, `local`, or `none`. |
-| `FORCE_DATA` | `0` | Set to `1` to overwrite existing Modal Volume data. |
-| `DATA_DIR` | `./data` | Local data directory used when `DATA_SOURCE=local`. |
-| `NEW_SECRET` | `0` | Set to `1` to rotate `MCP_PATH` during deploy and save it to `.env`. |
-| `LOCAL_SECRET` | `0` | Set to `1` to push the `MCP_PATH` from `.env`/environment as-is and fail if it is empty (used by `make deploy-local-secret`). |
-| `MODAL_APP_NAME` | `vro-mcp` | Modal app name used by deploy/undeploy scripts. |
-| `MODAL_VOLUME_NAME` | `vro-data` | Modal Volume name for SQLite data and Giella artifacts. |
-| `MODAL_SECRET_NAME` | `vro-mcp-secret` | Modal secret name storing `MCP_PATH`. |
-
-</details>
-
-### Translation backend resilience
-
-`translate_vro` is intentionally an HTTP client, not a bundled translation
-engine. The default points at the public Neurotõlge/TartuNLP endpoint, but you
-can point `VRO_NEUROTOLGE_BASE_URL` at a compatible local or self-hosted
-backend. See TartuNLP's
-[`translation-api`](https://github.com/TartuNLP/translation-api) and
-[`translation-worker`](https://github.com/TartuNLP/translation-worker)
-repositories for their setup instructions.
-
-## Connect a client
-
-All a client needs is the binary's absolute path. Run `make local-url` to print
-that path and ready-to-paste config for Claude Code and Codex.
-
-Claude Code:
+Full-text search works with the base install. For hybrid and vector search,
+install the semantic extra and fetch the Apache-2.0 Voyage checkpoint used by
+the release's vector index.
 
 ```sh
-claude mcp add vro -- /absolute/path/to/vro-mcp-server/.venv/bin/vro-mcp-server
+.venv/bin/pip install -e '.[semantic]'
+.venv/bin/hf download voyageai/voyage-4-nano \
+  --revision 433ece5e27a1611e9360dd7134ecaaf79fb3681d \
+  --local-dir models/voyage_4_nano
 ```
 
-Codex:
+Model files belong in `VRO_MODELS_DIR` (default `models/`). The
+`classifier` and `local-mt` Python extras enable locally supplied compatible
+models in `language_id/` and `mt_smugri_fp16/`. Run `check_setup` to see
+which optional components are installed.
 
-```sh
-codex mcp add vro -- /absolute/path/to/vro-mcp-server/.venv/bin/vro-mcp-server
-```
+Use `VRO_SOUTH_ESTONIAN_DB` to choose a public-format database and
+`VRO_GIELLA_SHARE_DIR` to choose a GiellaLT artifact directory.
+`VRO_NEUROTOLGE_BASE_URL` selects a compatible translation API.
 
-Generic JSON MCP client configuration:
-
-```json
-{
-  "mcpServers": {
-    "vro": {
-      "command": "/absolute/path/to/vro-mcp-server/.venv/bin/vro-mcp-server",
-      "cwd": "/absolute/path/to/vro-mcp-server"
-    }
-  }
-}
-```
-
-## Deployment
-
-The local setup above runs the server on your own machine. To use it from
-anywhere — including the Claude and ChatGPT web apps — deploy it to
-[Modal](https://modal.com) instead.
-
-```sh
-make deploy
-```
-
-This builds the server in Modal's cloud and prints a hosted HTTPS endpoint like:
-
-```text
-https://<workspace>--vro-mcp-serve.modal.run/<secret>/mcp
-```
-
-<p align="center">
-  <img src="assets/modal-setup-claude-code-usage-example.gif" alt="Modal setup and Claude Code usage example" width="100%" />
-</p>
-
-Paste that URL into any MCP client (Claude Code, Codex, Claude web, ChatGPT) and
-you can reach the tools from anywhere, no local install needed. The server wakes
-on demand and sits idle for free between requests. The URL embeds a random secret
-path that acts as its password, so keep it private.
-
-See [DEPLOY.md](DEPLOY.md) for prerequisites, connecting each client, and the
-full set of deploy commands.
-
-## License
-
-Code is MIT (`LICENSE`). The SQLite datasets are CC-BY-SA-4.0 and the prebuilt
-GiellaLT models are GPL-3.0. Both are distributed as separate release assets,
-each bundling its own license and attribution. See [NOTICE.md](NOTICE.md) for scope
-and source summaries.
+Project code is MIT licensed. Dataset and GiellaLT notices are separate.
+[Licenses and attribution](NOTICE.md)

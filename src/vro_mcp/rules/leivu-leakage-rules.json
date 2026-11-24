@@ -1,0 +1,131 @@
+{
+  "language": "leivu",
+  "ruleset_id": "leivu_estonian_leakage_v1_0",
+  "purpose": "Flag likely modern Standard Estonian morphological leakage in intended Leivu text while respecting Leivu apocope, palatalization, and academic UPA/practical spellings.",
+  "normalization": {
+    "lowercase": true,
+    "preserve_chars": ["q", "õ", "ä", "ö", "ü", "š", "ž", "ś", "ń", "ľ", "ŕ", "ĺ", "ť", "d́", "ę", "ǫ", "ə", "ʌ", "´", "'", "’"],
+    "token_regex": "[^\\W\\d_][^\\W\\d_'´’-]*['´’-]*[^\\W\\d_]*"
+  },
+  "rules": [
+    {
+      "id": "EST_ACTIVE_PAST_NUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}nud\\b",
+      "message": "Looks like Standard Estonian active past participle -nud. Leivu uses South Estonian participle endings (-nu/-nü/-n/-nU or apocopated forms), not -nud.",
+      "hint": "Rewrite with authentic Leivu participle morphology rather than Estonian -nud."
+    },
+    {
+      "id": "EST_PASSIVE_PAST_TUD_DUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}(tud|dud)\\b",
+      "message": "Looks like Standard Estonian passive past participle -tud/-dud. Leivu uses -t/-d or -tu/-tü/-du/-dü.",
+      "hint": "Use Leivu passive past morphology (-t/-d/-tu/-du)."
+    },
+    {
+      "id": "EST_NEG_PAST_EI_NUD",
+      "severity": "error",
+      "scope": "window",
+      "regex": "(?iu)\\bei\\s+[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]+(nud|tud|dud)\\b",
+      "message": "Looks like Standard Estonian past negation ei + -nud/-tud. Leivu uses past negation es + verb (es tie, es ole).",
+      "hint": "Use Leivu es past negation."
+    },
+    {
+      "id": "EST_NEG_POLE_POLNUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b(pole|polnud|poleks|polevat)\\b",
+      "message": "Standard Estonian contracted negation pole/polnud/poleks/polevat is foreign to Leivu.",
+      "hint": "Use Leivu ei/es + ole forms."
+    },
+    {
+      "id": "EST_3SG_PRESENT_B",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}b\\b",
+      "message": "May be Standard Estonian 3sg present -b. Leivu 3sg present typically ends vowel-stem or -s (or apocopated), rather than -b.",
+      "hint": "Verify against attested Leivu verb forms."
+    },
+    {
+      "id": "EST_3PL_PRESENT_VAD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}vad\\b",
+      "message": "Looks like Standard Estonian 3pl present -vad. Leivu uses -vA/-sE plural forms.",
+      "hint": "Replace Estonian -vad with attested Leivu 3pl morphology."
+    },
+    {
+      "id": "EST_IMPERSONAL_TAKSE_DAKSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}(takse|dakse)\\b",
+      "message": "Looks like Standard Estonian impersonal -takse/-dakse. Leivu uses -tAs/-dAs or South Estonian impersonal forms.",
+      "hint": "Replace -takse/-dakse with Leivu impersonal morphology."
+    },
+    {
+      "id": "EST_CONDITIONAL_PERSONAL",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}(ksin|ksime|ksite)\\b",
+      "message": "Looks like Standard Estonian conditional -ksin/-ksime/-ksite. Leivu uses South Estonian -ssi/-si conditional forms.",
+      "hint": "Replace with Leivu conditional morphology."
+    },
+    {
+      "id": "EST_ILLATIVE_SSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}sse\\b",
+      "message": "Looks like Standard Estonian illative -sse. Leivu illative uses -he, -de/-te, or short/geminate stem illatives.",
+      "hint": "Replace Estonian -sse with attested Leivu illative morphology."
+    },
+    {
+      "id": "EST_PL_ILLATIVE_DESSE_TESSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}(desse|tesse)\\b",
+      "message": "Looks like Standard Estonian plural illative -desse/-tesse.",
+      "hint": "Use Leivu plural illative morphology."
+    },
+    {
+      "id": "EST_PL_PARTITIVE_SID",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}sid\\b",
+      "message": "Looks like Standard Estonian plural partitive -sid.",
+      "hint": "Check attested Leivu plural partitive forms (-sit/-it/-id or vowel plural)."
+    },
+    {
+      "id": "EST_MAS_FORM",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}mas\\b",
+      "message": "Looks like Standard Estonian -mas supine. Leivu supine inessive uses -mAn / -mAh / -məh.",
+      "hint": "Check Leivu supine inessive forms."
+    },
+    {
+      "id": "EST_MATA_FORM",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}mata\\b",
+      "message": "Looks like Standard Estonian -mata abessive.",
+      "hint": "Check attested Leivu abessive supine (-malda/-mäldä)."
+    },
+    {
+      "id": "EST_TRANSLATIVE_KS",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕĺťęǫəʌ]{2,}ks\\b",
+      "message": "May be Standard Estonian translative -ks. Leivu uses archaic -s (or -st) translative.",
+      "hint": "Use Leivu -s translative if this is an inflected noun/adjective.",
+      "allowlist": ["maks", "seks", "kaks", "üks", "miks"]
+    }
+  ],
+  "do_not_flag_suffixes": [
+    {"suffix": "n", "reason": "Leivu inessive uses -n."},
+    {"suffix": "st", "reason": "Leivu elative uses -st."},
+    {"suffix": "l", "reason": "Leivu adessive uses -l."},
+    {"suffix": "q/'", "reason": "Glottal stop may be realized or lost under Latvian contact/apocope; never force a uniform spelling on historical sources."}
+  ]
+}

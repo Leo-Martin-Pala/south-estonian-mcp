@@ -1,0 +1,169 @@
+{
+  "language": "seto",
+  "ruleset_id": "seto_estonian_leakage_v1_0",
+  "purpose": "Flag likely Standard Estonian inflectional and lexical leakage in intended Seto text while preserving Seto morphology (-h inessive, -st translative, postposed negation, apostrophe glottal marks).",
+  "normalization": {
+    "lowercase": true,
+    "preserve_chars": ["q", "õ", "ä", "ö", "ü", "ś", "ń", "ľ", "ŕ", "ḿ", "ť", "´", "'", "’"],
+    "token_regex": "[^\\W\\d_][^\\W\\d_'´’-]*['´’-]*[^\\W\\d_]*"
+  },
+  "rules": [
+    {
+      "id": "EST_ACTIVE_PAST_NUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}nud\\b",
+      "message": "Looks like Standard Estonian active past participle -nud. Seto expects -nu'/ -nü' (or -nu/-nü), not -nud.",
+      "hint": "Rewrite as a Seto active past participle (-nu'/-nü'/-nu/-nü)."
+    },
+    {
+      "id": "EST_PASSIVE_PAST_TUD_DUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}(tud|dud)\\b",
+      "message": "Looks like Standard Estonian passive past participle -tud/-dud. Seto uses -t/-d or -tu'/-tü'/-du'/-dü'.",
+      "hint": "Check whether Seto requires -t/-d or plural/participle -tu'/-du'."
+    },
+    {
+      "id": "EST_NEG_PAST_EI_NUD",
+      "severity": "error",
+      "scope": "window",
+      "regex": "(?iu)\\bei\\s+[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]+(nud|tud|dud)\\b",
+      "message": "Looks like Estonian past negation ei + -nud/-tud. Seto past negation uses es/õs (es tii') or postposed/fused -õs/-es (olõ-õs).",
+      "hint": "Use Seto es/õs or postposed -õs/-s past negation."
+    },
+    {
+      "id": "EST_NEG_POLE_POLNUD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b(pole|polnud|poleks|polevat)\\b",
+      "message": "Standard Estonian pole/polnud/poleks/polevat does not belong in Seto.",
+      "hint": "Use Seto olõ-õi / olõ-i (present), olõ-õs / olõ-s (past), or ei/es olõ'."
+    },
+    {
+      "id": "EST_3SG_PRESENT_B",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}b\\b",
+      "message": "Looks like Standard Estonian 3sg present -b. Seto 3sg present is endingless (küdsä) or -(s)s (eläs, küdsäs, ilotõlõs).",
+      "hint": "Check whether this should be endingless or -(s)s in Seto.",
+      "allowlist": ["klub", "pub", "veeb", "seeb"]
+    },
+    {
+      "id": "EST_3PL_PRESENT_VAD",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}vad\\b",
+      "message": "Looks like Standard Estonian 3pl present -vad. Seto uses -va'/-vä', -sõ'/-se', and omma'/ommava'.",
+      "hint": "Use a Seto 3pl form (-va'/-vä' or -sõ'/-se')."
+    },
+    {
+      "id": "EST_IMPERSONAL_TAKSE_DAKSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}(takse|dakse)\\b",
+      "message": "Looks like Standard Estonian impersonal present -takse/-dakse. Seto impersonal present is -tas/-täs/-das/-däs.",
+      "hint": "Rewrite as a Seto impersonal form."
+    },
+    {
+      "id": "EST_SIMPLE_PAST_PERSONAL",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}(sin|sime|site)\\b",
+      "message": "Looks like Standard Estonian simple past personal ending -sin/-sime/-site.",
+      "hint": "Use Seto simple past forms (-i, -(ij)e/-(ij)õ, -si, -(d)sõ).",
+      "allowlist": ["masin"]
+    },
+    {
+      "id": "EST_CONDITIONAL_PERSONAL",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}(ksin|ksime|ksite)\\b",
+      "message": "Looks like Standard Estonian conditional -ksin/-ksime/-ksite. Seto conditional uses -si/-ssi/-sõ.",
+      "hint": "Rewrite using Seto conditional morphology."
+    },
+    {
+      "id": "EST_ILLATIVE_SSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}sse\\b",
+      "message": "Looks like Standard Estonian illative -sse. Seto uses -he, -de/-te, or short/geminate illative.",
+      "hint": "Replace Estonian -sse with the appropriate Seto illative.",
+      "allowlist": ["kasse", "lusse"]
+    },
+    {
+      "id": "EST_PL_ILLATIVE_DESSE_TESSE",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}(desse|tesse)\\b",
+      "message": "Looks like Standard Estonian plural illative -desse/-tesse.",
+      "hint": "Use Seto plural illative (-ihe/-he or short plural illative)."
+    },
+    {
+      "id": "EST_PL_PARTITIVE_SID",
+      "severity": "error",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}sid\\b",
+      "message": "Looks like Standard Estonian plural partitive or past ending -sid. Seto uses -sit/-it/-id, vowel plural, or -idsi.",
+      "hint": "Replace Estonian -sid with a Seto plural partitive or past form."
+    },
+    {
+      "id": "EST_DA_TA_INF_NO_GLOTTAL",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}(da|ta)\\b",
+      "message": "Looks like an Estonian da-/ta-infinitive without glottal stop (' or q). Seto infinitives mark glottal stop (tetä', tulla') or use -a/-ä with palatalization.",
+      "hint": "Check if this verb requires Seto glottal-stop marking (' or q).",
+      "allowlist": ["rada", "pada", "sada", "sõda", "aasta", "kohta"]
+    },
+    {
+      "id": "EST_MAS_FORM",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}mas\\b",
+      "message": "Looks like Estonian -mas supine. Seto supine inessive characteristically uses -mAh (e.g. tulõmah, elämäh).",
+      "hint": "Check whether this should be Seto -mah/-mäh (or -man/-män)."
+    },
+    {
+      "id": "EST_MATA_FORM",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}mata\\b",
+      "message": "Looks like Estonian -mata abessive supine. Seto uses -mAldA' (e.g. tulõmalda', elämäldä').",
+      "hint": "Check whether this should be Seto -malda'/-mäldä'."
+    },
+    {
+      "id": "EST_NOM_PL_D",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}[aeiouõäöü]d\\b",
+      "message": "May be Estonian nominative plural -d. Seto nominative plural takes a glottal stop (-' / -q), though stem partitives like tuud/muud/tüüd end in -d.",
+      "hint": "Check if nominative plural needs Seto glottal stop.",
+      "allowlist": ["tuud", "muud", "puud", "suud", "luud", "üüd", "tiid", "viid", "hääd", "tüüd", "miid", "siid", "kuud"]
+    },
+    {
+      "id": "EST_TRANSLATIVE_KS",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b[^\\W\\d_]['´’\\-\\wõäöüšžśńľŕḿť]{2,}ks\\b",
+      "message": "May be Estonian translative -ks. Seto translative uses -st (or -s), not -ks.",
+      "hint": "Check whether this requires Seto -st / -s translative.",
+      "allowlist": ["maks", "seks", "kaks", "üks", "miks"]
+    },
+    {
+      "id": "EST_LEXICAL_FUNCTION_WORDS",
+      "severity": "warning",
+      "scope": "token",
+      "regex": "(?iu)\\b(nüüd|väga|palju|midagi|kellegi|kuidas)\\b",
+      "message": "Standard Estonian function word/adverb leaked into Seto text.",
+      "hint": "Check Seto alternatives (põrõhõlla/nüüt, väega, pallo, midägi, kinkagi, kuis)."
+    }
+  ],
+  "do_not_flag_suffixes": [
+    {"suffix": "h", "reason": "Seto inessive characteristically ends in -h (tulõmah, külläh)."},
+    {"suffix": "st", "reason": "Seto both elative and translative can end in -st."},
+    {"suffix": "ga", "reason": "Seto comitative uses -ga / -ga'."},
+    {"suffix": "ni", "reason": "Seto terminative uses -ni / -ni'."},
+    {"suffix": "mast", "reason": "Seto supine elative is -mast/-mäst (tulõmast)."}
+  ]
+}

@@ -2,16 +2,35 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-MODEL="${VRO_SPELLER_MODEL:-$REPO_ROOT/data/giella-share/voikko/3/vro.zhfst}"
+SHARE_DIR="${VRO_GIELLA_SHARE_DIR:-$REPO_ROOT/data/giella-share}"
+LANG_CODE="${GIELLA_LANG:-vro}"
+
+if [[ "${1:-}" == "--lang" && -n "${2:-}" ]]; then
+  LANG_CODE="$2"
+  shift 2
+fi
+
+if [[ "$LANG_CODE" == "vro" && -n "${VRO_SPELLER_MODEL:-}" ]]; then
+  MODEL="$VRO_SPELLER_MODEL"
+else
+  MODEL="$SHARE_DIR/voikko/3/$LANG_CODE.zhfst"
+fi
+
+OSPELL_BIN="$(command -v hfst-ospell || true)"
+if [[ -z "$OSPELL_BIN" && -x "$REPO_ROOT/../giellalt-south-estonian/.tools/apertium/bin/hfst-ospell" ]]; then
+  OSPELL_BIN="$REPO_ROOT/../giellalt-south-estonian/.tools/apertium/bin/hfst-ospell"
+fi
 
 if [[ "${1:-}" == "--check" ]]; then
-  command -v hfst-ospell >/dev/null || { echo "missing hfst-ospell" >&2; exit 1; }
-  test -r "$MODEL" || { echo "missing speller model: $MODEL" >&2; exit 1; }
+  [[ -n "$OSPELL_BIN" ]] || { echo "missing hfst-ospell" >&2; exit 1; }
+  test -r "$MODEL" || { echo "missing speller model ($LANG_CODE): $MODEL" >&2; exit 1; }
   exit 0
 fi
 
+[[ -n "$OSPELL_BIN" ]] || { echo "missing hfst-ospell" >&2; exit 127; }
+
 perl -CSDA -ne 'while (/[\p{L}\p{M}]+(?:[-'\''][\p{L}\p{M}]+)*/g) { print lc("$&") . "\n" }' |
-  hfst-ospell -S "$MODEL" |
+  "$OSPELL_BIN" -S "$MODEL" |
   awk -v max="${VRO_SPELLER_MAX_SUGGESTIONS:-10}" '
     /^Corrections for / {
       print
