@@ -1,35 +1,33 @@
 from __future__ import annotations
 
 import json
+import math
 import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
 
 import libsql
-import numpy as np
 
 from vro_mcp.db import SouthEstonianStore, _vector_rrf_weight
 
 
 def _unit_vec(seed: int, dim: int = 8) -> list[float]:
-    arr = np.zeros(dim, dtype=np.float32)
-    arr[seed % dim] = 1.0
-    return arr.tolist()
+    return [float(index == seed % dim) for index in range(dim)]
 
 
 def _mix_vec(a: list[float], b: list[float], alpha: float) -> list[float]:
-    arr = alpha * np.asarray(a, dtype=np.float32) + (1.0 - alpha) * np.asarray(b, dtype=np.float32)
-    norm = float(np.linalg.norm(arr))
-    return (arr / norm).tolist() if norm > 1e-12 else arr.tolist()
+    values = [alpha * x + (1.0 - alpha) * y for x, y in zip(a, b, strict=True)]
+    norm = math.hypot(*values)
+    return [value / norm for value in values] if norm > 1e-12 else values
 
 
 class _FakeNano:
     def __init__(self, vec: list[float]) -> None:
-        self._vec = np.asarray(vec, dtype=np.float32)
+        self._vec = vec
         self.dim = len(vec)
 
-    def encode_query(self, _text: str) -> np.ndarray:
+    def encode_query(self, _text: str) -> list[float]:
         return self._vec
 
 

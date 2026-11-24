@@ -89,6 +89,31 @@ The two Facebook sources account for 1,780 corpus units and 1,675 translations.
 They are excluded along with sources lacking a verified grant. The temporary
 WordNet tools and data are outside this release.
 
+## SMUGRI-4 components
+
+TartuNLP reports 3,266,531 Võro tokens, 283,598 Setu tokens, and 26,895 Mulgi
+tokens. The downloadable collection carries CC BY-NC-SA 4.0. This permits
+public noncommercial sharing with credit and share-alike. Original-source
+terms vary. [Dataset card](https://huggingface.co/datasets/tartuNLP/smugri4-data)
+[License deed](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+| Provider component | Evidence and public coverage |
+| --- | --- |
+| `ilo` | The licensed original fiction corpus is already used by the public MCP. |
+| `setomaa` | The original licensed 2006–2013 Setomaa archive is already used by the public MCP. |
+| `vro-est` | The original licensed parallel corpus provides the public MCP's human pairs. |
+| `setomaa_2020jne`, `umaleht` | Separate newspaper material. Unrestricted redistribution grant unverified. |
+| `laused_n`, `vasted_n` | Examples and equivalent phrases. A separate unrestricted grant is unverified. |
+| `cifu_poordamine` | Appeal text. Unrestricted redistribution grant unverified. |
+| `eki_dictionary` | Seto and Mulgi dictionary examples. The package carries the noncommercial label. Exact edition rights need confirmation. |
+
+The [provider source list](https://huggingface.co/datasets/tartuNLP/smugri4-data/blob/main/corpus_source.md)
+identifies each component. The public release uses the original licensed
+distributions of the three matched components. The private MCP's five
+SMUGRI-labelled sources account for 216,980 corpus units, 234,971 stored
+translations and 102,131 dictionary rows. Matching exact source works and
+deduplicating against the public corpus comes before estimating new coverage.
+
 ## Highest-impact improvements
 
 1. Recover permissively licensed SMUGRI components by matching provider
