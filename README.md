@@ -43,7 +43,10 @@ directions, with optional local models for offline translation and Seto transfer
 
 The public data release has dictionary entries across all seven varieties.
 Corpus search covers Võro and Seto, with a small Mulgi sample. Parallel search
-returns human Võro–Estonian pairs. Use `get_language_stats` to inspect coverage
+returns human Võro–Estonian pairs, including provider-supplied usage examples.
+The default `data-v3-nc` adds SMUGRI-4 material under CC BY-NC-SA 4.0.
+Use `VRO_DATA_TAG=data-v2 make data` for the earlier dataset without the
+noncommercial material. Use `get_language_stats` to inspect coverage
 by language and source. See the [coverage and license audit](docs/public-data-audit.md)
 and [source manifest](src/vro_mcp/sources-public.json).
 

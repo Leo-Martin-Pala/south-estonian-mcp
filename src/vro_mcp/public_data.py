@@ -11,15 +11,27 @@ SOURCES_FILE = Path(__file__).with_name("sources-public.json")
 APPLICATION_ID = 0x56524F32
 
 
-def render_notice() -> str:
+def render_notice(path: Path) -> str:
     sources = json.loads(SOURCES_FILE.read_text(encoding="utf-8"))
+    with closing(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)) as conn:
+        included = {row[0] for row in conn.execute("SELECT source_slug FROM sources")}
+    noncommercial = any(sources[slug]["license"] == "CC-BY-NC-SA-4.0" for slug in included)
     sections = [
         "South Estonian MCP public dataset",
-        "Compilation and adaptations are distributed under CC BY-SA 4.0. "
-        "The original source licenses listed below continue to apply. "
-        "See LICENSE and https://creativecommons.org/licenses/by-sa/4.0/.",
+        (
+            "This database collects works under different licenses. "
+            "CC BY-NC-SA 4.0 applies to the SMUGRI-4 material and its adaptations. "
+            "Use of the complete database must respect the noncommercial terms. "
+            "Other sources retain their own terms. See LICENSE and LICENSE-NC-SA."
+            if noncommercial else
+            "Compilation and adaptations are distributed under CC BY-SA 4.0. "
+            "The original source licenses listed below continue to apply. "
+            "See LICENSE and https://creativecommons.org/licenses/by-sa/4.0/."
+        ),
     ]
     for slug, source in sources.items():
+        if slug not in included:
+            continue
         sections.append(
             f"{source['title']} ({slug})\n{source['credit']}\n"
             f"{source['url']}\n{source['license']} — {source['license_url']}\n"
@@ -48,12 +60,14 @@ def verify_public_data(path: Path) -> None:
                 WHERE e.id IS NULL LIMIT 1
             """).fetchone():
                 raise ValueError(f"Orphan dictionary rows in {table}")
-        if conn.execute("""
-            SELECT 1 FROM corpus_translations t LEFT JOIN corpus_units u ON t.unit_rowid = u.id
-            WHERE u.id IS NULL OR u.source_slug <> 'paraleelkorpus'
-               OR t.origin <> 'human' OR t.engine IS NOT 'paraleelkorpus' OR t.target_lang <> 'et'
-            LIMIT 1
-        """).fetchone():
+        approved_pairs = {(slug, policy["translation_engine"]) for slug, policy in sources.items()
+                          if "translation_engine" in policy}
+        pairs = conn.execute("""
+            SELECT DISTINCT u.source_slug, t.engine, t.origin, t.target_lang, t.lang, u.lang
+            FROM corpus_translations t LEFT JOIN corpus_units u ON t.unit_rowid = u.id
+        """)
+        if any((slug, engine) not in approved_pairs or origin != "human" or target != "et"
+               or lang != source_lang for slug, engine, origin, target, lang, source_lang in pairs):
             raise ValueError("Unapproved translations in the public dataset")
         if conn.execute("""
             SELECT 1 FROM corpus_units u LEFT JOIN corpus_documents d USING (doc_id)
@@ -62,9 +76,22 @@ def verify_public_data(path: Path) -> None:
             LIMIT 1
         """).fetchone():
             raise ValueError("Missing corpus attribution")
+        for slug, policy in sources.items():
+            if not policy.get("provider_import"):
+                continue
+            root = policy["url"].replace("/tree/", "/blob/") + "/"
+            if policy["kind"] == "corpus":
+                sql = ("SELECT 1 FROM corpus_units u JOIN corpus_documents d USING (doc_id) "
+                       "WHERE u.source_slug = ? AND d.source_url NOT GLOB ? LIMIT 1")
+            else:
+                sql = ("SELECT 1 FROM dict_entries WHERE source_slug = ? "
+                       "AND coalesce(source_url, '') NOT GLOB ? LIMIT 1")
+            if conn.execute(sql, (slug, root + "*")).fetchone():
+                raise ValueError(f"Unpinned source credit for {slug}")
 
 
 if __name__ == "__main__":
-    verify_public_data(Path(sys.argv[1]))
+    path = Path(sys.argv[1])
+    verify_public_data(path)
     if len(sys.argv) > 2:
-        Path(sys.argv[2]).write_text(render_notice(), encoding="utf-8")
+        Path(sys.argv[2]).write_text(render_notice(path), encoding="utf-8")

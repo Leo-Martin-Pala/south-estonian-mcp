@@ -20,10 +20,18 @@ make package-data
 
 Repeat `--wiki-dump` for older snapshots needed to identify pages, in
 chronological order, and `--documents` for each source metadata file.
+For the noncommercial edition, also pass `--smugri-root` pointing to a
+checkout of [TartuNLP SMUGRI-4](https://huggingface.co/datasets/tartuNLP/smugri4-data)
+at revision `902597137be2310f03f5b33292cb01c7585d639b` and save the official
+[CC BY-NC-SA 4.0 legal text](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.txt)
+as `data/LICENSE-NC-SA`. Git LFS data can be checked out in place or placed
+under `lfs_objects/` beside the checkout, preserving its relative path.
+The importer checks the pinned Git blob or LFS object before reading it.
+
 GiellaLT artifacts are released separately with `make package-giella`.
 Use a fresh GitHub release tag for each dataset revision, then update
 `VRO_DATA_TAG` defaults when publishing a new server version.
 
 ```sh
-make release-data DATA_TAG=data-v2
+make release-data DATA_TAG=data-v3-nc
 ```

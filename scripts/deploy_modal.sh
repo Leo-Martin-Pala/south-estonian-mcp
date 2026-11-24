@@ -66,6 +66,8 @@ upload_local_data() {
   need_file "$data_dir/south_estonian_public.db"
   python3 "$ROOT/src/vro_mcp/public_data.py" "$data_dir/south_estonian_public.db"
   "$MODAL_BIN" volume put "$VOLUME_NAME" "$data_dir/south_estonian_public.db" /south_estonian_public.db --force
+  # Clear the release identity after installing a custom dataset.
+  "$MODAL_BIN" volume rm "$VOLUME_NAME" /.dataset-release 2>/dev/null || true
 
   if [[ -d "$data_dir/giella-share" ]]; then
     "$MODAL_BIN" volume put "$VOLUME_NAME" "$data_dir/giella-share" /giella-share --force
@@ -91,7 +93,7 @@ DATA_SOURCE="$(setting DATA_SOURCE "release")"
 FORCE_DATA="$(setting FORCE_DATA "0")"
 DATA_DIR="$(setting DATA_DIR "$ROOT/data")"
 VRO_DATA_REPO_VALUE="$(setting VRO_DATA_REPO "Leo-Martin-Pala/south-estonian-mcp")"
-VRO_DATA_TAG_VALUE="$(setting VRO_DATA_TAG "data-v2")"
+VRO_DATA_TAG_VALUE="$(setting VRO_DATA_TAG "data-v3-nc")"
 VRO_GIELLA_TAG_VALUE="$(setting VRO_GIELLA_TAG "giella-v1")"
 VRO_NEUROTOLGE_BASE_URL_VALUE="$(setting VRO_NEUROTOLGE_BASE_URL "")"
 

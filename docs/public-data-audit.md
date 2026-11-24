@@ -1,5 +1,40 @@
 # Public data coverage and licenses
 
+## Noncommercial edition (data-v3-nc)
+
+This release adds four components from the exact pinned TartuNLP distribution
+at revision `902597137be2310f03f5b33292cb01c7585d639b`. The dataset's
+CC BY-NC-SA 4.0 grant applies to these imports. Direct scrapes from the
+same publishers have separate rights. The earlier `data-v2` is available
+with its original permissive source selection.
+[Pinned dataset card](https://huggingface.co/datasets/tartuNLP/smugri4-data/blob/902597137be2310f03f5b33292cb01c7585d639b/README.md)
+[Pinned component credits](https://huggingface.co/datasets/tartuNLP/smugri4-data/blob/902597137be2310f03f5b33292cb01c7585d639b/corpus_source.md)
+
+| Added component | Corpus units | Estonian pairs | Dictionary entries |
+| --- | ---: | ---: | ---: |
+| Uma Leht | 69,892 | — | — |
+| Setomaa, 2020 onward | 9,969 | — | — |
+| Võro `laused_n` provider usage examples | 30,201 | 30,201 | — |
+| Võro `vasted_n` provider phrase equivalents | — | — | 78,755 |
+| **Total added** | **110,062** | **30,201** | **78,755** |
+| **Whole v3 dataset** | **203,988** | **37,453** | **95,180** |
+
+News is deduplicated by language and normalized paragraph text. For
+`laused_n`, the importer deduplicates exact normalized pairs and excludes
+identical sides and ambiguous provider separators. The `vasted_n` rows
+represent lexical and phrase groups. Their counts do not measure unique
+headwords. Every new result can be traced to the exact upstream file.
+The new rows are searchable by full text.
+
+The original permissively licensed `ilo`, `setomaa` and `vro-est` sources
+remain in their established public lanes. The `mes1.xml` and `sto1.xml`
+dictionary exports need clarification from EKI and TartuNLP on the scope of
+the exact grant. The CIFU appeal was omitted pending a source-level
+check of all language versions. Independent newspaper, Facebook, and
+dictionary scrapes are outside this import.
+
+## v2 baseline and private comparison
+
 The public build uses licenses and public-domain notices that support
 redistribution and adaptation, including commercial use. The builder admits
 sources by exact identity. The private unified snapshot is the denominator.

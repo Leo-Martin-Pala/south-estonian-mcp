@@ -71,5 +71,46 @@
     "license": "CC-BY-4.0",
     "license_url": "https://creativecommons.org/licenses/by/4.0/",
     "changes": "Selected entries attested in South Estonian locations, normalized lookup keys and retained locality evidence. EKI lists the source on its reuse downloads page (https://arhiiv.eki.ee/litsents/)."
+  },
+  "smugri4_umaleht": {
+    "kind": "corpus",
+    "title": "Uma Leht (TartuNLP SMUGRI-4 edition)",
+    "credit": "Uma Leht authors and editors, Sulev Iva, and the TartuNLP SMUGRI-4 team",
+    "url": "https://huggingface.co/datasets/tartuNLP/smugri4-data/tree/902597137be2310f03f5b33292cb01c7585d639b/vro/mono/umaleht",
+    "license": "CC-BY-NC-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "provider_import": true,
+    "changes": "Selected and deduplicated provider text units, trimmed whitespace, and indexed the published language fields."
+  },
+  "smugri4_setomaa_2020jne": {
+    "kind": "corpus",
+    "title": "Setomaa 2020 onward (TartuNLP SMUGRI-4 edition)",
+    "credit": "Setomaa authors and editors, Setomaa Liit, Sulev Iva, and the TartuNLP SMUGRI-4 team",
+    "url": "https://huggingface.co/datasets/tartuNLP/smugri4-data/tree/902597137be2310f03f5b33292cb01c7585d639b/vro/mono/setomaa_2020jne",
+    "license": "CC-BY-NC-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "provider_import": true,
+    "changes": "Selected and deduplicated provider text units, trimmed whitespace, and indexed the published language fields."
+  },
+  "smugri4_vro_laused": {
+    "kind": "corpus",
+    "title": "Võro–Estonian examples (TartuNLP SMUGRI-4 laused_n)",
+    "credit": "Sulev Iva and the TartuNLP SMUGRI-4 team",
+    "url": "https://huggingface.co/datasets/tartuNLP/smugri4-data/tree/902597137be2310f03f5b33292cb01c7585d639b/vro/multi/laused_n",
+    "license": "CC-BY-NC-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "provider_import": true,
+    "changes": "Selected and deduplicated provider text units, trimmed whitespace, and indexed the published language fields. Kept unique one-to-one Võro–Estonian pairs and removed identical sides.",
+    "translation_engine": "smugri4-laused_n"
+  },
+  "smugri4_vasted_n": {
+    "kind": "dictionary",
+    "title": "Võro–Estonian equivalent phrases (TartuNLP SMUGRI-4 vasted_n)",
+    "credit": "Sulev Iva and the TartuNLP SMUGRI-4 team",
+    "url": "https://huggingface.co/datasets/tartuNLP/smugri4-data/tree/902597137be2310f03f5b33292cb01c7585d639b/vro/multi/vasted_n",
+    "license": "CC-BY-NC-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "provider_import": true,
+    "changes": "Selected and deduplicated provider glossary groups, preserved phrase forms and variants, and indexed normalized lookup keys."
   }
 }

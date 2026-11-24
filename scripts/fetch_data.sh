@@ -5,7 +5,7 @@ set -eu
 
 # Bump this default tag whenever you publish a new dataset release.
 REPO="${VRO_DATA_REPO:-Leo-Martin-Pala/south-estonian-mcp}"
-TAG="${VRO_DATA_TAG:-data-v2}"
+TAG="${VRO_DATA_TAG:-data-v3-nc}"
 ASSET="vro-data.tar.xz"
 
 cd "$(dirname "$0")/.."
@@ -24,6 +24,10 @@ fi
 
 tar xJf "$tmp" -C "$staging" south_estonian_public.db LICENSE NOTICE
 python3 src/vro_mcp/public_data.py "$staging/south_estonian_public.db"
+if grep -Fq 'LICENSE-NC-SA' "$staging/NOTICE"; then
+    tar xJf "$tmp" -C "$staging" LICENSE-NC-SA
+    mv "$staging/LICENSE-NC-SA" data/LICENSE-NC-SA
+fi
 mv "$staging/LICENSE" data/LICENSE
 mv "$staging/NOTICE" data/NOTICE
 mv "$staging/south_estonian_public.db" data/south_estonian_public.db

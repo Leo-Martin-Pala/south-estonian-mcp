@@ -17,11 +17,12 @@ modal run modal_app.py::hydrate_release
 modal deploy modal_app.py
 ```
 
-The v2 database uses `/data/south_estonian_public.db`. It can be installed
+The public database uses `/data/south_estonian_public.db`. It can be installed
 alongside the earlier dataset. Existing GiellaLT artifacts live in
-`/data/giella-share`. The data packaging and upload paths validate the public
-database before publication. `make deploy-release-force` refreshes the release
-files.
+`/data/giella-share`. The data packaging and upload paths validate the public database before publication.
+The default is the noncommercial `data-v3-nc` edition. The deploy command
+downloads the selected dataset when its release tag changes. Set
+`VRO_DATA_TAG=data-v2` for the earlier edition.
 
 The default hosted image supports full-text search and the existing translation
 API. To enable semantic search in your deployment, install the semantic Python

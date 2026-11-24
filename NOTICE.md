@@ -5,12 +5,14 @@ under the MIT License. See [LICENSE](LICENSE).
 
 ## Dataset
 
-The `data-v2` release distributes `south_estonian_public.db`. The compilation
-and adaptations are distributed under CC BY-SA 4.0. Original terms and credit
-are listed in the [source manifest](src/vro_mcp/sources-public.json) and in the
-archive's NOTICE. The bundled LICENSE contains CC BY-SA 4.0. Wikipedia-derived
-dictionary entries include the original revision link. Wikidata labels, titles,
-and item identifiers are CC0.
+The `data-v3-nc` release distributes a collection of licensed sources in
+`south_estonian_public.db`. The SMUGRI-4 material is CC BY-NC-SA 4.0. The
+full dataset is for noncommercial use. Other sources retain their own
+terms. The `data-v2` release remains available under its CC BY-SA 4.0
+compilation terms. Original terms, source links, credit and changes appear
+in the [source manifest](src/vro_mcp/sources-public.json) and the archive's
+NOTICE. The archive bundles both applicable license texts. Wikidata
+labels, titles, and item identifiers are CC0.
 
 ## GiellaLT and optional models
 

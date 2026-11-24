@@ -1093,6 +1093,7 @@ class SouthEstonianStore:
                         item["entry_id"] = entry_id
                     if src_slug:
                         item["source_slug"] = src_slug
+                        item.update(source_attribution(src_slug))
                     by_lang.setdefault(rlang, []).append(item)
                 if by_lang:
                     # Find stems attested in >= 2 languages (or matching query_word)

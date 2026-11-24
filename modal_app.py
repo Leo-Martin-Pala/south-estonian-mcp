@@ -78,14 +78,17 @@ def hydrate_release_data(
     *,
     force: bool = False,
     repo: str = "Leo-Martin-Pala/south-estonian-mcp",
-    data_tag: str = "data-v2",
+    data_tag: str = "data-v3-nc",
     giella_tag: str = "giella-v1",
 ):
     data_root = Path("/data")
     db_path = data_root / "south_estonian_public.db"
     giella_root = data_root / "giella-share"
+    release_marker = data_root / ".dataset-release"
+    release = f"{repo}@{data_tag}"
+    installed_release = release_marker.read_text().strip() if release_marker.exists() else None
 
-    if force or not db_path.exists():
+    if force or not db_path.exists() or installed_release != release:
         from vro_mcp.public_data import verify_public_data
 
         url = f"https://github.com/{repo}/releases/download/{data_tag}/vro-data.tar.xz"
@@ -97,6 +100,7 @@ def hydrate_release_data(
             staged = data_root / f".{db_path.name}.incoming"
             shutil.copy2(source, staged)
             staged.replace(db_path)
+        release_marker.write_text(release + "\n")
         print("Public dataset is present in the Modal Volume.")
     else:
         print("Public dataset already exists; skipping release download.")
@@ -116,7 +120,7 @@ def hydrate_release_data(
 def hydrate_release():
     force = os.getenv("FORCE_DATA", "0") == "1"
     repo = os.getenv("VRO_DATA_REPO", "Leo-Martin-Pala/south-estonian-mcp")
-    data_tag = os.getenv("VRO_DATA_TAG", "data-v2")
+    data_tag = os.getenv("VRO_DATA_TAG", "data-v3-nc")
     giella_tag = os.getenv("VRO_GIELLA_TAG", "giella-v1")
     hydrate_release_data.remote(
         force=force,

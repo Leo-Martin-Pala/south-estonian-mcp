@@ -4,8 +4,8 @@ SHELL := /bin/bash
 
 # Release tags. Keep in sync with the VRO_DATA_TAG / VRO_GIELLA_TAG defaults in
 # scripts/fetch_data.sh and scripts/fetch_giella.sh. Override on the command
-# line, e.g. `make release-data DATA_TAG=data-v2`.
-DATA_TAG ?= data-v2
+# line, e.g. `make release-data DATA_TAG=data-v3-nc`.
+DATA_TAG ?= data-v3-nc
 DATA_ASSET := vro-data.tar.xz
 GIELLA_TAG ?= giella-v1
 GIELLA_ASSET := giella-share.tar.xz
@@ -66,12 +66,16 @@ package-data: ## Build the reviewed public dataset release archive
 	@set -eu; stage=$$(mktemp -d); trap 'rm -rf "$$stage"' EXIT; \
 	  python3 src/vro_mcp/public_data.py data/south_estonian_public.db "$$stage/NOTICE"; \
 	  cp data/LICENSE "$$stage/LICENSE"; \
-	  tar cJf $(DATA_ASSET) -C data south_estonian_public.db -C "$$stage" LICENSE NOTICE
+	  files=(LICENSE NOTICE); \
+	  if grep -Fq 'LICENSE-NC-SA' "$$stage/NOTICE"; then \
+	    cp data/LICENSE-NC-SA "$$stage/LICENSE-NC-SA"; files+=(LICENSE-NC-SA); \
+	  fi; \
+	  tar cJf $(DATA_ASSET) -C data south_estonian_public.db -C "$$stage" "$${files[@]}"
 
 release-data: package-data ## Publish the public dataset as a GitHub release (DATA_TAG=...)
 	gh release create $(DATA_TAG) $(DATA_ASSET) \
 	  --title "South Estonian public dataset ($(DATA_TAG))" \
-	  --notes 'Public corpus, human parallel examples, and dictionaries. CC BY-SA 4.0 compilation. Source-level licenses and credit are in the bundled NOTICE.'
+	  --notes 'Public corpus, human parallel examples, and dictionaries. Check the bundled NOTICE for source-level terms, including the noncommercial terms of the SMUGRI-4 material.'
 
 package-giella: ## Build the giella-share release archive from data/giella-share/
 	test -f data/giella-share/LICENSE || { echo "data/giella-share/LICENSE missing; build with 'make giella-build' first"; exit 1; }

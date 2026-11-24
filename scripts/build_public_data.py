@@ -16,6 +16,8 @@ from pathlib import Path
 
 import libsql
 
+from import_smugri4 import import_smugri4
+
 from vro_mcp.db import PUBLIC_SOURCES, _norm_gloss, normalize_db_text
 from vro_mcp.public_data import APPLICATION_ID, verify_public_data
 from vro_mcp.tokenization import tokenize
@@ -189,13 +191,15 @@ def rebuild_cognates(output):
     """)
 
 
-def build(source_path, output_path, wiki_paths, metadata_paths, publisher_parallel, estonian_ids):
+def build(source_path, output_path, wiki_paths, metadata_paths, publisher_parallel, estonian_ids, smugri_root=None):
     with closing(sqlite3.connect(source_path.resolve().as_uri() + "?mode=ro", uri=True)) as source:
         # All reads and coverage counts see the same source snapshot.
         source.execute("BEGIN")
         with closing(libsql.connect(str(output_path))) as output:
             output.executescript((ROOT / "scripts/public_data_schema.sql").read_text())
             for slug, policy in SOURCES.items():
+                if policy.get("provider_import"):
+                    continue
                 if policy["kind"] == "corpus":
                     copy_rows(source, output, "corpus_units", "source_slug = ?", (slug,))
                     if engine := policy.get("translation_engine"):
@@ -214,6 +218,13 @@ def build(source_path, output_path, wiki_paths, metadata_paths, publisher_parall
                     output.execute("UPDATE dict_entries SET source_url = ? "
                                    "WHERE source_slug = ? AND coalesce(source_url, '') = ''", (policy["url"], slug))
 
+            if estonian_ids:
+                import_estonian_ids(output, estonian_ids)
+            document_credits(output, wiki_paths, metadata_paths)
+            if smugri_root:
+                print("smugri4", json.dumps(import_smugri4(output, smugri_root)))
+
+            for slug, policy in SOURCES.items():
                 langs = set()
                 counts = []
                 for table, from_sql in (
@@ -229,9 +240,6 @@ def build(source_path, output_path, wiki_paths, metadata_paths, publisher_parall
                     output.execute("INSERT INTO sources VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                                    (slug, json.dumps(sorted(langs)), *counts, policy["title"], policy["url"], policy["license"]))
 
-            if estonian_ids:
-                import_estonian_ids(output, estonian_ids)
-            document_credits(output, wiki_paths, metadata_paths)
             rebuild_word_frequencies(output)
             rebuild_cognates(output)
             output.execute("INSERT INTO dict_fts (headword, definition_text, lang, entry_rowid) "
@@ -260,6 +268,7 @@ def main():
     parser.add_argument("--documents", type=Path, action="append", default=[], help="Source document metadata JSONL")
     parser.add_argument("--publisher-parallel", type=Path, help="Licensed publisher archive of paired .vro.txt and .et.txt files")
     parser.add_argument("--estonian-ids", type=Path, help="CC BY 4.0 Estonian IDS wordlist TSV")
+    parser.add_argument("--smugri-root", type=Path, help="Optional pinned TartuNLP Git snapshot for the noncommercial edition")
     parser.add_argument("--output", type=Path, default=ROOT / "data/south_estonian_public.db")
     args = parser.parse_args()
 
@@ -269,7 +278,7 @@ def main():
     target.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=target.parent) as work:
         staged = Path(work) / target.name
-        build(args.source, staged, args.wiki_dump, args.documents, args.publisher_parallel, args.estonian_ids)
+        build(args.source, staged, args.wiki_dump, args.documents, args.publisher_parallel, args.estonian_ids, args.smugri_root)
         verify_public_data(staged)
         os.replace(staged, target)
 

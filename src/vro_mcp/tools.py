@@ -435,6 +435,9 @@ class VroTools:
                     if source not in concept or target not in concept:
                         continue
                     concept["direction"] = canonical_direction
+                for field in ("source_slug", "source_url", "license", "license_url", "credit"):
+                    if field in entry:
+                        concept[field] = entry[field]
                 concepts.append(concept)
             results[query] = concepts
         return results
