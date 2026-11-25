@@ -1,6 +1,6 @@
 # Public data coverage and licenses
 
-## Noncommercial edition (data-v3-nc)
+## Initial noncommercial edition (data-v3-nc)
 
 This release adds four components from the exact pinned TartuNLP distribution
 at revision `902597137be2310f03f5b33292cb01c7585d639b`. The dataset's
@@ -26,12 +26,32 @@ represent lexical and phrase groups. Their counts do not measure unique
 headwords. Every new result can be traced to the exact upstream file.
 The new rows are searchable by full text.
 
-The original permissively licensed `ilo`, `setomaa` and `vro-est` sources
-remain in their established public lanes. The `mes1.xml` and `sto1.xml`
-dictionary exports need clarification from EKI and TartuNLP on the scope of
-the exact grant. The CIFU appeal was omitted pending a source-level
-check of all language versions. Independent newspaper, Facebook, and
-dictionary scrapes are outside this import.
+## Expanded noncommercial edition (data-v4-nc)
+
+The official SMUGRI-4 package terms apply to the additional South Estonian
+components from the same pinned revision. The importer verifies provenance,
+retains attribution and deduplicates rows. The earlier permissively licensed
+versions of the fiction, newspaper and parallel corpora remain available.
+
+| Provider component added since v3 | Corpus units | Stored bilingual pairs |
+| --- | ---: | ---: |
+| `ilo` fiction | 9,132 | 0 |
+| `setomaa` older newspaper archive | 6,609 | 0 |
+| `vro-est` parallel corpus | 1,203 | 1,187 |
+| `cifu_poordamine` appeal | 6 | 18 |
+| `mes1` Mulgi dictionary examples | 4,919 | 4,919 |
+| `sto1` Seto dictionary examples | 44,341 | 44,337 |
+| **Total added** | **66,210** | **50,461** |
+| **Whole v4 dataset** | **270,198** | **87,914** |
+
+The EKI entries are searchable usage examples with contextual Estonian
+equivalents. Four previously flagged Seto target glosses were omitted.
+The appeal includes Estonian, English and German sides. The parallel corpus
+keeps paired lines where source and target boundaries match and uses
+document-level pairs otherwise. The server returns excerpts for long documents.
+Public dictionary phrase entries total
+95,180, unchanged from v3. Independent acquisitions of newspaper,
+dictionary, and Facebook text retain their separate rights status.
 
 ## v2 baseline and private comparison
 

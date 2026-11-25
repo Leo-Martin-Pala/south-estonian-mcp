@@ -4,8 +4,8 @@ SHELL := /bin/bash
 
 # Release tags. Keep in sync with the VRO_DATA_TAG / VRO_GIELLA_TAG defaults in
 # scripts/fetch_data.sh and scripts/fetch_giella.sh. Override on the command
-# line, e.g. `make release-data DATA_TAG=data-v3-nc`.
-DATA_TAG ?= data-v3-nc
+# line, e.g. `make release-data DATA_TAG=data-v4-nc`.
+DATA_TAG ?= data-v4-nc
 DATA_ASSET := vro-data.tar.xz
 GIELLA_TAG ?= giella-v1
 GIELLA_ASSET := giella-share.tar.xz

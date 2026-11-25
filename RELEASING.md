@@ -33,5 +33,5 @@ Use a fresh GitHub release tag for each dataset revision, then update
 `VRO_DATA_TAG` defaults when publishing a new server version.
 
 ```sh
-make release-data DATA_TAG=data-v3-nc
+make release-data DATA_TAG=data-v4-nc
 ```

@@ -305,15 +305,16 @@ def create_server() -> Any:
     def search_parallel_examples(
         query: str,
         lang: SouthEstonianLang | None = None,
-        target_lang: TargetLang | None = None,
+        target_lang: Literal["et", "en", "de", "lv"] | None = None,
         mode: SearchMode = "hybrid",
         origin_filter: str | None = None,
         include_context: bool = False,
         limit: int = 10,
     ) -> dict[str, Any]:
         """
-        Search aligned parallel translation examples (`corpus_units` <-> `et`/`en`/`lv`
-        translations) across both source and translation text. `origin_filter`
+        Search aligned examples and contextual dictionary pairs across source and
+        target text. Common target languages include Estonian, English, German
+        and Latvian. `origin_filter`
         accepts 'human', 'llm', 'mt' (or comma-separated). Omits raw quality
         scores when clean and surfaces warnings only when thresholds are crossed.
         """

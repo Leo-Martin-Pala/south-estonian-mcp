@@ -78,7 +78,7 @@ def hydrate_release_data(
     *,
     force: bool = False,
     repo: str = "Leo-Martin-Pala/south-estonian-mcp",
-    data_tag: str = "data-v3-nc",
+    data_tag: str = "data-v4-nc",
     giella_tag: str = "giella-v1",
 ):
     data_root = Path("/data")
@@ -120,7 +120,7 @@ def hydrate_release_data(
 def hydrate_release():
     force = os.getenv("FORCE_DATA", "0") == "1"
     repo = os.getenv("VRO_DATA_REPO", "Leo-Martin-Pala/south-estonian-mcp")
-    data_tag = os.getenv("VRO_DATA_TAG", "data-v3-nc")
+    data_tag = os.getenv("VRO_DATA_TAG", "data-v4-nc")
     giella_tag = os.getenv("VRO_GIELLA_TAG", "giella-v1")
     hydrate_release_data.remote(
         force=force,

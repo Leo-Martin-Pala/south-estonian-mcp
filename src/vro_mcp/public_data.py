@@ -60,13 +60,16 @@ def verify_public_data(path: Path) -> None:
                 WHERE e.id IS NULL LIMIT 1
             """).fetchone():
                 raise ValueError(f"Orphan dictionary rows in {table}")
-        approved_pairs = {(slug, policy["translation_engine"]) for slug, policy in sources.items()
-                          if "translation_engine" in policy}
+        approved_pairs = {
+            (slug, policy["translation_engine"], target)
+            for slug, policy in sources.items() if "translation_engine" in policy
+            for target in policy.get("translation_targets", ["et"])
+        }
         pairs = conn.execute("""
             SELECT DISTINCT u.source_slug, t.engine, t.origin, t.target_lang, t.lang, u.lang
             FROM corpus_translations t LEFT JOIN corpus_units u ON t.unit_rowid = u.id
         """)
-        if any((slug, engine) not in approved_pairs or origin != "human" or target != "et"
+        if any((slug, engine, target) not in approved_pairs or origin != "human"
                or lang != source_lang for slug, engine, origin, target, lang, source_lang in pairs):
             raise ValueError("Unapproved translations in the public dataset")
         if conn.execute("""
@@ -79,14 +82,18 @@ def verify_public_data(path: Path) -> None:
         for slug, policy in sources.items():
             if not policy.get("provider_import"):
                 continue
-            root = policy["url"].replace("/tree/", "/blob/") + "/"
+            roots = [url.replace("/tree/", "/blob/") + "/*"
+                     for url in policy.get("provider_urls", [policy["url"]])]
+            outside_roots = " AND ".join("coalesce(src.url, '') NOT GLOB ?" for _ in roots)
             if policy["kind"] == "corpus":
-                sql = ("SELECT 1 FROM corpus_units u JOIN corpus_documents d USING (doc_id) "
-                       "WHERE u.source_slug = ? AND d.source_url NOT GLOB ? LIMIT 1")
+                urls = ("SELECT u.source_slug, d.source_url AS url FROM corpus_units u "
+                        "JOIN corpus_documents d USING (doc_id)")
             else:
-                sql = ("SELECT 1 FROM dict_entries WHERE source_slug = ? "
-                       "AND coalesce(source_url, '') NOT GLOB ? LIMIT 1")
-            if conn.execute(sql, (slug, root + "*")).fetchone():
+                urls = "SELECT source_slug, source_url AS url FROM dict_entries"
+            if conn.execute(
+                f"SELECT 1 FROM ({urls}) src WHERE src.source_slug = ? AND {outside_roots} LIMIT 1",
+                (slug, *roots),
+            ).fetchone():
                 raise ValueError(f"Unpinned source credit for {slug}")
 
 

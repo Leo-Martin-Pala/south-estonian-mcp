@@ -5,7 +5,7 @@ set -eu
 
 # Bump this default tag whenever you publish a new dataset release.
 REPO="${VRO_DATA_REPO:-Leo-Martin-Pala/south-estonian-mcp}"
-TAG="${VRO_DATA_TAG:-data-v3-nc}"
+TAG="${VRO_DATA_TAG:-data-v4-nc}"
 ASSET="vro-data.tar.xz"
 
 cd "$(dirname "$0")/.."

@@ -14,9 +14,12 @@ from vro_mcp.db import _norm_gloss, normalize_db_text
 
 REVISION = "902597137be2310f03f5b33292cb01c7585d639b"
 BLOB_URL = f"https://huggingface.co/datasets/tartuNLP/smugri4-data/blob/{REVISION}/"
-NEWS = (
+MONOLINGUAL = (
     ("smugri4_umaleht", "umaleht", "vro", "est_vro_stand_uma"),
     ("smugri4_setomaa_2020jne", "setomaa_2020jne", "seto", "est_vro_seto"),
+    ("smugri4_ilo", "ilo", "vro", "est_vro_x"),
+    ("smugri4_setomaa_archive", "setomaa", "seto", "est_vro_seto"),
+    ("smugri4_vro_est", "vro-est", "vro", "est_vro_x"),
 )
 PAIRS = "smugri4_vro_laused"
 GLOSSARY = "smugri4_vasted_n"
@@ -82,9 +85,9 @@ def insert_units(conn, units, credits):
     conn.executemany("INSERT INTO corpus_documents VALUES (?, ?, ?, ?)", credits)
 
 
-def import_news(conn, snapshot: Snapshot, seen: set[tuple[str, str]]) -> dict:
+def import_monolingual(conn, snapshot: Snapshot, seen: set[tuple[str, str]]) -> dict:
     counts = {}
-    for slug, component, lang, field in NEWS:
+    for slug, component, default_lang, field in MONOLINGUAL:
         units, credits = [], []
         skipped = Counter()
         root = f"vro/mono/{component}/"
@@ -94,6 +97,8 @@ def import_news(conn, snapshot: Snapshot, seen: set[tuple[str, str]]) -> dict:
         for path in paths:
             file_id = snapshot.blobs[path][:20]
             for container_idx, (features, records) in enumerate(snapshot.records(path, component, "texts")):
+                metadata = features.get("text_metainfo") or {}
+                lang = "seto" if str(metadata.get("kiil:", "")).casefold() == "seto" else default_lang
                 for doc_idx, document in enumerate(records):
                     doc_id = f"{slug}:{file_id}:{container_idx}:{doc_idx}"
                     unit_count = len(units)
@@ -109,8 +114,7 @@ def import_news(conn, snapshot: Snapshot, seen: set[tuple[str, str]]) -> dict:
                         seen.add(key)
                         units.append((f"{doc_id}:p{idx}", lang, "paragraph", doc_id, idx, slug, text, lang))
                     if len(units) > unit_count:
-                        metadata = features.get("text_metainfo") or {}
-                        title = metadata.get("päälkiri:") or features.get("filename")
+                        title = metadata.get("päälkiri:") or metadata.get("Välläannõq:") or features.get("filename")
                         author = metadata.get("autor:")
                         credits.append((doc_id, title, author, BLOB_URL + quote(path)))
         insert_units(conn, units, credits)
@@ -193,11 +197,102 @@ def import_glossary(conn, snapshot: Snapshot) -> dict:
     return {"entries": len(entries), "definitions": len(definitions), **skipped}
 
 
+# Zero-based records whose Estonian sides failed the corpus direction audit.
+SETO_BAD_TARGETS = {33330, 36550, 38061, 40146}
+
+
+def paired_units(row, component, field):
+    source = row[field]
+    targets = {code: row[key] for key, code in (("est", "et"), ("eng", "en"), ("deu", "de")) if key in row}
+    if component != "vro-est":
+        yield 0, "sentence" if component == "eki_dictionary" else "paragraph", source, targets
+        return
+
+    lines = source.splitlines()
+    target_lines = {code: text.splitlines() for code, text in targets.items()}
+    # Preserve the published line positions only when every side has matching
+    # line and blank-line boundaries. Otherwise retain the published document pair.
+    if all(len(side) == len(lines) and all(bool(a.strip()) == bool(b.strip()) for a, b in zip(lines, side))
+           for side in target_lines.values()):
+        for idx, line in enumerate(lines):
+            yield idx, "sentence", line, {code: side[idx] for code, side in target_lines.items()}
+    else:
+        yield 0, "document", source, targets
+
+
+def import_additional_pairs(conn, snapshot: Snapshot) -> dict:
+    providers = (
+        ("smugri4_vro_est", "vro/multi/vro-est/", "vro-est", "vro", "est_vro_x", "texts", "smugri4-vro-est"),
+        ("smugri4_cifu_appeal", "vro/multi/cifu_poordamine/", "cifu_poordamine", "vro", "est_vro_x", "texts", "smugri4-cifu"),
+        ("smugri4_mulgi_dictionary", "eesti_murded/mulgi/multi/eki_dictionary/", "eki_dictionary", "mulgi", "est_mulgi_ekidct", "sentences", "smugri4-eki-dictionary"),
+        ("smugri4_seto_dictionary", "eesti_murded/setu/multi/eki_dictionary/", "eki_dictionary", "seto", "est_setu_ekidct", "sentences", "smugri4-eki-dictionary"),
+    )
+    existing = {(lang, code, canonical(src), canonical(tgt)) for lang, code, src, tgt in conn.execute("""
+        SELECT u.lang, t.target_lang, u.text, t.translated_text
+        FROM corpus_translations t JOIN corpus_units u ON u.id=t.unit_rowid
+    """).fetchall()}
+    results = {}
+    for slug, folder, component, lang, field, kind, engine in providers:
+        units, credits, translations = [], [], []
+        skipped = Counter()
+        paths = sorted(path for path in snapshot.blobs if path.startswith(folder) and path.endswith(".json"))
+        if not paths:
+            raise ValueError(f"No published files under {folder}")
+        for path in paths:
+            url = BLOB_URL + quote(path)
+            file_id = hashlib.sha256(path.encode()).hexdigest()[:20]
+            for block, (features, records) in enumerate(snapshot.records(path, component, kind)):
+                for row_index, row in enumerate(records):
+                    doc_id = f"{slug}:{file_id}:{block}:{row_index}"
+                    before = len(units)
+                    for part, level, text, targets in paired_units(row, component, field):
+                        text = text.strip()
+                        if not any(char.isalpha() for char in text):
+                            continue
+                        unit_id = f"{doc_id}:{part}"
+                        source_key = canonical(text)
+                        new_targets = 0
+                        omit_gloss = lang == "seto" and block == 0 and row_index in SETO_BAD_TARGETS
+                        for code, target in targets.items():
+                            target = target.strip()
+                            key = (lang, code, source_key, canonical(target))
+                            if not target or omit_gloss:
+                                if omit_gloss:
+                                    skipped["audited_glosses_omitted"] += 1
+                                continue
+                            if key in existing:
+                                skipped["duplicate_pairs"] += 1
+                                continue
+                            existing.add(key)
+                            # Dictionary rows are contextual examples and can also be single-word glosses.
+                            reliability = 700 if component == "eki_dictionary" else 850
+                            translations.append((lang, code, target, engine, reliability, unit_id))
+                            new_targets += 1
+                        if new_targets or omit_gloss:
+                            units.append((unit_id, lang, level, doc_id, part, slug, text, lang))
+                    if len(units) > before:
+                        credits.append((doc_id, features["filename"], None, url))
+        insert_units(conn, units, credits)
+        conn.executemany("""
+            INSERT INTO corpus_translations (unit_rowid, lang, target_lang, translated_text, origin, engine, reliability)
+            SELECT id, ?, ?, ?, 'human', ?, ? FROM corpus_units WHERE unit_id = ?
+        """, translations)
+        results[slug] = {"files": len(paths), "units": len(units),
+                         "translations": len(translations), **skipped}
+    return results
+
+
 def import_smugri4(conn, root: Path) -> dict:
     snapshot = Snapshot(root)
     seen = {(lang, canonical(text)) for lang, text in conn.execute("SELECT lang,text FROM corpus_units").fetchall()}
-    return {
-        **import_news(conn, snapshot, seen),
+    mono = import_monolingual(conn, snapshot, seen)
+    results = {
+        **mono,
         PAIRS: import_pairs(conn, snapshot),
         GLOSSARY: import_glossary(conn, snapshot),
     }
+    additional = import_additional_pairs(conn, snapshot)
+    parallel = additional["smugri4_vro_est"]
+    for key in ("files", "units"):
+        parallel[key] += mono["smugri4_vro_est"][key]
+    return {**results, **additional}

@@ -20,7 +20,7 @@ modal deploy modal_app.py
 The public database uses `/data/south_estonian_public.db`. It can be installed
 alongside the earlier dataset. Existing GiellaLT artifacts live in
 `/data/giella-share`. The data packaging and upload paths validate the public database before publication.
-The default is the noncommercial `data-v3-nc` edition. The deploy command
+The default is the noncommercial `data-v4-nc` edition. The deploy command
 downloads the selected dataset when its release tag changes. Set
 `VRO_DATA_TAG=data-v2` for the earlier edition.
 

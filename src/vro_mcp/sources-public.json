@@ -112,5 +112,88 @@
     "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
     "provider_import": true,
     "changes": "Selected and deduplicated provider glossary groups, preserved phrase forms and variants, and indexed normalized lookup keys."
+  },
+  "smugri4_ilo": {
+    "kind": "corpus",
+    "title": "Võro and Seto fiction (SMUGRI-4 ilo)",
+    "credit": "Original authors, Sulev Iva, and the TartuNLP SMUGRI-4 team",
+    "url": "https://huggingface.co/datasets/tartuNLP/smugri4-data/tree/902597137be2310f03f5b33292cb01c7585d639b/vro/mono/ilo",
+    "license": "CC-BY-NC-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "provider_import": true,
+    "changes": "Indexed nonduplicate text units and used publisher metadata to identify explicitly Seto works."
+  },
+  "smugri4_setomaa_archive": {
+    "kind": "corpus",
+    "title": "Setomaa 2006–2013 (SMUGRI-4 edition)",
+    "credit": "Original article authors, Kaur Männamaa, Sulev Iva, and the TartuNLP SMUGRI-4 team",
+    "url": "https://huggingface.co/datasets/tartuNLP/smugri4-data/tree/902597137be2310f03f5b33292cb01c7585d639b/vro/mono/setomaa",
+    "license": "CC-BY-NC-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "provider_import": true,
+    "changes": "Indexed provider Seto text units and deduplicated against the public corpus."
+  },
+  "smugri4_vro_est": {
+    "kind": "corpus",
+    "title": "Võro parallel corpus (SMUGRI-4 vro-est)",
+    "credit": "Original authors and translators, Sulev Iva, and the TartuNLP SMUGRI-4 team",
+    "url": "https://huggingface.co/datasets/tartuNLP/smugri4-data/tree/902597137be2310f03f5b33292cb01c7585d639b/vro/multi/vro-est",
+    "license": "CC-BY-NC-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "provider_import": true,
+    "changes": "Indexed distinct paired lines with matching boundaries. Kept other published pairs at document level.",
+    "translation_engine": "smugri4-vro-est",
+    "translation_targets": [
+      "et",
+      "en"
+    ],
+    "provider_urls": [
+      "https://huggingface.co/datasets/tartuNLP/smugri4-data/tree/902597137be2310f03f5b33292cb01c7585d639b/vro/multi/vro-est",
+      "https://huggingface.co/datasets/tartuNLP/smugri4-data/tree/902597137be2310f03f5b33292cb01c7585d639b/vro/mono/vro-est"
+    ]
+  },
+  "smugri4_cifu_appeal": {
+    "kind": "corpus",
+    "title": "CIFU appeal on South Estonian (SMUGRI-4 edition)",
+    "credit": "CIFU appeal authors and translators, and the TartuNLP SMUGRI-4 team",
+    "url": "https://huggingface.co/datasets/tartuNLP/smugri4-data/tree/902597137be2310f03f5b33292cb01c7585d639b/vro/multi/cifu_poordamine",
+    "license": "CC-BY-NC-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "provider_import": true,
+    "changes": "Preserved and indexed the provider’s multilingual sections.",
+    "translation_engine": "smugri4-cifu",
+    "translation_targets": [
+      "et",
+      "en",
+      "de"
+    ]
+  },
+  "smugri4_mulgi_dictionary": {
+    "kind": "corpus",
+    "title": "Mulgi dictionary usage examples (SMUGRI-4 mes1)",
+    "credit": "Eesti Keele Instituut, the original dictionary compilers, and the TartuNLP SMUGRI-4 team",
+    "url": "https://huggingface.co/datasets/tartuNLP/smugri4-data/tree/902597137be2310f03f5b33292cb01c7585d639b/eesti_murded/mulgi/multi/eki_dictionary",
+    "license": "CC-BY-NC-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "provider_import": true,
+    "changes": "Indexed dictionary examples and provider glosses as contextual pairs.",
+    "translation_engine": "smugri4-eki-dictionary",
+    "translation_targets": [
+      "et"
+    ]
+  },
+  "smugri4_seto_dictionary": {
+    "kind": "corpus",
+    "title": "Seto dictionary usage examples (SMUGRI-4 sto1)",
+    "credit": "Eesti Keele Instituut, the original dictionary compilers, and the TartuNLP SMUGRI-4 team",
+    "url": "https://huggingface.co/datasets/tartuNLP/smugri4-data/tree/902597137be2310f03f5b33292cb01c7585d639b/eesti_murded/setu/multi/eki_dictionary",
+    "license": "CC-BY-NC-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "provider_import": true,
+    "changes": "Indexed dictionary examples and provider glosses as contextual pairs. Omitted four previously flagged glosses.",
+    "translation_engine": "smugri4-eki-dictionary",
+    "translation_targets": [
+      "et"
+    ]
   }
 }

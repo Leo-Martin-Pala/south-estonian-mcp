@@ -53,6 +53,15 @@ def _snippet_char_limit(value: int | None) -> int:
     return max(MIN_SNIPPET_CHARS, min(int(value), MAX_SNIPPET_CHARS))
 
 
+def _document_excerpt(text: str, query: str, limit: int = MAX_SNIPPET_CHARS) -> str:
+    if len(text) <= limit:
+        return text
+    match = re.search(re.escape(query), text, re.IGNORECASE)
+    start = max(0, match.start() - limit // 3) if match else 0
+    end = start + limit - 2
+    return ("…" if start else "") + text[start:end].strip() + ("…" if end < len(text) else "")
+
+
 def normalize_public_direction(value: str | None) -> str | None:
     if value is None:
         return None
@@ -1265,7 +1274,9 @@ class SouthEstonianStore:
                     return
                 if norm_lang and lang != norm_lang:
                     return
-            if snippet_limit is not None and len(snippet) > snippet_limit:
+            if unit_level == "document":
+                snippet = _document_excerpt(snippet, cleaned, snippet_limit or MAX_SNIPPET_CHARS)
+            elif snippet_limit is not None and len(snippet) > snippet_limit:
                 snippet = snippet[:snippet_limit].rstrip() + "…"
             ex: dict[str, Any] = {
                 "unit_id": uid,
@@ -1492,7 +1503,7 @@ class SouthEstonianStore:
                     "lang": ulang,
                     "unit_level": ulevel,
                     "source_slug": s_slug,
-                    "text": txt,
+                    "text": _document_excerpt(txt, query) if ulevel == "document" else txt,
                     "match": item_meta["match"],
                     **self._corpus_attribution(conn, s_slug, doc_id),
                 }
@@ -1752,8 +1763,9 @@ class SouthEstonianStore:
                     "unit_id": uid,
                     "lang": ulang,
                     "target_lang": tgt_lang,
-                    "source_text": src_txt,
-                    "translated_text": tr_txt,
+                    "unit_level": ulevel,
+                    "source_text": _document_excerpt(src_txt, query) if ulevel == "document" else src_txt,
+                    "translated_text": _document_excerpt(tr_txt, query) if ulevel == "document" else tr_txt,
                     "origin": origin,
                     "source_slug": s_slug,
                     "channels": info["channels"],
