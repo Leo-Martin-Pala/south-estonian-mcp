@@ -10,17 +10,18 @@ import os
 import sqlite3
 import tempfile
 import xml.etree.ElementTree as ET
-from collections import Counter, defaultdict
+from collections import defaultdict
 from contextlib import closing
 from pathlib import Path
 
 import libsql
 
 from import_smugri4 import import_smugri4
+from public_website_scrapes import import_website_scrapes, website_page_credits
+from public_word_bag import rebuild_word_frequencies
 
-from vro_mcp.db import PUBLIC_SOURCES, _norm_gloss, normalize_db_text
+from vro_mcp.db import PUBLIC_SOURCES, _norm_gloss
 from vro_mcp.public_data import APPLICATION_ID, verify_public_data
-from vro_mcp.tokenization import tokenize
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = PUBLIC_SOURCES
@@ -149,23 +150,6 @@ def document_credits(output, wiki_paths, metadata_paths):
     )
 
 
-def rebuild_word_frequencies(output):
-    counts = defaultdict(Counter)
-    for lang, text in output.execute("""
-        SELECT lang, text FROM corpus_units AS unit
-        WHERE unit_level = 'sentence' OR NOT EXISTS (
-            SELECT 1 FROM corpus_units
-            WHERE doc_id = unit.doc_id AND unit_level = 'sentence'
-        ) AND unit_level = 'paragraph'
-    """).fetchall():
-        counts[lang].update(word.lower() for word in tokenize(text))
-    output.executemany(
-        "INSERT INTO word_frequencies (lang, lookup_key, form, freq) VALUES (?, ?, ?, ?)",
-        [(lang, key, word, count) for lang, forms in counts.items()
-         for word, count in sorted(forms.items()) if (key := normalize_db_text(word))],
-    )
-
-
 def rebuild_cognates(output):
     output.execute("""
         INSERT INTO dict_cognates (concept_key, concept_lang, lang, entry_rowid, headword, pos, definition_text)
@@ -191,14 +175,15 @@ def rebuild_cognates(output):
     """)
 
 
-def build(source_path, output_path, wiki_paths, metadata_paths, publisher_parallel, estonian_ids, smugri_root=None):
+def build(source_path, output_path, wiki_paths, metadata_paths, publisher_parallel, estonian_ids,
+          smugri_root=None, website_corpus_root=None):
     with closing(sqlite3.connect(source_path.resolve().as_uri() + "?mode=ro", uri=True)) as source:
         # All reads and coverage counts see the same source snapshot.
         source.execute("BEGIN")
         with closing(libsql.connect(str(output_path))) as output:
             output.executescript((ROOT / "scripts/public_data_schema.sql").read_text())
             for slug, policy in SOURCES.items():
-                if policy.get("provider_import"):
+                if policy.get("provider_import") or policy.get("website_scrape"):
                     continue
                 if policy["kind"] == "corpus":
                     copy_rows(source, output, "corpus_units", "source_slug = ?", (slug,))
@@ -223,8 +208,13 @@ def build(source_path, output_path, wiki_paths, metadata_paths, publisher_parall
             document_credits(output, wiki_paths, metadata_paths)
             if smugri_root:
                 print("smugri4", json.dumps(import_smugri4(output, smugri_root)))
+            website_pages = website_page_credits(website_corpus_root, source) if website_corpus_root else {}
+            if website_corpus_root:
+                print("website scrapes", json.dumps(import_website_scrapes(source, output, website_pages)))
 
             for slug, policy in SOURCES.items():
+                if policy.get("website_scrape"):
+                    continue
                 langs = set()
                 counts = []
                 for table, from_sql in (
@@ -240,7 +230,7 @@ def build(source_path, output_path, wiki_paths, metadata_paths, publisher_parall
                     output.execute("INSERT INTO sources VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                                    (slug, json.dumps(sorted(langs)), *counts, policy["title"], policy["url"], policy["license"]))
 
-            rebuild_word_frequencies(output)
+            rebuild_word_frequencies(output, source, website_pages)
             rebuild_cognates(output)
             output.execute("INSERT INTO dict_fts (headword, definition_text, lang, entry_rowid) "
                            "SELECT e.headword, coalesce(d.definition_text, ''), e.lang, e.id "
@@ -269,6 +259,8 @@ def main():
     parser.add_argument("--publisher-parallel", type=Path, help="Licensed publisher archive of paired .vro.txt and .et.txt files")
     parser.add_argument("--estonian-ids", type=Path, help="CC BY 4.0 Estonian IDS wordlist TSV")
     parser.add_argument("--smugri-root", type=Path, help="Optional pinned TartuNLP Git snapshot for the noncommercial edition")
+    parser.add_argument("--website-corpus-root", type=Path,
+                        help="Include text backed by the corpus workspace's captured HTML pages")
     parser.add_argument("--output", type=Path, default=ROOT / "data/south_estonian_public.db")
     args = parser.parse_args()
 
@@ -278,7 +270,8 @@ def main():
     target.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=target.parent) as work:
         staged = Path(work) / target.name
-        build(args.source, staged, args.wiki_dump, args.documents, args.publisher_parallel, args.estonian_ids, args.smugri_root)
+        build(args.source, staged, args.wiki_dump, args.documents, args.publisher_parallel,
+              args.estonian_ids, args.smugri_root, args.website_corpus_root)
         verify_public_data(staged)
         os.replace(staged, target)
 

@@ -53,6 +53,25 @@ Public dictionary phrase entries total
 95,180, unchanged from v3. Independent acquisitions of newspaper,
 dictionary, and Facebook text retain their separate rights status.
 
+## HTML website text and expanded word frequencies (data-v5-nc)
+
+This release adds 7,973 text units from 1,399 documents
+across 25 website and blog sources. Their source records use `unknown`
+for redistribution terms. Every document has a URL backed by a saved HTML
+capture and is searchable through the corpus index. The Mulgimaa portal
+rescrape contributes 284 units from 63 documents. The legacy Mulgimaa local
+file collection is excluded from the website text and the word frequencies.
+The source manifest and bundled notice identify the terms for each source.
+
+The public database can serve pooled counts from the unified and public
+corpora across all seven varieties. A form is included when it occurs in
+at least two documents. The builder uses the finest available text units
+for each document and counts matching text units shared by the two
+databases once. Website input must have a verified HTML capture. The table
+stores word forms and counts, with no links to
+individual documents or usage examples. Some input sources have unknown
+redistribution terms. The bundled notice records this for the aggregate.
+
 ## v2 baseline and private comparison
 
 The public build uses licenses and public-domain notices that support
@@ -98,8 +117,9 @@ through full-text search.
 
 - **Väike murdesõnastik.** EKI distributes the exact electronic text and
   locality files on its reuse downloads page. The local import points to the
-  same `vms.t` source. The public build includes 12,509 entries with EKI credit
-  under the site's standard CC BY 4.0 terms.
+  same `vms.t` source. The dictionary's row on EKI's downloads page carries
+  the Public Domain Mark 1.0. The public build includes 12,509 entries and
+  retains EKI as the source.
   [EKI reuse terms](https://arhiiv.eki.ee/litsents/)
   [Edition download](https://arhiiv.eki.ee/litsents/vaba/dl.cgi?D=vms)
 - **Mulk muigas.** DIGAR marks the exact 2021 edition Public Domain. This

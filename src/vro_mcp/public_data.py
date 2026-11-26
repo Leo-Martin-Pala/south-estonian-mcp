@@ -15,6 +15,9 @@ def render_notice(path: Path) -> str:
     sources = json.loads(SOURCES_FILE.read_text(encoding="utf-8"))
     with closing(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)) as conn:
         included = {row[0] for row in conn.execute("SELECT source_slug FROM sources")}
+        aggregate_word_bag = conn.execute(
+            "SELECT 1 FROM sqlite_schema WHERE type='table' AND name='word_frequency_metadata'"
+        ).fetchone()
     noncommercial = any(sources[slug]["license"] == "CC-BY-NC-SA-4.0" for slug in included)
     sections = [
         "South Estonian MCP public dataset",
@@ -29,12 +32,31 @@ def render_notice(path: Path) -> str:
             "See LICENSE and https://creativecommons.org/licenses/by-sa/4.0/."
         ),
     ]
+    if aggregate_word_bag:
+        sections.append(
+            "Word frequencies are pooled counts of individual forms found in at least two "
+            "documents across the unified South Estonian corpus and the public corpus. "
+            "Website input is limited to extracted text from captured HTML pages. Some inputs have "
+            "unknown redistribution terms. The word-frequency table contains "
+            "aggregate counts and omits document links, examples, and source text."
+        )
+    if any(sources[slug].get("website_scrape") for slug in included):
+        sections.append(
+            "The direct website sources contain extracted HTML page text. "
+            "Sources marked unknown have no redistribution grant on record. "
+            "The licenses stated elsewhere in this notice apply to their named sources. "
+            "Original authors and site publishers retain their applicable rights."
+        )
     for slug, source in sources.items():
         if slug not in included:
             continue
+        terms = (
+            f"{source['license']} — {source['license_url']}" if source["license_url"]
+            else "Redistribution terms: unknown"
+        )
         sections.append(
             f"{source['title']} ({slug})\n{source['credit']}\n"
-            f"{source['url']}\n{source['license']} — {source['license_url']}\n"
+            f"{source['url']}\n{terms}\n"
             f"Changes: {source['changes']}"
         )
     return "\n\n".join(sections) + "\n"
@@ -52,6 +74,9 @@ def verify_public_data(path: Path) -> None:
             if slugs - allowed:
                 raise ValueError(f"Unapproved sources in {table}: {sorted(slugs - allowed)}")
         for slug, license_name in conn.execute("SELECT source_slug, license FROM sources"):
+            # Older release archives used EKI's general download label for this edition.
+            if (slug, license_name) == ("eki_vms_dictionary", "CC-BY-4.0"):
+                continue
             if slug not in sources or sources[slug]["license"] != license_name:
                 raise ValueError(f"Unapproved source metadata for {slug}")
         for table in ("dict_definitions", "dict_examples", "dict_inflections", "dict_cognates", "dict_fts"):

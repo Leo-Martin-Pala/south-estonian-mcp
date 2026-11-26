@@ -68,8 +68,8 @@
     "title": "Väike murdesõnastik",
     "credit": "Eesti Keele Instituut, Väike murdesõnastik I–II (1982/1989), electronic edition",
     "url": "https://arhiiv.eki.ee/litsents/vaba/dl.cgi?D=vms",
-    "license": "CC-BY-4.0",
-    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "license": "Public Domain",
+    "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
     "changes": "Selected entries attested in South Estonian locations, normalized lookup keys and retained locality evidence. EKI lists the source on its reuse downloads page (https://arhiiv.eki.ee/litsents/)."
   },
   "smugri4_umaleht": {
@@ -195,5 +195,255 @@
     "translation_targets": [
       "et"
     ]
+  },
+  "aabits_mulgimaa": {
+    "kind": "corpus",
+    "title": "Mulgi aabits",
+    "credit": "Original authors and site publishers",
+    "url": "https://aabits.mulgimaa.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "haanimaa": {
+    "kind": "corpus",
+    "title": "Haanimaa",
+    "credit": "Original authors and site publishers",
+    "url": "https://haanimaa.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "harmavorguq": {
+    "kind": "corpus",
+    "title": "Härmävõrgoq blog",
+    "credit": "Original authors and site publishers",
+    "url": "https://harmavorguq.blogspot.com/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "helyait": {
+    "kind": "corpus",
+    "title": "Helüait",
+    "credit": "Original authors and site publishers",
+    "url": "https://xn--helait-5ya.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "keelepesa_haanimaa": {
+    "kind": "corpus",
+    "title": "Haanimaa keelepesä",
+    "credit": "Original authors and site publishers",
+    "url": "https://keelepesa.haanimaa.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "kogukond_setomaa": {
+    "kind": "corpus",
+    "title": "Setomaa kogukond",
+    "credit": "Original authors and site publishers",
+    "url": "https://kogukond.setomaa.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "laulutii_wp": {
+    "kind": "corpus",
+    "title": "Laulutii",
+    "credit": "Original authors and site publishers",
+    "url": "https://laulutii.wordpress.com/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "liinatsuraq": {
+    "kind": "corpus",
+    "title": "Liinatsuraq (wayback)",
+    "credit": "Original authors and site publishers",
+    "url": "https://web.archive.org/web/20041009161647/http://www.liinatsuraq.ee:80/plaat.html",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "luulelennud_blog": {
+    "kind": "corpus",
+    "title": "Luulelennud blog",
+    "credit": "Original authors and site publishers",
+    "url": "https://luulelennud.blogspot.com/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "mihkelsoon": {
+    "kind": "corpus",
+    "title": "Mihkel Soon",
+    "credit": "Original authors and site publishers",
+    "url": "https://mihkelsoon.com/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "mulgimaa_rescrape": {
+    "kind": "corpus",
+    "title": "Mulgimaa portaal (rescrape)",
+    "credit": "Original authors and site publishers",
+    "url": "https://mki.mulgimaa.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "savvusann": {
+    "kind": "corpus",
+    "title": "Savvusann",
+    "credit": "Original authors and site publishers",
+    "url": "https://savvusann.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "setoinstituut": {
+    "kind": "corpus",
+    "title": "Seto Instituut",
+    "credit": "Original authors and site publishers",
+    "url": "https://www.setoinstituut.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "setomaa_portal": {
+    "kind": "corpus",
+    "title": "Setomaa portaal",
+    "credit": "Original authors and site publishers",
+    "url": "https://kogukond.setomaa.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "taarkatare": {
+    "kind": "corpus",
+    "title": "Taarka Tarõ (wayback)",
+    "credit": "Original authors and site publishers",
+    "url": "https://web.archive.org/web/20190915155325/http://taarkatare.com/utskord-oll/kirmasost-maaselitsast-ja-paastust/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "tallinnavoruselts": {
+    "kind": "corpus",
+    "title": "Tallinna Võru Selts",
+    "credit": "Original authors and site publishers",
+    "url": "https://tallinnavoruselts.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "umakiil": {
+    "kind": "corpus",
+    "title": "Uma Kiil",
+    "credit": "Original authors and site publishers",
+    "url": "https://umakiil.eu/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "umapido": {
+    "kind": "corpus",
+    "title": "Uma Pido",
+    "credit": "Original authors and site publishers",
+    "url": "https://umapido.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "umapido_wp": {
+    "kind": "corpus",
+    "title": "Uma Pido (Wordpress)",
+    "credit": "Original authors and site publishers",
+    "url": "https://umapido.wordpress.com/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "vanavorumaamuuseumid": {
+    "kind": "corpus",
+    "title": "Vana-Võromaa muuseumid",
+    "credit": "Original authors and site publishers",
+    "url": "https://vanavorumaamuuseumid.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "visitsetomaa": {
+    "kind": "corpus",
+    "title": "Visit Setomaa",
+    "credit": "Original authors and site publishers",
+    "url": "https://visitsetomaa.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "vorokiil_blog": {
+    "kind": "corpus",
+    "title": "Võro kiil blog",
+    "credit": "Original authors and site publishers",
+    "url": "https://vorokiil.blogspot.com/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "vorokongress": {
+    "kind": "corpus",
+    "title": "Võro Kongress",
+    "credit": "Original authors and site publishers",
+    "url": "https://vorokongress.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "voroselts": {
+    "kind": "corpus",
+    "title": "Võro Selts",
+    "credit": "Original authors and site publishers",
+    "url": "https://voroselts.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
+  },
+  "wi_ee": {
+    "kind": "corpus",
+    "title": "Võro Instituut (wi.ee)",
+    "credit": "Original authors and site publishers",
+    "url": "https://wi.ee/",
+    "license": "unknown",
+    "license_url": null,
+    "website_scrape": true,
+    "changes": "Extracted and segmented text from captured HTML pages."
   }
 }

@@ -138,12 +138,14 @@ def source_attribution(slug: str, url: str | None = None) -> dict[str, str]:
     source = PUBLIC_SOURCES.get(slug)
     if not source:
         return {}
-    return {
+    attribution = {
         "source_url": url or source["url"],
         "license": source["license"],
-        "license_url": source["license_url"],
         "credit": source["credit"],
     }
+    if source["license_url"]:
+        attribution["license_url"] = source["license_url"]
+    return attribution
 
 
 def _rank_dict_entry(
